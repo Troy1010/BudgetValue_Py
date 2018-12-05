@@ -1,31 +1,25 @@
-import tkinter as TK
+import tkinter as tk
 import tkinter.filedialog  # noqa
 from tkinter import ttk as FancyTK
-import pickle
+import sqlite3
 # Globals
 LARGE_FONT = ("Verdana", 12)
 
 
-class BudgetValueApp_Data():
-    pass
-
-
-class BudgetValueApp(TK.Tk):
-    vBudgetValueApp_Data = BudgetValueApp_Data()
+class BudgetValueApp(tk.Tk):
+    vConnection = sqlite3.connect("SpendingsHistory")
 
     def __init__(self, *args, **kwargs):
-        TK.Tk.__init__(self, *args, **kwargs)
-        TK.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
-        TK.Tk.wm_title(self, "Budget Value")
-
-        container = TK.Frame(self)
+        tk.Tk.__init__(self, *args, **kwargs)
+        tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
+        tk.Tk.wm_title(self, "Budget Value")
 
         cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
         self.cTabButtons = {}
-
+        container = tk.Frame(self)
         for i, vPage in enumerate(cTabPages):
-            vButton = TK.Button(container, text=vPage.__name__,
+            vButton = tk.Button(container, text=vPage.__name__,
                                 command=lambda vPage=vPage: self.ShowTab(vPage))
             self.cTabButtons[vPage] = vButton
             vButton.grid(row=0, column=i, sticky="nsew")
@@ -59,25 +53,24 @@ class BudgetValueApp(TK.Tk):
         frame.tkraise()
 
 
-def LoadHistory():
-    vFile = TK.filedialog.askopenfile()
+def ImportHistory():
+    vFile = tk.filedialog.askopenfile()
     print(vFile)
 
 
-class SpendingHistory(TK.Frame):
+class SpendingHistory(tk.Frame):
     def __init__(self, parent, controller):
-        TK.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Spending History", font=LARGE_FONT)
-        vLabel.pack(pady=10, padx=10)
+        tk.Frame.__init__(self, parent)
 
-        vButton_LoadHistory = FancyTK.Button(self, text="Upload History",
-                                             command=lambda: LoadHistory())
-        vButton_LoadHistory.pack()
+        for i in range(5):
+            for j in range(5):
+                b = tk.Entry(self, state="readonly")
+                b.grid(row=i, column=j)
 
 
-class PaycheckPlan(TK.Frame):
+class PaycheckPlan(tk.Frame):
     def __init__(self, parent, controller):
-        TK.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Paycheck Plan", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
@@ -86,9 +79,9 @@ class PaycheckPlan(TK.Frame):
         vButton1.pack()
 
 
-class NetWorth(TK.Frame):
+class NetWorth(tk.Frame):
     def __init__(self, parent, controller):
-        TK.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Net Worth", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
@@ -97,9 +90,9 @@ class NetWorth(TK.Frame):
         vButton1.pack()
 
 
-class Spendables(TK.Frame):
+class Spendables(tk.Frame):
     def __init__(self, parent, controller):
-        TK.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Spendables", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
@@ -108,9 +101,9 @@ class Spendables(TK.Frame):
         vButton1.pack()
 
 
-class Reports(TK.Frame):
+class Reports(tk.Frame):
     def __init__(self, parent, controller):
-        TK.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Reports", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
