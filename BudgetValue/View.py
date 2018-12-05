@@ -59,6 +59,7 @@ class SpendingHistory(tk.Frame):
             self, text="Import Spendings History", command=self.ImportHistory)
         vButton1.grid(columnspan=5, sticky='W')
 
+        # vModel.connection.cursor().execute()
         for i in range(5):
             for j in range(5):
                 b = tk.Entry(self, state="readonly")

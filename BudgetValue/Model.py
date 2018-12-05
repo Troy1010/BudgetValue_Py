@@ -3,10 +3,13 @@ import sqlite3
 import pandas
 import TM_CommonPy as TM  # noqa
 import os
+from pathlib import Path
 
 
 class BudgetValueModel():
-    connection = sqlite3.connect("SpendingsHistory.db")
+    sPath = str(Path.home()) + "/Documents/BudgetValue/SpendingsHistory.db"
+    TM.TryMkdir(os.path.dirname(sPath))
+    connection = sqlite3.connect(sPath)
 
     def ImportHistory(self, sFilePath):
         sheet = pandas.read_csv(sFilePath)
