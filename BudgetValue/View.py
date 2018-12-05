@@ -25,9 +25,7 @@ class BudgetValueView(tk.Tk):
             self.cTabButtons[vPage] = vButton
             vButton.grid(row=0, column=i)
 
-        # fill to limits, expand beyond limits
         container.pack(side="top", fill="both", expand=False)
-        # 0 is minimum, weight is sorta priority
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
@@ -36,7 +34,6 @@ class BudgetValueView(tk.Tk):
         for F in cTabPages:
             frame = F(container, self)
             self.frames[F] = frame
-            # NorthSouthEastWest alignment and stretch
             frame.grid(row=1, columnspan=len(cTabPages), sticky="nsew")
 
         self.ShowTab(SpendingHistory)

@@ -10,9 +10,9 @@ class BudgetValueModel():
 
     def ImportHistory(self, sFilePath):
         sheet = pandas.read_csv(sFilePath)
+        sName = os.path.basename(sFilePath)
         try:
-            sheet.to_sql(os.path.basename(sFilePath),
-                         self.connection, index=False)
+            sheet.to_sql(sName, self.connection, index=False)
         except ValueError:
-            BVLog.debug("already exists sheet:" + str(sheet))
+            BVLog.debug("Sheet already exists:" + sName)
         self.connection.commit()
