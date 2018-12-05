@@ -1,10 +1,7 @@
 import tkinter as TK
 from tkinter import ttk as FancyTK
-import matplotlib
 # Globals
 LARGE_FONT = ("Verdana", 12)
-
-matplotlib.use("TkAgg")
 
 
 class BudgetValueApp(TK.Tk):
@@ -14,6 +11,14 @@ class BudgetValueApp(TK.Tk):
 
         container = TK.Frame(self)
 
+        cPageList = (SpendingHistory, PaycheckPlan, NetWorth,
+                     Spendables, Reports, TestFrame)
+
+        for i, vPage in enumerate(cPageList):
+            vButton = FancyTK.Button(container, text=vPage.__name__,
+                                     command=lambda vPage=vPage: self.show_frame(vPage))
+            vButton.grid(row=0, column=i, sticky="nsew")
+
         # fill to limits, expand beyond limits
         container.pack(side="top", fill="both", expand=True)
         # 0 is minimum, weight is sorta priority
@@ -22,11 +27,11 @@ class BudgetValueApp(TK.Tk):
 
         self.frames = {}
 
-        for F in (SpendingHistory, PaycheckPlan, NetWorth, Spendables, Reports, TestFrame):
+        for F in cPageList:
             frame = F(container, self)
             self.frames[F] = frame
             # NorthSouthEastWest alignment and stretch
-            frame.grid(row=0, column=0, sticky="nsew")
+            frame.grid(row=1, columnspan=len(cPageList), sticky="nsew")
 
         self.show_frame(SpendingHistory)
 
@@ -41,8 +46,6 @@ class TestFrame(TK.Frame):
         vLabel = FancyTK.Label(self, text="Test Frame", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
-        #menubar = TK.Menu(controller)
-        # self.config(menu=menubar)
         vButton1 = FancyTK.Button(self, text="Spending History",
                                   command=lambda: controller.show_frame(SpendingHistory))
         vButton1.pack()
