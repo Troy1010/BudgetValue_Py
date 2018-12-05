@@ -1,0 +1,17 @@
+Tasks
+	Spending History
+		Upload history
+		Catagorize
+			add a spend
+			edit a spend
+	Paycheck Plan
+		Edit
+	Net Worth
+		Edit
+Results
+	Spendables
+		Override
+	Reports
+
+User sets up Paycheck Plan
+User uploads NetWorth
