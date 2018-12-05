@@ -2,6 +2,7 @@
 **/TestWorkspace*
 
 
+*.db
 .vs
 .vscode
 *.pyproj
