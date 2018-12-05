@@ -1,5 +1,5 @@
 import tkinter as TK
-import tkinter.filedialog
+import tkinter.filedialog  # noqa
 from tkinter import ttk as FancyTK
 # Globals
 LARGE_FONT = ("Verdana", 12)
@@ -9,7 +9,7 @@ class BudgetValueApp(TK.Tk):
     def __init__(self, *args, **kwargs):
         TK.Tk.__init__(self, *args, **kwargs)
         TK.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
-        self.winfo_toplevel().title = "Budget Value"
+        TK.Tk.wm_title(self, "Budget Value")
 
         container = TK.Frame(self)
 
@@ -43,7 +43,8 @@ class BudgetValueApp(TK.Tk):
 
 
 def LoadHistory():
-    vFilename = TK.filedialog.askopenfile()
+    vFile = TK.filedialog.askopenfile()
+    print(vFile)
 
 
 class SpendingHistory(TK.Frame):
