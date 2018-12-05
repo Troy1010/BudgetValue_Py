@@ -7,7 +7,7 @@ LARGE_FONT = ("Verdana", 12)
 
 
 class BudgetValueApp(tk.Tk):
-    vConnection = sqlite3.connect("SpendingsHistory")
+    vConnection = sqlite3.connect("SpendingsHistory.db")
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -19,7 +19,7 @@ class BudgetValueApp(tk.Tk):
         self.cTabButtons = {}
         container = tk.Frame(self)
         for i, vPage in enumerate(cTabPages):
-            vButton = tk.Button(container, text=vPage.__name__,
+            vButton = tk.Button(container, text=vPage.__name__, width=15,
                                 command=lambda vPage=vPage: self.ShowTab(vPage))
             self.cTabButtons[vPage] = vButton
             vButton.grid(row=0, column=i, sticky="nsew")
@@ -42,13 +42,13 @@ class BudgetValueApp(tk.Tk):
 
     def ResetTabButtonColors(self):
         for vButton in self.cTabButtons.values():
-            vButton.configure(background='SystemButtonFace')
+            vButton.configure(background='grey')
 
     def ShowTab(self, controller):
         frame = self.frames[controller]
         # Highlight current tab
         self.ResetTabButtonColors()
-        self.cTabButtons[controller].configure(background='grey')
+        self.cTabButtons[controller].configure(background='SystemButtonFace')
         #
         frame.tkraise()
 
