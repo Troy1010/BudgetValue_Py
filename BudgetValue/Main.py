@@ -1,4 +1,5 @@
 import tkinter as TK
+import tkinter.filedialog
 from tkinter import ttk as FancyTK
 # Globals
 LARGE_FONT = ("Verdana", 12)
@@ -8,11 +9,12 @@ class BudgetValueApp(TK.Tk):
     def __init__(self, *args, **kwargs):
         TK.Tk.__init__(self, *args, **kwargs)
         TK.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
+        self.winfo_toplevel().title = "Budget Value"
 
         container = TK.Frame(self)
 
         cPageList = (SpendingHistory, PaycheckPlan, NetWorth,
-                     Spendables, Reports, TestFrame)
+                     Spendables, Reports)
 
         for i, vPage in enumerate(cPageList):
             vButton = FancyTK.Button(container, text=vPage.__name__,
@@ -40,15 +42,8 @@ class BudgetValueApp(TK.Tk):
         frame.tkraise()
 
 
-class TestFrame(TK.Frame):
-    def __init__(self, parent, controller):
-        TK.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Test Frame", font=LARGE_FONT)
-        vLabel.pack(pady=10, padx=10)
-
-        vButton1 = FancyTK.Button(self, text="Spending History",
-                                  command=lambda: controller.show_frame(SpendingHistory))
-        vButton1.pack()
+def LoadHistory():
+    vFilename = TK.filedialog.askopenfile()
 
 
 class SpendingHistory(TK.Frame):
@@ -57,25 +52,9 @@ class SpendingHistory(TK.Frame):
         vLabel = FancyTK.Label(self, text="Spending History", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Paycheck Plan",
-                                  command=lambda: controller.show_frame(PaycheckPlan))
-        vButton1.pack()
-
-        vButton1 = FancyTK.Button(self, text="NetWorth",
-                                  command=lambda: controller.show_frame(NetWorth))
-        vButton1.pack()
-
-        vButton1 = FancyTK.Button(self, text="Spendables",
-                                  command=lambda: controller.show_frame(Spendables))
-        vButton1.pack()
-
-        vButton1 = FancyTK.Button(self, text="Reports",
-                                  command=lambda: controller.show_frame(Reports))
-        vButton1.pack()
-
-        vButton1 = FancyTK.Button(self, text="TestFrame",
-                                  command=lambda: controller.show_frame(TestFrame))
-        vButton1.pack()
+        vButton_LoadHistory = FancyTK.Button(self, text="Upload History",
+                                             command=lambda: LoadHistory())
+        vButton_LoadHistory.pack()
 
 
 class PaycheckPlan(TK.Frame):
