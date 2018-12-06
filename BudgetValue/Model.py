@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 
-class BudgetValueModel():
+class Model():
     sPath = str(Path.home()) + "/Documents/BudgetValue/SpendingsHistory.db"
     TM.TryMkdir(os.path.dirname(sPath))
     connection = sqlite3.connect(sPath)

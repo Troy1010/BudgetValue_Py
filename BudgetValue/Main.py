@@ -1,5 +1,5 @@
 import BudgetValue
 
 
-app = BudgetValue.BudgetValueView()
+app = BudgetValue.View()
 app.mainloop()

@@ -1,4 +1,4 @@
-from .Model import BudgetValueModel
-from .View import BudgetValueView
+from .Model import Model
+from .View import View
 
-__all__ = ['BudgetValueView', 'BudgetValueModel']
+__all__ = ['View', 'Model']

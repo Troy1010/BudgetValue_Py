@@ -6,10 +6,10 @@ import TM_CommonPy as TM  # noqa
 import BudgetValue
 # Globals
 LARGE_FONT = ("Verdana", 12)
-vModel = BudgetValue.BudgetValueModel()
+vModel = BudgetValue.Model()
 
 
-class BudgetValueView(tk.Tk):
+class View(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
@@ -59,13 +59,12 @@ class SpendingHistory(tk.Frame):
             self, text="Import Spendings History", command=self.ImportHistory)
         vButton1.grid(columnspan=5, sticky='W')
 
-        # vModel.connection.cursor().execute()
         for i in range(5):
             for j in range(5):
                 b = tk.Entry(self, state="readonly")
                 b.grid(row=i + 1, column=j)
 
-    def ImportHistory(self):
+    def ImportHistory(controller):
         vFile = tk.filedialog.askopenfile()
         vModel.ImportHistory(vFile.name)
 
