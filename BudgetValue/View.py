@@ -5,15 +5,15 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 # Globals
-LARGE_FONT = ("Verdana", 12)
-TEXT_FONT = ("Calibri", 10)
+FONT_LARGE = ("Verdana", 12)
+FONT_TEXT = ("Calibri", 10)
+FONT_TEXT_BOLD = ("Calibri", 10, "bold")
 
 
 class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
-        #tk.Tk.wm_title(self, "Budget Value")
+        self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('700x800')
 
@@ -128,7 +128,7 @@ class SpendingHistory(tk.Frame):
             cursor.execute("SELECT * FROM 'transactions.csv'")
             names = [description[0] for description in cursor.description]
             for j, vItem in enumerate(names):
-                cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
+                cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
                 if j < len(row) - 1:
                     cColWidths[j] = min(30, cColWidths[j])
             # Display table
@@ -137,7 +137,7 @@ class SpendingHistory(tk.Frame):
             #names = list(map(lambda x: x[0], cursor.description))
             names = [description[0] for description in cursor.description]
             for j, vItem in enumerate(names):
-                b = tk.Text(vTableFrame, font=TEXT_FONT,
+                b = tk.Text(vTableFrame, font=FONT_TEXT_BOLD,
                             borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                 b.insert(1.0, vItem)
                 b.grid(row=0, column=j)
@@ -147,7 +147,7 @@ class SpendingHistory(tk.Frame):
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
-                    b = tk.Text(vTableFrame, font=TEXT_FONT,
+                    b = tk.Text(vTableFrame, font=FONT_TEXT,
                                 borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
                     b.grid(row=i + 1, column=j)
@@ -167,7 +167,7 @@ class SpendingHistory(tk.Frame):
 class PaycheckPlan(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Paycheck Plan", font=LARGE_FONT)
+        vLabel = FancyTK.Label(self, text="Paycheck Plan", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = FancyTK.Button(self, text="Spending History",)
@@ -177,7 +177,7 @@ class PaycheckPlan(tk.Frame):
 class NetWorth(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Net Worth", font=LARGE_FONT)
+        vLabel = FancyTK.Label(self, text="Net Worth", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = FancyTK.Button(self, text="Spending History",)
@@ -187,7 +187,7 @@ class NetWorth(tk.Frame):
 class Spendables(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Spendables", font=LARGE_FONT)
+        vLabel = FancyTK.Label(self, text="Spendables", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = FancyTK.Button(self, text="Spending History",)
@@ -197,7 +197,7 @@ class Spendables(tk.Frame):
 class Reports(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Reports", font=LARGE_FONT)
+        vLabel = FancyTK.Label(self, text="Reports", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = FancyTK.Button(self, text="Spending History",)
