@@ -18,13 +18,13 @@ class View(tk.Tk):
         # MenuBar
         vMenuBar = tk.Menu(self)
         self.config(menu=vMenuBar)
-        vFileMenu = tk.Menu(vMenuBar)
+        vFileMenu = tk.Menu(vMenuBar, tearoff=False)
         vFileMenu.add_command(label="Import Spending History",
                               command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
         vMenuBar.add_cascade(label="File", menu=vFileMenu)
-        vEditMenu = tk.Menu(vMenuBar)
+        vEditMenu = tk.Menu(vMenuBar, tearoff=False)
         vMenuBar.add_cascade(label="Edit", menu=vEditMenu)
-        vSettingsMenu = tk.Menu(vMenuBar)
+        vSettingsMenu = tk.Menu(vMenuBar, tearoff=False)
         vSettingsMenu.add_command(label="Preferences..")
         vMenuBar.add_cascade(label="Settings", menu=vSettingsMenu)
         # Tab Page Container
