@@ -28,7 +28,7 @@ class View(tk.Tk):
         vTabPageContainer.grid_rowconfigure(0, weight=1)
         vTabPageContainer.grid_columnconfigure(0, weight=1)
         for vPage in cTabPages:
-            frame = vPage(vTabPageContainer, self, vModel)
+            frame = vPage(vTabPageContainer, vModel)
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
@@ -75,19 +75,18 @@ class TabBar(tk.Frame):
 
 
 class SpendingHistory(tk.Frame):
-    def __init__(self, parent, controller, vModel):
+    def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         # ImportHistory button
         vButton_ImportHistory = FancyTK.Button(self, text="Import Spending History",
                                                command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
         vButton_ImportHistory.pack(side=tk.TOP, anchor='w')
         # Table
-        vTable = self.Table(self, controller, vModel)
+        vTable = self.Table(self, vModel)
         vTable.pack(side=tk.LEFT, anchor='w', expand=True, fill="both")
         # Scrollbar
         vScrollbar = tk.Scrollbar(self)
         vScrollbar.pack(side=tk.LEFT, anchor='w', fill="y")
-        #
         vTable.config(yscrollcommand=vScrollbar.set)
         vScrollbar.config(command=vTable.yview)
 
@@ -98,7 +97,7 @@ class SpendingHistory(tk.Frame):
             vModel.ImportHistory(vFile.name)
 
     class Table(tk.Canvas):
-        def __init__(self, parent, controller, vModel):
+        def __init__(self, parent, vModel):
             tk.Canvas.__init__(self, parent)
             vTableFrame = tk.Frame(self)
             self.create_window((0, 0), window=vTableFrame, anchor='nw')
@@ -115,8 +114,6 @@ class SpendingHistory(tk.Frame):
             # Display table
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
-                if i > 15:
-                    break
                 for j, vItem in enumerate(row):
                     b = tk.Label(vTableFrame, text=str(vItem),
                                  borderwidth=2, width=cColWidths[j], relief='ridge', anchor='w')
@@ -128,44 +125,40 @@ class SpendingHistory(tk.Frame):
 
 
 class PaycheckPlan(tk.Frame):
-    def __init__(self, parent, controller, vModel):
+    def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Paycheck Plan", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",
-                                  command=lambda: controller.ShowTab(SpendingHistory))
+        vButton1 = FancyTK.Button(self, text="Spending History",)
         vButton1.pack()
 
 
 class NetWorth(tk.Frame):
-    def __init__(self, parent, controller, vModel):
+    def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Net Worth", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",
-                                  command=lambda: controller.ShowTab(SpendingHistory))
+        vButton1 = FancyTK.Button(self, text="Spending History",)
         vButton1.pack()
 
 
 class Spendables(tk.Frame):
-    def __init__(self, parent, controller, vModel):
+    def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Spendables", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",
-                                  command=lambda: controller.ShowTab(SpendingHistory))
+        vButton1 = FancyTK.Button(self, text="Spending History",)
         vButton1.pack()
 
 
 class Reports(tk.Frame):
-    def __init__(self, parent, controller, vModel):
+    def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Reports", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",
-                                  command=lambda: controller.ShowTab(SpendingHistory))
+        vButton1 = FancyTK.Button(self, text="Spending History",)
         vButton1.pack()
