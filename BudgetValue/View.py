@@ -36,9 +36,9 @@ class View(tk.Tk):
                                expand=True, fill="both")
         vTabPageContainer.grid_rowconfigure(0, weight=1)
         vTabPageContainer.grid_columnconfigure(0, weight=1)
-        for F in cTabPages:
-            frame = F(vTabPageContainer, self, vModel)
-            vTabBar.cTabPageFrames[F] = frame
+        for vPage in cTabPages:
+            frame = vPage(vTabPageContainer, self, vModel)
+            vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
         vTabBar.ShowTab(SpendingHistory)
@@ -49,9 +49,7 @@ class TabBar(tk.Frame):
 
     def __init__(self, parent, controller, vModel, cTabPages):
         tk.Frame.__init__(self, parent)
-
         self.cTabButtons = {}
-
         for i, vPage in enumerate(cTabPages):
             vButton = tk.Button(self, text=vPage.__name__, width=15,
                                 command=lambda vPage=vPage: self.ShowTab(vPage))
