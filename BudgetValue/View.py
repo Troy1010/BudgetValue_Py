@@ -16,7 +16,17 @@ class View(tk.Tk):
         cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
-
+        vMenuBar = tk.Menu(self)
+        self.config(menu=vMenuBar)
+        vFileMenu = tk.Menu(vMenuBar)
+        vFileMenu.add_command(label="Import Spending History",
+                              command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
+        vMenuBar.add_cascade(label="File", menu=vFileMenu)
+        vEditMenu = tk.Menu(vMenuBar)
+        vMenuBar.add_cascade(label="Edit", menu=vEditMenu)
+        vSettingsMenu = tk.Menu(vMenuBar)
+        vSettingsMenu.add_command(label="Preferences..")
+        vMenuBar.add_cascade(label="Settings", menu=vSettingsMenu)
         # Tab Page Container
         vTabPageContainer = tk.Frame(self)
         vTabPageContainer.grid(row=1, stick="nsew")
@@ -64,21 +74,22 @@ class TabBar(tk.Frame):
 class SpendingHistory(tk.Frame):
     def __init__(self, parent, controller, vModel):
         tk.Frame.__init__(self, parent)
-        self.vModel = vModel
 
         vButton1 = FancyTK.Button(
-            self, text="Import Spendings History", command=self.ImportHistory)
+            self, text="Import Spending History", command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
         vButton1.grid(columnspan=5, sticky='W')
 
+        # Spending History Table
         for i in range(5):
             for j in range(5):
                 b = tk.Entry(self, state="readonly")
                 b.grid(row=i + 1, column=j)
 
-    def ImportHistory(self):
+    @staticmethod
+    def ImportHistory(vModel):
         vFile = tk.filedialog.askopenfile()
         if vFile is not None:
-            self.vModel.ImportHistory(vFile.name)
+            vModel.ImportHistory(vFile.name)
 
 
 class PaycheckPlan(tk.Frame):
