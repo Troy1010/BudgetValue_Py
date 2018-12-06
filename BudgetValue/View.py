@@ -27,19 +27,19 @@ class View(tk.Tk):
         vSettingsMenu = tk.Menu(vMenuBar, tearoff=False)
         vSettingsMenu.add_command(label="Preferences..")
         vMenuBar.add_cascade(label="Settings", menu=vSettingsMenu)
+        # TabBar
+        vTabBar = TabBar(self, self, vModel, cTabPages)
+        vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
         # Tab Page Container
-        vTabPageContainer = tk.Frame(self)
-        vTabPageContainer.grid(row=1, stick="nsew")
+        vTabPageContainer = tk.Frame(self, borderwidth=2)
+        vTabPageContainer.pack(side=tk.TOP, anchor='nw',
+                               expand=True, fill="both")
         vTabPageContainer.grid_rowconfigure(0, weight=1)
         vTabPageContainer.grid_columnconfigure(0, weight=1)
-        # TabBar
-        vTabBar = TabBar(vTabPageContainer, self, vModel, cTabPages)
-        vTabBar.grid(row=0, stick="nsew")
-        # Tab Pages
         for F in cTabPages:
             frame = F(vTabPageContainer, self, vModel)
             vTabBar.cTabPageFrames[F] = frame
-            frame.grid(row=1, sticky="nsew")
+            frame.grid(row=0, sticky="nsew")
 
         vTabBar.ShowTab(SpendingHistory)
 
