@@ -14,6 +14,8 @@ class View(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         tk.Tk.wm_title(self, "Budget Value")
+        self.geometry('700x800')
+        # win.geometry('200x100')
 
         cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
@@ -111,8 +113,9 @@ class SpendingHistory(tk.Frame):
             cColWidths = {}
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
-                    cColWidths[j] = min(
-                        30, max(cColWidths.get(j, 0), len(str(vItem))))
+                    cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
+                    if j < len(row) - 1:
+                        cColWidths[j] = min(30, cColWidths[j])
             # Display table
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
