@@ -5,46 +5,55 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 # Globals
 LARGE_FONT = ("Verdana", 12)
-vModel = None  # There must be a better way..
 
 
 class View(tk.Tk):
-    def __init__(self, vModel2, *args, **kwargs):
-        global vModel
-        vModel = vModel2
+    def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         tk.Tk.wm_title(self, "Budget Value")
 
         cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
+        # MenuBar
+
+        # Tab Page Container
+        vTabPageContainer = tk.Frame(self)
+        vTabPageContainer.grid(row=1, stick="nsew")
+        vTabPageContainer.grid_rowconfigure(0, weight=1)
+        vTabPageContainer.grid_columnconfigure(0, weight=1)
+        # TabBar
+        vTabBar = TabBar(vTabPageContainer, self, vModel, cTabPages)
+        vTabBar.grid(row=0, stick="nsew")
+        # Tab Pages
+        for F in cTabPages:
+            frame = F(vTabPageContainer, self, vModel)
+            vTabBar.cTabPageFrames[F] = frame
+            frame.grid(row=1, sticky="nsew")
+
+        vTabBar.ShowTab(SpendingHistory)
+
+
+class TabBar(tk.Frame):
+    cTabPageFrames = {}
+
+    def __init__(self, parent, controller, vModel, cTabPages):
+        tk.Frame.__init__(self, parent)
+
         self.cTabButtons = {}
-        container = tk.Frame(self)
+
         for i, vPage in enumerate(cTabPages):
-            vButton = tk.Button(container, text=vPage.__name__, width=15,
+            vButton = tk.Button(self, text=vPage.__name__, width=15,
                                 command=lambda vPage=vPage: self.ShowTab(vPage))
             self.cTabButtons[vPage] = vButton
             vButton.grid(row=0, column=i)
-
-        container.pack(side="top", fill="both", expand=False)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-
-        for F in cTabPages:
-            frame = F(container, self)
-            self.frames[F] = frame
-            frame.grid(row=1, columnspan=len(cTabPages), sticky="nsew")
-
-        self.ShowTab(SpendingHistory)
 
     def ResetTabButtonColors(self):
         for vButton in self.cTabButtons.values():
             vButton.configure(background='grey')
 
     def ShowTab(self, controller):
-        frame = self.frames[controller]
+        frame = self.cTabPageFrames[controller]
         # Highlight current tab
         self.ResetTabButtonColors()
         self.cTabButtons[controller].configure(background='SystemButtonFace')
@@ -53,8 +62,9 @@ class View(tk.Tk):
 
 
 class SpendingHistory(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, vModel):
         tk.Frame.__init__(self, parent)
+        self.vModel = vModel
 
         vButton1 = FancyTK.Button(
             self, text="Import Spendings History", command=self.ImportHistory)
@@ -67,11 +77,12 @@ class SpendingHistory(tk.Frame):
 
     def ImportHistory(self):
         vFile = tk.filedialog.askopenfile()
-        vModel.ImportHistory(vFile.name)
+        if vFile is not None:
+            self.vModel.ImportHistory(vFile.name)
 
 
 class PaycheckPlan(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Paycheck Plan", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
@@ -82,7 +93,7 @@ class PaycheckPlan(tk.Frame):
 
 
 class NetWorth(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Net Worth", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
@@ -93,7 +104,7 @@ class NetWorth(tk.Frame):
 
 
 class Spendables(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Spendables", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
@@ -104,7 +115,7 @@ class Spendables(tk.Frame):
 
 
 class Reports(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = FancyTK.Label(self, text="Reports", font=LARGE_FONT)
         vLabel.pack(pady=10, padx=10)
