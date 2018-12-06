@@ -19,7 +19,7 @@ class View(tk.Tk):
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
         # TabBar
-        vTabBar = TabBar(self, self, vModel, cTabPages)
+        vTabBar = TabBar(self, vModel, cTabPages)
         vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
         # Tab Page Container
         vTabPageContainer = tk.Frame(self, borderwidth=2)
@@ -52,26 +52,26 @@ class MenuBar(tk.Menu):
 class TabBar(tk.Frame):
     cTabPageFrames = {}
 
-    def __init__(self, parent, controller, vModel, cTabPages):
+    def __init__(self, parent, vModel, cTabPages):
         tk.Frame.__init__(self, parent)
         self.cTabButtons = {}
-        for i, vPage in enumerate(cTabPages):
-            vButton = tk.Button(self, text=vPage.__name__, width=15,
-                                command=lambda vPage=vPage: self.ShowTab(vPage))
-            self.cTabButtons[vPage] = vButton
+        for i, vFrame in enumerate(cTabPages):
+            vButton = tk.Button(self, text=vFrame.__name__, width=15,
+                                command=lambda vFrame=vFrame: self.ShowTab(vFrame))
+            self.cTabButtons[vFrame] = vButton
             vButton.grid(row=0, column=i)
 
     def ResetTabButtonColors(self):
         for vButton in self.cTabButtons.values():
             vButton.configure(background='grey')
 
-    def ShowTab(self, controller):
-        frame = self.cTabPageFrames[controller]
+    def ShowTab(self, frame):
+        frameObj = self.cTabPageFrames[frame]
         # Highlight current tab
         self.ResetTabButtonColors()
-        self.cTabButtons[controller].configure(background='SystemButtonFace')
+        self.cTabButtons[frame].configure(background='SystemButtonFace')
         #
-        frame.tkraise()
+        frameObj.tkraise()
 
 
 class SpendingHistory(tk.Frame):
