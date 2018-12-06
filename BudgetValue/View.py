@@ -80,7 +80,7 @@ class SpendingHistory(tk.Frame):
         vButton_ImportHistory.pack(side=tk.TOP, anchor='w')
         # Table
         vTable = self.Table(self, controller, vModel)
-        vTable.pack(side=tk.LEFT, anchor='w')
+        vTable.pack(side=tk.LEFT, anchor='w', expand=True, fill="both")
         # Scrollbar
         vScrollbar = tk.Scrollbar(self)
         vScrollbar.pack(side=tk.LEFT, anchor='w', fill="y")
@@ -94,40 +94,34 @@ class SpendingHistory(tk.Frame):
         if vFile is not None:
             vModel.ImportHistory(vFile.name)
 
-    class TableFrame(tk.Frame):
-        def __init__(self, parent, controller, vModel):
-            tk.Frame.__init__(self, parent)
-            # Table
-            # vSpendingHistoryTable = SpendingHistory.Table(
-            #     self, controller, vModel)
-            # vSpendingHistoryTable.pack()
-            listbox = tk.Listbox(self)
-            listbox.pack()
-            for i in range(100):
-                listbox.insert(tk.END, i)
-            # Scrollbar
-            vScrollbar = tk.Scrollbar(self)
-            vScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            listbox.config(yscrollcommand=vScrollbar.set)
-            vScrollbar.config(command=listbox.yview)
-
     class Table(tk.Canvas):
         def __init__(self, parent, controller, vModel):
             tk.Canvas.__init__(self, parent)
+            vTableFrame = tk.Frame(self)
+            self.create_window((0, 0), window=vTableFrame, anchor='nw')
+            vTableFrame.bind("<Configure>", lambda event,
+                             canvas=self: self.onFrameConfigure())
             cursor = vModel.connection.cursor()
+            # Find cColWidths
             cursor.execute("SELECT * FROM 'transactions.csv'")
             cColWidths = {}
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
                     cColWidths[j] = min(
                         30, max(cColWidths.get(j, 0), len(str(vItem))))
-            print("cColWidths:" + str(cColWidths.values()))
+            # Display table
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
+                if i > 15:
+                    break
                 for j, vItem in enumerate(row):
-                    b = tk.Label(self, text=str(vItem),
+                    b = tk.Label(vTableFrame, text=str(vItem),
                                  borderwidth=2, width=cColWidths[j], relief='ridge', anchor='w')
                     b.grid(row=i, column=j)
+
+        def onFrameConfigure(self):
+            '''Reset the scroll region to encompass the inner frame'''
+            self.configure(scrollregion=self.bbox("all"))
 
 
 class PaycheckPlan(tk.Frame):
