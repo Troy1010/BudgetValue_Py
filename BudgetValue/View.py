@@ -5,6 +5,8 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 # Globals
 LARGE_FONT = ("Verdana", 12)
+#TEXT_FONT = ("Verdana", 10)
+TEXT_FONT = ("Calibri", 10)
 
 
 class View(tk.Tk):
@@ -115,9 +117,11 @@ class SpendingHistory(tk.Frame):
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
-                    b = tk.Label(vTableFrame, text=str(vItem),
-                                 borderwidth=2, width=cColWidths[j], relief='ridge', anchor='w')
+                    b = tk.Text(vTableFrame, font=TEXT_FONT,
+                                borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                    b.insert(1.0, str(vItem))
                     b.grid(row=i, column=j)
+                    b.configure(state="disabled")
 
         def onFrameConfigure(self):
             '''Reset the scroll region to encompass the inner frame'''
