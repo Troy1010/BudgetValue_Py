@@ -1,5 +1,6 @@
 import BudgetValue
 
 
-app = BudgetValue.View()
+vModel = BudgetValue.Model()
+app = BudgetValue.View(vModel)
 app.mainloop()

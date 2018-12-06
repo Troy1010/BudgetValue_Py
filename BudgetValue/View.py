@@ -3,14 +3,15 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk as FancyTK
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
-import BudgetValue
 # Globals
 LARGE_FONT = ("Verdana", 12)
-vModel = BudgetValue.Model()
+vModel = None  # There must be a better way..
 
 
 class View(tk.Tk):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, vModel2, *args, **kwargs):
+        global vModel
+        vModel = vModel2
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         tk.Tk.wm_title(self, "Budget Value")
@@ -64,7 +65,7 @@ class SpendingHistory(tk.Frame):
                 b = tk.Entry(self, state="readonly")
                 b.grid(row=i + 1, column=j)
 
-    def ImportHistory(controller):
+    def ImportHistory(self):
         vFile = tk.filedialog.askopenfile()
         vModel.ImportHistory(vFile.name)
 
