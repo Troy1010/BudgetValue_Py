@@ -16,17 +16,8 @@ class View(tk.Tk):
         cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
-        vMenuBar = tk.Menu(self)
+        vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
-        vFileMenu = tk.Menu(vMenuBar, tearoff=False)
-        vFileMenu.add_command(label="Import Spending History",
-                              command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
-        vMenuBar.add_cascade(label="File", menu=vFileMenu)
-        vEditMenu = tk.Menu(vMenuBar, tearoff=False)
-        vMenuBar.add_cascade(label="Edit", menu=vEditMenu)
-        vSettingsMenu = tk.Menu(vMenuBar, tearoff=False)
-        vSettingsMenu.add_command(label="Preferences..")
-        vMenuBar.add_cascade(label="Settings", menu=vSettingsMenu)
         # TabBar
         vTabBar = TabBar(self, self, vModel, cTabPages)
         vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
@@ -42,6 +33,20 @@ class View(tk.Tk):
             frame.grid(row=0, sticky="nsew")
 
         vTabBar.ShowTab(SpendingHistory)
+
+
+class MenuBar(tk.Menu):
+    def __init__(self, vModel):
+        tk.Menu.__init__(self)
+        vFileMenu = tk.Menu(self, tearoff=False)
+        vFileMenu.add_command(label="Import Spending History",
+                              command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
+        self.add_cascade(label="File", menu=vFileMenu)
+        vEditMenu = tk.Menu(self, tearoff=False)
+        self.add_cascade(label="Edit", menu=vEditMenu)
+        vSettingsMenu = tk.Menu(self, tearoff=False)
+        vSettingsMenu.add_command(label="Preferences..")
+        self.add_cascade(label="Settings", menu=vSettingsMenu)
 
 
 class TabBar(tk.Frame):
