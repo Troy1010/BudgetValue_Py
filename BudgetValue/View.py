@@ -6,7 +6,6 @@ import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 # Globals
 LARGE_FONT = ("Verdana", 12)
-#TEXT_FONT = ("Verdana", 10)
 TEXT_FONT = ("Calibri", 10)
 
 
@@ -14,9 +13,9 @@ class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
-        tk.Tk.wm_title(self, "Budget Value")
+        #tk.Tk.wm_title(self, "Budget Value")
+        self.title("Budget Value")
         self.geometry('700x800')
-        # win.geometry('200x100')
 
         cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
@@ -86,14 +85,23 @@ class SpendingHistory(tk.Frame):
         vButton_ImportHistory = FancyTK.Button(self, text="Import Spending History",
                                                command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
         vButton_ImportHistory.pack(side=tk.TOP, anchor='w')
-        # Table
-        vTable = self.Table(self, vModel)
-        vTable.pack(side=tk.LEFT, anchor='w', expand=True, fill="both")
-        # Scrollbar
-        vScrollbar = tk.Scrollbar(self)
-        vScrollbar.pack(side=tk.LEFT, anchor='w', fill="y")
-        vTable.config(yscrollcommand=vScrollbar.set)
-        vScrollbar.config(command=vTable.yview)
+        # TableFrame
+        vTableFrame = tk.Frame(self)
+        vTableFrame.pack(side=tk.LEFT, expand=True, fill="both")
+        vTableFrame.grid_rowconfigure(0, weight=1)
+        vTableFrame.grid_columnconfigure(0, weight=1)
+        #  Table
+        vTable = self.Table(vTableFrame, vModel)
+        vTable.grid(row=0, column=0, sticky="NSEW")
+        #  Scrollbars
+        vScrollbar_Y = tk.Scrollbar(vTableFrame)
+        vScrollbar_Y.grid(row=0, column=1, sticky="ns")
+        vTable.config(yscrollcommand=vScrollbar_Y.set)
+        vScrollbar_Y.config(command=vTable.yview)
+        vScrollbar_X = tk.Scrollbar(vTableFrame, orient=tk.HORIZONTAL)
+        vScrollbar_X.grid(row=1, column=0, sticky="ew")
+        vTable.config(xscrollcommand=vScrollbar_X.set)
+        vScrollbar_X.config(command=vTable.xview)
 
     @staticmethod
     def ImportHistory(vModel):
@@ -117,14 +125,32 @@ class SpendingHistory(tk.Frame):
                     cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
                     if j < len(row) - 1:
                         cColWidths[j] = min(30, cColWidths[j])
+            cursor.execute("SELECT * FROM 'transactions.csv'")
+            names = [description[0] for description in cursor.description]
+            for j, vItem in enumerate(names):
+                cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
+                if j < len(row) - 1:
+                    cColWidths[j] = min(30, cColWidths[j])
             # Display table
+            #  Headers
+            cursor.execute("SELECT * FROM 'transactions.csv'")
+            #names = list(map(lambda x: x[0], cursor.description))
+            names = [description[0] for description in cursor.description]
+            for j, vItem in enumerate(names):
+                b = tk.Text(vTableFrame, font=TEXT_FONT,
+                            borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                b.insert(1.0, vItem)
+                b.grid(row=0, column=j)
+                b.configure(state="disabled")
+
+            #  Cells
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
                     b = tk.Text(vTableFrame, font=TEXT_FONT,
                                 borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
-                    b.grid(row=i, column=j)
+                    b.grid(row=i + 1, column=j)
                     b.configure(state="disabled")
             # Make table mousewheelable
             for vWidget in BV.GetAllChildren(self):
