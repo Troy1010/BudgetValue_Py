@@ -3,6 +3,7 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk as FancyTK
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
+import BudgetValue as BV
 # Globals
 LARGE_FONT = ("Verdana", 12)
 #TEXT_FONT = ("Verdana", 10)
@@ -125,10 +126,16 @@ class SpendingHistory(tk.Frame):
                     b.insert(1.0, str(vItem))
                     b.grid(row=i, column=j)
                     b.configure(state="disabled")
+            # Make table mousewheelable
+            for vWidget in BV.GetAllChildren(self):
+                vWidget.bind("<MouseWheel>", self.onMousewheel)
 
         def onFrameConfigure(self):
             '''Reset the scroll region to encompass the inner frame'''
             self.configure(scrollregion=self.bbox("all"))
+
+        def onMousewheel(self, event):
+            self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
 class PaycheckPlan(tk.Frame):
