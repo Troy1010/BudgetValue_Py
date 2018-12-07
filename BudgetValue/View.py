@@ -117,40 +117,33 @@ class SpendingHistory(tk.Frame):
             tk.Canvas.__init__(self, parent)
 
             cursor = vModel.connection.cursor()
+            cursor.execute("SELECT * FROM 'transactions.csv'")
+            headers = [description[0] for description in cursor.description]
+            cursor = list(cursor)
 
-            # Make Window scrollable
+            # Assign Window to Canvas
             vTableWindow = tk.Frame(self)
             self.create_window((0, 0), window=vTableWindow, anchor='nw')
-            vTableWindow.bind("<Configure>", lambda event,
-                              canvas=self: self.onFrameConfigure())
-            # Find cColWidths
-            cursor.execute("SELECT * FROM 'transactions.csv'")
+            # Display table
+            #  Determine cColWidths
             cColWidths = {}
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
                     cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
                     if j < len(row) - 1:
                         cColWidths[j] = min(30, cColWidths[j])
-            cursor.execute("SELECT * FROM 'transactions.csv'")
-            names = [description[0] for description in cursor.description]
-            for j, vItem in enumerate(names):
+            for j, vItem in enumerate(headers):
                 cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
                 if j < len(row) - 1:
                     cColWidths[j] = min(30, cColWidths[j])
-            # Display table
             #  Headers
-            cursor.execute("SELECT * FROM 'transactions.csv'")
-            #names = list(map(lambda x: x[0], cursor.description))
-            names = [description[0] for description in cursor.description]
-            for j, vItem in enumerate(names):
+            for j, vItem in enumerate(headers):
                 b = tk.Text(vTableWindow, font=FONT_TEXT_BOLD,
                             borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                 b.insert(1.0, vItem)
                 b.grid(row=0, column=j)
                 b.configure(state="disabled")
-
             #  Cells
-            cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
                     b = tk.Text(vTableWindow, font=FONT_TEXT,
@@ -158,7 +151,9 @@ class SpendingHistory(tk.Frame):
                     b.insert(1.0, str(vItem))
                     b.grid(row=i + 1, column=j)
                     b.configure(state="disabled")
-            # Make table mousewheelable
+            # Make Window scrollable
+            vTableWindow.bind("<Configure>", lambda event,
+                              canvas=self: self.onFrameConfigure())
             for vWidget in BV.GetAllChildren(self):
                 vWidget.bind("<MouseWheel>", self.onMousewheel)
 
