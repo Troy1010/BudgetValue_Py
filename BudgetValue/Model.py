@@ -7,15 +7,33 @@ from pathlib import Path
 
 
 class Model():
-    sPath = str(Path.home()) + "/Documents/BudgetValue/SpendingsHistory.db"
-    TM.TryMkdir(os.path.dirname(sPath))
-    connection = sqlite3.connect(sPath)
+    def __init__(self):
+        self.sPath = str(Path.home()) \
+            + "/Documents/BudgetValue/SpendingsHistory.db"
+        TM.TryMkdir(os.path.dirname(self.sPath))
+        self.connection = sqlite3.connect(self.sPath)
+        self.SpendingHistory = SpendingHistory(self)
 
-    def ImportHistory(self, sFilePath):
+
+class SpendingHistory():
+    def __init__(self, vModel):
+        self.vModel = vModel
+
+    def Import(self, sFilePath):
         sheet = pandas.read_csv(sFilePath)
         sName = os.path.basename(sFilePath)
         try:
-            sheet.to_sql(sName, self.connection, index=False)
+            sheet.to_sql(sName, self.vModel.connection, index=False)
         except ValueError:
             BVLog.debug("Sheet already exists:" + sName)
-        self.connection.commit()
+        self.vModel.connection.commit()
+
+    def GetTable(self):
+        cursor = self.vModel.connection.cursor()
+        cursor.execute("SELECT * FROM 'transactions.csv'")
+        return cursor
+
+    def GetHeader(self):
+        cursor = self.vModel.connection.cursor()
+        cursor.execute("SELECT * FROM 'transactions.csv'")
+        return [description[0] for description in cursor.description]

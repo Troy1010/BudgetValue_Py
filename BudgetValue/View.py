@@ -4,6 +4,7 @@ from tkinter import ttk
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
+import itertools
 # Globals
 FONT_LARGE = ("Verdana", 12)
 FONT_TEXT = ("Calibri", 10)
@@ -90,9 +91,11 @@ class SpendingHistory(tk.Frame):
         vTableFrame.pack(side=tk.TOP, expand=True, fill="both")
         vTableFrame.grid_rowconfigure(1, weight=1)
         vTableFrame.grid_columnconfigure(0, weight=1)
+        #  Determine cColWidths
+        vTableFrame.cColWidths = self.GetColWidths(vModel)
         #  Header
         vHeader = self.Header(vTableFrame, vModel)
-        vHeader.grid(row=0, column=0)
+        vHeader.grid(row=0, column=0, sticky="NSEW")
         #  Table
         vTable = self.Table(vTableFrame, vModel)
         vTable.grid(row=1, column=0, sticky="NSEW")
@@ -110,62 +113,40 @@ class SpendingHistory(tk.Frame):
     def ImportHistory(vModel):
         vFile = tk.filedialog.askopenfile()
         if vFile is not None:
-            vModel.ImportHistory(vFile.name)
+            vModel.SpendingHistory.Import(vFile.name)
+
+    def GetColWidths(self, vModel):
+        cColWidths = {}
+        for row in itertools.chain([vModel.SpendingHistory.GetHeader()], vModel.SpendingHistory.GetTable()):
+            for j, vItem in enumerate(row):
+                cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
+                if j < len(row) - 1:
+                    cColWidths[j] = min(30, cColWidths[j])
+        return cColWidths
 
     class Header(tk.Frame):
         def __init__(self, parent, vModel):
             tk.Frame.__init__(self, parent)
-
-            cursor = vModel.connection.cursor()
-            cursor.execute("SELECT * FROM 'transactions.csv'")
-            header = [description[0] for description in cursor.description]
-            cursor = list(cursor)
-
-            # Determine cColWidths
-            cursor.append(header)
-            cColWidths = {}
-            for i, row in enumerate(cursor):
-                for j, vItem in enumerate(row):
-                    cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
-                    if j < len(row) - 1:
-                        cColWidths[j] = min(30, cColWidths[j])
-            cursor = cursor[:-1]
-            # Header
-            for j, vItem in enumerate(header):
+            for j, vItem in enumerate(vModel.SpendingHistory.GetHeader()):
                 b = tk.Text(self, font=FONT_TEXT_BOLD,
-                            borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                            borderwidth=2, width=parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                 b.insert(1.0, str(vItem))
-                b.grid(row=i + 1, column=j)
+                b.grid(row=0, column=j)
                 b.configure(state="disabled")
 
     class Table(tk.Canvas):
         def __init__(self, parent, vModel):
             tk.Canvas.__init__(self, parent)
-
-            cursor = vModel.connection.cursor()
-            cursor.execute("SELECT * FROM 'transactions.csv'")
-            header = [description[0] for description in cursor.description]
-            cursor = list(cursor)
-
             # Assign Windows to Canvas
             vTableWindow = tk.Frame(self)
             self.create_window((0, 0), window=vTableWindow, anchor='nw')
-            # Determine cColWidths
-            cursor.append(header)
-            cColWidths = {}
-            for i, row in enumerate(cursor):
-                for j, vItem in enumerate(row):
-                    cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
-                    if j < len(row) - 1:
-                        cColWidths[j] = min(30, cColWidths[j])
-            cursor = cursor[:-1]
             # Table
-            for i, row in enumerate(cursor):
+            for i, row in enumerate(vModel.SpendingHistory.GetTable()):
                 for j, vItem in enumerate(row):
                     b = tk.Text(vTableWindow, font=FONT_TEXT,
-                                borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                                borderwidth=2, width=parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
-                    b.grid(row=i + 1, column=j)
+                    b.grid(row=i, column=j)
                     b.configure(state="disabled")
             # Make Table scrollable
             vTableWindow.bind("<Configure>", lambda event,
