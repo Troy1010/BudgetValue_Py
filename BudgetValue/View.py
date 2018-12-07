@@ -85,24 +85,24 @@ class SpendingHistory(tk.Frame):
         vButton_ImportHistory = ttk.Button(self, text="Import Spending History",
                                            command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
         vButton_ImportHistory.pack(side=tk.TOP, anchor='w')
-        # Separator
-        vSeparator = ttk.Separator(self, orient=tk.HORIZONTAL)
-        vSeparator.pack(side=tk.TOP, expand=False, fill="x")
         # TableFrame
         vTableFrame = tk.Frame(self, background='lightgrey')
         vTableFrame.pack(side=tk.TOP, expand=True, fill="both")
-        vTableFrame.grid_rowconfigure(0, weight=1)
+        vTableFrame.grid_rowconfigure(1, weight=1)
         vTableFrame.grid_columnconfigure(0, weight=1)
+        #  Header
+        vHeader = self.Header(vTableFrame, vModel)
+        vHeader.grid(row=0, column=0)
         #  Table
         vTable = self.Table(vTableFrame, vModel)
-        vTable.grid(row=0, column=0, sticky="NSEW")
+        vTable.grid(row=1, column=0, sticky="NSEW")
         #  Scrollbars
         vScrollbar_Y = tk.Scrollbar(vTableFrame)
-        vScrollbar_Y.grid(row=0, column=1, sticky="ns")
+        vScrollbar_Y.grid(row=0, rowspan=2, column=1, sticky="ns")
         vTable.config(yscrollcommand=vScrollbar_Y.set)
         vScrollbar_Y.config(command=vTable.yview)
         vScrollbar_X = tk.Scrollbar(vTableFrame, orient=tk.HORIZONTAL)
-        vScrollbar_X.grid(row=1, column=0, sticky="ew")
+        vScrollbar_X.grid(row=2, column=0, sticky="ew")
         vTable.config(xscrollcommand=vScrollbar_X.set)
         vScrollbar_X.config(command=vTable.xview)
 
@@ -112,37 +112,62 @@ class SpendingHistory(tk.Frame):
         if vFile is not None:
             vModel.ImportHistory(vFile.name)
 
-    class Table(tk.Canvas):
+    class Header(tk.Frame):
         def __init__(self, parent, vModel):
-            tk.Canvas.__init__(self, parent)
+            tk.Frame.__init__(self, parent)
 
             cursor = vModel.connection.cursor()
             cursor.execute("SELECT * FROM 'transactions.csv'")
-            headers = [description[0] for description in cursor.description]
+            header = [description[0] for description in cursor.description]
             cursor = list(cursor)
-            cursor.insert(0, headers)
 
-            # Assign Window to Canvas
-            vTableWindow = tk.Frame(self)
-            self.create_window((0, 0), window=vTableWindow, anchor='nw')
-            # Display table
-            #  Determine cColWidths
+            # Determine cColWidths
+            cursor.append(header)
             cColWidths = {}
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
                     cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
                     if j < len(row) - 1:
                         cColWidths[j] = min(30, cColWidths[j])
-            #  Cells
+            cursor = cursor[:-1]
+            # Header
+            for j, vItem in enumerate(header):
+                b = tk.Text(self, font=FONT_TEXT_BOLD,
+                            borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                b.insert(1.0, str(vItem))
+                b.grid(row=i + 1, column=j)
+                b.configure(state="disabled")
+
+    class Table(tk.Canvas):
+        def __init__(self, parent, vModel):
+            tk.Canvas.__init__(self, parent)
+
+            cursor = vModel.connection.cursor()
+            cursor.execute("SELECT * FROM 'transactions.csv'")
+            header = [description[0] for description in cursor.description]
+            cursor = list(cursor)
+
+            # Assign Windows to Canvas
+            vTableWindow = tk.Frame(self)
+            self.create_window((0, 0), window=vTableWindow, anchor='nw')
+            # Determine cColWidths
+            cursor.append(header)
+            cColWidths = {}
             for i, row in enumerate(cursor):
-                vFont = FONT_TEXT_BOLD if i == 0 else FONT_TEXT
                 for j, vItem in enumerate(row):
-                    b = tk.Text(vTableWindow, font=vFont,
+                    cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
+                    if j < len(row) - 1:
+                        cColWidths[j] = min(30, cColWidths[j])
+            cursor = cursor[:-1]
+            # Table
+            for i, row in enumerate(cursor):
+                for j, vItem in enumerate(row):
+                    b = tk.Text(vTableWindow, font=FONT_TEXT,
                                 borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
                     b.grid(row=i + 1, column=j)
                     b.configure(state="disabled")
-            # Make Window scrollable
+            # Make Table scrollable
             vTableWindow.bind("<Configure>", lambda event,
                               canvas=self: self.onFrameConfigure())
             for vWidget in BV.GetAllChildren(self):
