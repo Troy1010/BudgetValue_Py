@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.filedialog  # noqa
-from tkinter import ttk as FancyTK
+from tkinter import ttk
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
@@ -82,12 +82,15 @@ class SpendingHistory(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         # ImportHistory button
-        vButton_ImportHistory = FancyTK.Button(self, text="Import Spending History",
-                                               command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
+        vButton_ImportHistory = ttk.Button(self, text="Import Spending History",
+                                           command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
         vButton_ImportHistory.pack(side=tk.TOP, anchor='w')
+        # Separator
+        vSeparator = ttk.Separator(self, orient=tk.HORIZONTAL)
+        vSeparator.pack(side=tk.TOP, expand=False, fill="x")
         # TableFrame
-        vTableFrame = tk.Frame(self)
-        vTableFrame.pack(side=tk.LEFT, expand=True, fill="both")
+        vTableFrame = tk.Frame(self, background='lightgrey')
+        vTableFrame.pack(side=tk.TOP, expand=True, fill="both")
         vTableFrame.grid_rowconfigure(0, weight=1)
         vTableFrame.grid_columnconfigure(0, weight=1)
         #  Table
@@ -167,38 +170,38 @@ class SpendingHistory(tk.Frame):
 class PaycheckPlan(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Paycheck Plan", font=FONT_LARGE)
+        vLabel = ttk.Label(self, text="Paycheck Plan", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",)
+        vButton1 = ttk.Button(self, text="Spending History",)
         vButton1.pack()
 
 
 class NetWorth(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Net Worth", font=FONT_LARGE)
+        vLabel = ttk.Label(self, text="Net Worth", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",)
+        vButton1 = ttk.Button(self, text="Spending History",)
         vButton1.pack()
 
 
 class Spendables(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Spendables", font=FONT_LARGE)
+        vLabel = ttk.Label(self, text="Spendables", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",)
+        vButton1 = ttk.Button(self, text="Spending History",)
         vButton1.pack()
 
 
 class Reports(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = FancyTK.Label(self, text="Reports", font=FONT_LARGE)
+        vLabel = ttk.Label(self, text="Reports", font=FONT_LARGE)
         vLabel.pack(pady=10, padx=10)
 
-        vButton1 = FancyTK.Button(self, text="Spending History",)
+        vButton1 = ttk.Button(self, text="Spending History",)
         vButton1.pack()
