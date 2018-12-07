@@ -108,9 +108,6 @@ class SpendingHistory(tk.Frame):
         vButton_ImportHistory = ttk.Button(vButtonFrame, text="Import Spending History",
                                            command=lambda self=self: self.ImportHistory())
         vButton_ImportHistory.pack(side=tk.LEFT, anchor='w')
-        vButton_Refresh = ttk.Button(vButtonFrame, text="Refresh",
-                                     command=lambda self=self: self.Table.Refresh(self.vTable))
-        vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def ImportHistory(self):
         # Prompt which file
