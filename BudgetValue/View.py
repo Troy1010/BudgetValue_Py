@@ -91,7 +91,6 @@ class SpendingHistory(tk.Frame):
         vTableFrame.pack(side=tk.TOP, expand=True, fill="both")
         vTableFrame.grid_rowconfigure(1, weight=1)
         vTableFrame.grid_columnconfigure(0, weight=1)
-        #  Determine cColWidths
         vTableFrame.cColWidths = self.GetColWidths(vModel)
         #  Header
         vHeader = self.Header(vTableFrame, vModel)
