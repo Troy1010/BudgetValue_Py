@@ -136,7 +136,7 @@ class SpendingHistory(tk.Frame):
     class Table(tk.Canvas):
         def __init__(self, parent, vModel):
             tk.Canvas.__init__(self, parent)
-            # Assign Windows to Canvas
+            # Assign TableWindow to Canvas
             vTableWindow = tk.Frame(self)
             self.create_window((0, 0), window=vTableWindow, anchor='nw')
             # Table
