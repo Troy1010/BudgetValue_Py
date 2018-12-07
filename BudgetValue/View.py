@@ -66,26 +66,23 @@ class TabBar(tk.Frame):
             self.cTabButtons[vFrame] = vButton
             vButton.grid(row=0, column=i)
 
-    def ResetTabButtonColors(self):
+    def HighlightButton(self, vButtonToHighlight):
         for vButton in self.cTabButtons.values():
-            vButton.configure(background='grey')
+            color = 'SystemButtonFace' if vButton == vButtonToHighlight else 'grey'
+            vButton.configure(background=color)
 
     def ShowTab(self, frame):
-        frameObj = self.cTabPageFrames[frame]
-        # Highlight current tab
-        self.ResetTabButtonColors()
-        self.cTabButtons[frame].configure(background='SystemButtonFace')
-        #
-        frameObj.tkraise()
+        self.HighlightButton(self.cTabButtons[frame])
+        self.cTabPageFrames[frame].tkraise()
 
 
 class SpendingHistory(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        # ImportHistory button
-        vButton_ImportHistory = ttk.Button(self, text="Import Spending History",
-                                           command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
-        vButton_ImportHistory.pack(side=tk.TOP, anchor='w')
+        self.vModel = vModel
+        # ButtonBar
+        vButtonFrame = tk.Frame(self)
+        vButtonFrame.pack(side=tk.TOP, anchor='w')
         # TableFrame
         vTableFrame = tk.Frame(self, background='lightgrey')
         vTableFrame.pack(side=tk.TOP, expand=True, fill="both")
@@ -96,23 +93,33 @@ class SpendingHistory(tk.Frame):
         vHeader = self.Header(vTableFrame, vModel)
         vHeader.grid(row=0, column=0, sticky="NSEW")
         #  Table
-        vTable = self.Table(vTableFrame, vModel)
-        vTable.grid(row=1, column=0, sticky="NSEW")
+        self.vTable = self.Table(vTableFrame, vModel)
+        self.vTable.grid(row=1, column=0, sticky="NSEW")
         #  Scrollbars
         vScrollbar_Y = tk.Scrollbar(vTableFrame)
         vScrollbar_Y.grid(row=0, rowspan=2, column=1, sticky="ns")
-        vTable.config(yscrollcommand=vScrollbar_Y.set)
-        vScrollbar_Y.config(command=vTable.yview)
+        self.vTable.config(yscrollcommand=vScrollbar_Y.set)
+        vScrollbar_Y.config(command=self.vTable.yview)
         vScrollbar_X = tk.Scrollbar(vTableFrame, orient=tk.HORIZONTAL)
         vScrollbar_X.grid(row=2, column=0, sticky="ew")
-        vTable.config(xscrollcommand=vScrollbar_X.set)
-        vScrollbar_X.config(command=vTable.xview)
+        self.vTable.config(xscrollcommand=vScrollbar_X.set)
+        vScrollbar_X.config(command=self.vTable.xview)
+        # ButtonBar - continued
+        vButton_ImportHistory = ttk.Button(vButtonFrame, text="Import Spending History",
+                                           command=lambda self=self: self.ImportHistory())
+        vButton_ImportHistory.pack(side=tk.LEFT, anchor='w')
+        vButton_Refresh = ttk.Button(vButtonFrame, text="Refresh",
+                                     command=lambda self=self: self.Table.Refresh(self.vTable))
+        vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
-    @staticmethod
-    def ImportHistory(vModel):
+    def ImportHistory(self):
+        # Prompt which file
         vFile = tk.filedialog.askopenfile()
+        # Import
         if vFile is not None:
-            vModel.SpendingHistory.Import(vFile.name)
+            self.vModel.SpendingHistory.Import(vFile.name)
+        # Refresh view
+        self.vTable.Refresh()
 
     def GetColWidths(self, vModel):
         cColWidths = {}
@@ -136,20 +143,32 @@ class SpendingHistory(tk.Frame):
     class Table(tk.Canvas):
         def __init__(self, parent, vModel):
             tk.Canvas.__init__(self, parent)
+            self.vModel = vModel
+            self.parent = parent
             # Assign TableWindow to Canvas
-            vTableWindow = tk.Frame(self)
-            self.create_window((0, 0), window=vTableWindow, anchor='nw')
+            self.vTableWindow = tk.Frame(self)
+            self.create_window((0, 0), window=self.vTableWindow, anchor='nw')
             # Table
-            for i, row in enumerate(vModel.SpendingHistory.GetTable()):
+            self.Refresh()
+
+        def Refresh(self):
+            # Remove old data
+            for vWidget in BV.GetAllChildren(self):
+                if 'tkinter.Text' in str(type(vWidget)):
+                    vWidget.grid_forget()
+                    vWidget.destroy()
+            # Place new data
+            for i, row in enumerate(self.vModel.SpendingHistory.GetTable()):
                 for j, vItem in enumerate(row):
-                    b = tk.Text(vTableWindow, font=FONT_TEXT,
-                                borderwidth=2, width=parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                    b = tk.Text(self.vTableWindow, font=FONT_TEXT,
+                                borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
                     b.grid(row=i, column=j)
                     b.configure(state="disabled")
-            # Make Table scrollable
-            vTableWindow.bind("<Configure>", lambda event,
-                              canvas=self: self.onFrameConfigure())
+            self.update_idletasks()
+            # Make scrollable
+            self.vTableWindow.bind("<Configure>", lambda event,
+                                   canvas=self: self.onFrameConfigure())
             for vWidget in BV.GetAllChildren(self):
                 vWidget.bind("<MouseWheel>", self.onMousewheel)
 
