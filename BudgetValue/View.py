@@ -120,6 +120,7 @@ class SpendingHistory(tk.Frame):
             cursor.execute("SELECT * FROM 'transactions.csv'")
             headers = [description[0] for description in cursor.description]
             cursor = list(cursor)
+            cursor.insert(0, headers)
 
             # Assign Window to Canvas
             vTableWindow = tk.Frame(self)
@@ -132,21 +133,11 @@ class SpendingHistory(tk.Frame):
                     cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)))
                     if j < len(row) - 1:
                         cColWidths[j] = min(30, cColWidths[j])
-            for j, vItem in enumerate(headers):
-                cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
-                if j < len(row) - 1:
-                    cColWidths[j] = min(30, cColWidths[j])
-            #  Headers
-            for j, vItem in enumerate(headers):
-                b = tk.Text(vTableWindow, font=FONT_TEXT_BOLD,
-                            borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
-                b.insert(1.0, vItem)
-                b.grid(row=0, column=j)
-                b.configure(state="disabled")
             #  Cells
             for i, row in enumerate(cursor):
+                vFont = FONT_TEXT_BOLD if i == 0 else FONT_TEXT
                 for j, vItem in enumerate(row):
-                    b = tk.Text(vTableWindow, font=FONT_TEXT,
+                    b = tk.Text(vTableWindow, font=vFont,
                                 borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
                     b.grid(row=i + 1, column=j)
