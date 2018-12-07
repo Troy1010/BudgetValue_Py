@@ -115,11 +115,14 @@ class SpendingHistory(tk.Frame):
     class Table(tk.Canvas):
         def __init__(self, parent, vModel):
             tk.Canvas.__init__(self, parent)
-            vTableFrame = tk.Frame(self)
-            self.create_window((0, 0), window=vTableFrame, anchor='nw')
-            vTableFrame.bind("<Configure>", lambda event,
-                             canvas=self: self.onFrameConfigure())
+
             cursor = vModel.connection.cursor()
+
+            # Make Window scrollable
+            vTableWindow = tk.Frame(self)
+            self.create_window((0, 0), window=vTableWindow, anchor='nw')
+            vTableWindow.bind("<Configure>", lambda event,
+                              canvas=self: self.onFrameConfigure())
             # Find cColWidths
             cursor.execute("SELECT * FROM 'transactions.csv'")
             cColWidths = {}
@@ -140,7 +143,7 @@ class SpendingHistory(tk.Frame):
             #names = list(map(lambda x: x[0], cursor.description))
             names = [description[0] for description in cursor.description]
             for j, vItem in enumerate(names):
-                b = tk.Text(vTableFrame, font=FONT_TEXT_BOLD,
+                b = tk.Text(vTableWindow, font=FONT_TEXT_BOLD,
                             borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                 b.insert(1.0, vItem)
                 b.grid(row=0, column=j)
@@ -150,7 +153,7 @@ class SpendingHistory(tk.Frame):
             cursor.execute("SELECT * FROM 'transactions.csv'")
             for i, row in enumerate(cursor):
                 for j, vItem in enumerate(row):
-                    b = tk.Text(vTableFrame, font=FONT_TEXT,
+                    b = tk.Text(vTableWindow, font=FONT_TEXT,
                                 borderwidth=2, width=cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
                     b.grid(row=i + 1, column=j)
