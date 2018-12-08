@@ -1,3 +1,4 @@
+
 import tkinter as tk
 import tkinter.filedialog  # noqa
 from tkinter import ttk
@@ -80,7 +81,7 @@ class SpendingHistory(tk.Frame):
                     vWidget.destroy()
             # Place new data
             for j, vItem in enumerate(self.vModel.SpendingHistory.GetHeader()):
-                b = tk.Text(self, font=Fonts.FONT_TEXT_BOLD,
+                b = tk.Text(self, font=Fonts.FONT_SMALL_BOLD,
                             borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                 b.insert(1.0, str(vItem))
                 b.grid(row=0, column=j)
@@ -104,7 +105,7 @@ class SpendingHistory(tk.Frame):
             # Place new data
             for i, row in enumerate(self.vModel.SpendingHistory.GetTable()):
                 for j, vItem in enumerate(row):
-                    b = tk.Text(self.vTableWindow, font=Fonts.FONT_TEXT,
+                    b = tk.Text(self.vTableWindow, font=Fonts.FONT_SMALL,
                                 borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                     b.insert(1.0, str(vItem))
                     b.grid(row=i, column=j)

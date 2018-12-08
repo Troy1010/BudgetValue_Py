@@ -1,5 +1,5 @@
 import BudgetValue.Model
-import BudgetValue.ViewModel  # noqa
+import BudgetValue.View  # noqa
 from .Misc import GetAllChildren
 
-__all__ = ['ViewModel', 'Model', 'GetAllChildren']
+__all__ = ['View', 'Model', 'GetAllChildren']

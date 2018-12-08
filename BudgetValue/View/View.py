@@ -1,20 +1,20 @@
+from BudgetValue._Logger import BVLog  # noqa
+import TM_CommonPy as TM  # noqa
 import tkinter as tk
 import tkinter.filedialog  # noqa
 from tkinter import ttk
-from BudgetValue._Logger import BVLog  # noqa
-import TM_CommonPy as TM  # noqa
-from .SpendingHistory import SpendingHistory
-from . import Fonts
+import BudgetValue as BV
+from BudgetValue.View import Fonts
 
 
-class ViewModel(tk.Tk):
+class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (SpendingHistory, PaycheckPlan, NetWorth,
+        cTabPages = (BV.View.SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
@@ -33,7 +33,7 @@ class ViewModel(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(SpendingHistory)
+        vTabBar.ShowTab(BV.View.SpendingHistory)
 
 
 class MenuBar(tk.Menu):
@@ -41,7 +41,7 @@ class MenuBar(tk.Menu):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
         vFileMenu.add_command(label="Import Spending History",
-                              command=lambda vModel=vModel: SpendingHistory.ImportHistory(vModel))
+                              command=lambda vModel=vModel: BV.View.SpendingHistory.ImportHistory(vModel))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)
@@ -75,7 +75,8 @@ class TabBar(tk.Frame):
 class PaycheckPlan(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = ttk.Label(self, text="Paycheck Plan", font=Fonts.FONT_MEDIUM)
+        vLabel = ttk.Label(self, text="Paycheck Plan",
+                           font=Fonts.FONT_MEDIUM)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = ttk.Button(self, text="Spending History",)
@@ -85,7 +86,8 @@ class PaycheckPlan(tk.Frame):
 class NetWorth(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = ttk.Label(self, text="Net Worth", font=Fonts.FONT_MEDIUM)
+        vLabel = ttk.Label(self, text="Net Worth",
+                           font=Fonts.FONT_MEDIUM)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = ttk.Button(self, text="Spending History",)
@@ -95,7 +97,8 @@ class NetWorth(tk.Frame):
 class Spendables(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = ttk.Label(self, text="Spendables", font=Fonts.FONT_MEDIUM)
+        vLabel = ttk.Label(self, text="Spendables",
+                           font=Fonts.FONT_MEDIUM)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = ttk.Button(self, text="Spending History",)
@@ -105,7 +108,8 @@ class Spendables(tk.Frame):
 class Reports(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
-        vLabel = ttk.Label(self, text="Reports", font=Fonts.FONT_MEDIUM)
+        vLabel = ttk.Label(self, text="Reports",
+                           font=Fonts.FONT_MEDIUM)
         vLabel.pack(pady=10, padx=10)
 
         vButton1 = ttk.Button(self, text="Spending History",)

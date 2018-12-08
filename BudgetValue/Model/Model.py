@@ -1,7 +1,6 @@
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
-import BudgetValue.Model  # noqa
 import sqlite3
 import os
 import pathlib
