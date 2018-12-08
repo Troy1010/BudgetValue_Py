@@ -23,10 +23,10 @@ class SpendingHistory(tk.Frame):
         self.vTableFrame.grid_columnconfigure(0, weight=1)
         self.vTableFrame.parent = self
         #  Header
-        self.vHeader = self.Header(self.vTableFrame, vModel)
+        self.vHeader = BV.View.SpendingHistory.Header(self.vTableFrame, vModel)
         self.vHeader.grid(row=0, column=0, sticky="NSEW")
         #  Table
-        self.vTable = self.Table(self.vTableFrame, vModel)
+        self.vTable = BV.View.SpendingHistory.Table(self.vTableFrame, vModel)
         self.vTable.grid(row=1, column=0, sticky="NSEW")
         #  Scrollbars
         vScrollbar_Y = tk.Scrollbar(self.vTableFrame)
@@ -131,8 +131,7 @@ class SpendingHistory(tk.Frame):
             self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
         def MakePopup_SelectCatagory(self, cell):
-            vPopup = SpendingHistory.Popup_SelectCatagory(
-                cell.parent)
+            vPopup = BV.View.SpendingHistory.Popup_SelectCatagory(cell.parent)
             vPopup.place(x=cell.winfo_x()
                          + cell.winfo_width(), y=cell.winfo_y())
             vPopup.tkraise()
