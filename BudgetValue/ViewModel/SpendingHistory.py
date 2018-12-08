@@ -1,0 +1,149 @@
+import tkinter as tk
+import tkinter.filedialog  # noqa
+from tkinter import ttk
+from BudgetValue._Logger import BVLog  # noqa
+import TM_CommonPy as TM  # noqa
+import BudgetValue as BV
+import itertools
+from . import Fonts
+
+
+class SpendingHistory(tk.Frame):
+    def __init__(self, parent, vModel):
+        tk.Frame.__init__(self, parent)
+        self.vModel = vModel
+        # ButtonBar
+        self.vButtonFrame = tk.Frame(self)
+        self.vButtonFrame.pack(side=tk.TOP, anchor='w')
+        # TableFrame
+        self.vTableFrame = tk.Frame(self, background='lightgrey')
+        self.vTableFrame.pack(side=tk.TOP, expand=True, fill="both")
+        self.vTableFrame.grid_rowconfigure(1, weight=1)
+        self.vTableFrame.grid_columnconfigure(0, weight=1)
+        self.vTableFrame.parent = self
+        #  Header
+        self.vHeader = self.Header(self.vTableFrame, vModel)
+        self.vHeader.grid(row=0, column=0, sticky="NSEW")
+        #  Table
+        self.vTable = self.Table(self.vTableFrame, vModel)
+        self.vTable.grid(row=1, column=0, sticky="NSEW")
+        #  Scrollbars
+        vScrollbar_Y = tk.Scrollbar(self.vTableFrame)
+        vScrollbar_Y.grid(row=0, rowspan=2, column=1, sticky="ns")
+        self.vTable.config(yscrollcommand=vScrollbar_Y.set)
+        vScrollbar_Y.config(command=self.vTable.yview)
+        vScrollbar_X = tk.Scrollbar(self.vTableFrame, orient=tk.HORIZONTAL)
+        vScrollbar_X.grid(row=2, column=0, sticky="ew")
+        self.vTable.config(xscrollcommand=vScrollbar_X.set)
+        vScrollbar_X.config(command=self.vTable.xview)
+        # ButtonBar - continued
+        vButton_ImportHistory = ttk.Button(self.vButtonFrame, text="Import Spending History",
+                                           command=lambda self=self: self.ImportHistory())
+        vButton_ImportHistory.pack(side=tk.LEFT, anchor='w')
+        #
+        self.Refresh()
+
+    def Refresh(self):
+        self.vTableFrame.cColWidths = self.GetColWidths(self.vModel)
+        self.vHeader.Refresh()
+        self.vTable.Refresh()
+
+    def ImportHistory(self):
+        # Prompt which file
+        vFile = tk.filedialog.askopenfile()
+        # Import
+        if vFile is not None:
+            self.vModel.SpendingHistory.Import(vFile.name)
+        # Refresh view
+        self.vTable.Refresh()
+
+    def GetColWidths(self, vModel):
+        cColWidths = {}
+        for row in itertools.chain([vModel.SpendingHistory.GetHeader()], vModel.SpendingHistory.GetTable()):
+            for j, vItem in enumerate(row):
+                cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
+                if j < len(row) - 1:
+                    cColWidths[j] = min(30, cColWidths[j])
+        return cColWidths
+
+    class Header(tk.Frame):
+        def __init__(self, parent, vModel):
+            tk.Frame.__init__(self, parent)
+            self.vModel = vModel
+            self.parent = parent
+
+        def Refresh(self):
+            # Remove old data
+            for vWidget in BV.GetAllChildren(self):
+                if 'tkinter.Text' in str(type(vWidget)):
+                    vWidget.grid_forget()
+                    vWidget.destroy()
+            # Place new data
+            for j, vItem in enumerate(self.vModel.SpendingHistory.GetHeader()):
+                b = tk.Text(self, font=Fonts.FONT_TEXT_BOLD,
+                            borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                b.insert(1.0, str(vItem))
+                b.grid(row=0, column=j)
+                b.configure(state="disabled")
+
+    class Table(tk.Canvas):
+        def __init__(self, parent, vModel):
+            tk.Canvas.__init__(self, parent)
+            self.vModel = vModel
+            self.parent = parent
+            # Assign TableWindow to Canvas
+            self.vTableWindow = tk.Frame(self)
+            self.create_window((0, 0), window=self.vTableWindow, anchor='nw')
+
+        def Refresh(self):
+            # Remove old data
+            for vWidget in BV.GetAllChildren(self):
+                if 'tkinter.Text' in str(type(vWidget)):
+                    vWidget.grid_forget()
+                    vWidget.destroy()
+            # Place new data
+            for i, row in enumerate(self.vModel.SpendingHistory.GetTable()):
+                for j, vItem in enumerate(row):
+                    b = tk.Text(self.vTableWindow, font=Fonts.FONT_TEXT,
+                                borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
+                    b.insert(1.0, str(vItem))
+                    b.grid(row=i, column=j)
+                    b.configure(state="disabled")
+                    b.parent = self
+            self.update_idletasks()
+            # Make scrollable
+            self.vTableWindow.bind(
+                "<Configure>", lambda event: self.onFrameConfigure())
+            for vWidget in BV.GetAllChildren(self, bIncludeRoot=True):
+                vWidget.bind("<MouseWheel>", self.onMousewheel)
+            # Popup - Select Catagory
+            for cell in self.vTableWindow.children.values():
+                if cell.grid_info()['column'] == 0:
+                    cell.bind(
+                        '<Button-1>', lambda event, cell=cell: self.MakePopup_SelectCatagory(cell))
+
+        def onFrameConfigure(self):
+            '''Reset the scroll region to encompass the inner frame'''
+            self.configure(scrollregion=self.bbox("all"))
+
+        def onMousewheel(self, event):
+            self.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        def MakePopup_SelectCatagory(self, cell):
+            vPopup = SpendingHistory.Popup_SelectCatagory(
+                cell.parent)
+            vPopup.place(x=cell.winfo_x()
+                         + cell.winfo_width(), y=cell.winfo_y())
+            vPopup.tkraise()
+
+    class Popup_SelectCatagory(tk.Frame):
+        previous_popup = None
+
+        def __init__(self, parent):
+            if self.__class__.previous_popup is not None:
+                self.__class__.previous_popup.destroy()
+            tk.Frame.__init__(self, parent)
+            self.__class__.previous_popup = self
+
+            b = tk.Button(self, text="Popip")
+            b.pack()
