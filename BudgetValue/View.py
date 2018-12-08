@@ -201,8 +201,8 @@ class SpendingHistory(tk.Frame):
         def MakePopup_SelectCatagory(self, cell):
             vPopup = SpendingHistory.Popup_SelectCatagory(
                 cell.parent)
-            vPopup.place(x=cell.winfo_x() +
-                         cell.winfo_width(), y=cell.winfo_y())
+            vPopup.place(x=cell.winfo_x()
+                         + cell.winfo_width(), y=cell.winfo_y())
             vPopup.tkraise()
 
     class Popup_SelectCatagory(tk.Frame):
