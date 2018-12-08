@@ -6,8 +6,12 @@ from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
 
+from .SpendingHistory.SpendingHistory import SpendingHistory
+
 
 class View(tk.Tk):
+    SpendingHistory = SpendingHistory
+
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
