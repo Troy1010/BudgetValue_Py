@@ -6,7 +6,7 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import itertools
-from . import Fonts
+from BudgetValue.View import Fonts
 
 
 class SpendingHistory(tk.Frame):
