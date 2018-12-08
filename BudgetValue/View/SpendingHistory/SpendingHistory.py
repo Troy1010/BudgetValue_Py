@@ -1,4 +1,3 @@
-
 import tkinter as tk
 import tkinter.filedialog  # noqa
 from tkinter import ttk
@@ -7,8 +6,16 @@ import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import itertools
 
+from .Table import Table
+from .SelectCatagoryPopup import SelectCatagoryPopup
+from .Header import Header
+
 
 class SpendingHistory(tk.Frame):
+    Header = Header
+    SelectCatagoryPopup = SelectCatagoryPopup
+    Table = Table
+
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
