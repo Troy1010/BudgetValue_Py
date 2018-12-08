@@ -27,7 +27,7 @@ class ViewModel(tk.Tk):
         # TabBar
         vTabBar = TabBar(self, vModel, cTabPages)
         vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
-        # Tab Page Container
+        # TabPageContainer
         vTabPageContainer = tk.Frame(self, borderwidth=2)
         vTabPageContainer.pack(side=tk.TOP, anchor='nw',
                                expand=True, fill="both")

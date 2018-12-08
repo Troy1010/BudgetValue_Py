@@ -1,6 +1,6 @@
-import BudgetValue
+import BudgetValue as BV
 
 
-vModel = BudgetValue.Model()
-app = BudgetValue.ViewModel(vModel)
+vModel = BV.Model.Model()
+app = BV.ViewModel.ViewModel(vModel)
 app.mainloop()
