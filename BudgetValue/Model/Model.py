@@ -15,6 +15,10 @@ class Model():
         self.SpendingHistory = SpendingHistory(self)
 
 
+class Catagories():
+    pass
+
+
 class SpendingHistory():
     def __init__(self, vModel):
         self.vModel = vModel

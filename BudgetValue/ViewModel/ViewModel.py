@@ -12,7 +12,7 @@ FONT_TEXT = ("Calibri", 10)
 FONT_TEXT_BOLD = ("Calibri", 10, "bold")
 
 
-class View(tk.Tk):
+class ViewModel(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
