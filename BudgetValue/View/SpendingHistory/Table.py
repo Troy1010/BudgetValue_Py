@@ -47,7 +47,7 @@ class Table(tk.Canvas):
         self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def MakePopup_SelectCatagory(self, cell):
-        vPopup = BV.View.SpendingHistory.Popup_SelectCatagory(cell.parent)
+        vPopup = BV.View.SpendingHistory.SelectCatagoryPopup(cell.parent)
         vPopup.place(x=cell.winfo_x()
                      + cell.winfo_width(), y=cell.winfo_y())
         vPopup.tkraise()
