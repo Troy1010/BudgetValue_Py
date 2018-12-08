@@ -1,10 +1,12 @@
-def GetAllChildren(vItem):
-    return GetAllChildren_Helper(vItem).GetAllChildren()
+def GetAllChildren(vItem, bIncludeRoot=False):
+    return GetAllChildren_Helper(vItem, bIncludeRoot=bIncludeRoot).GetAllChildren()
 
 
 class GetAllChildren_Helper():
-    def __init__(self, vItem):
-        self.cChildren = [vItem]
+    def __init__(self, vItem, bIncludeRoot):
+        self.cChildren = []
+        if bIncludeRoot:
+            self.cChildren.append(vItem)
         self.AppendChildren(vItem)
 
     def GetAllChildren(self):
