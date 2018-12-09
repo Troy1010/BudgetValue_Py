@@ -5,14 +5,8 @@ import sqlite3
 import os
 import pathlib
 
-from .SpendingHistory import SpendingHistory
-from .Catagories import Catagories
-
 
 class Model():
-    SpendingHistory = SpendingHistory
-    Catagories = Catagories
-
     def __init__(self):
         self.sPath = str(pathlib.Path.home()) \
             + "/Documents/BudgetValue/SpendingsHistory.db"
