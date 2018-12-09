@@ -19,9 +19,14 @@ class SelectCategoryPopup(tk.Frame):
             b.pack(fill=tk.BOTH, expand=True)
 
     def SelectCategory(self, category, cell):
-        cell.config(state="normal")
-        cell.delete("1.0", tk.END)
-        cell.insert(1.0, category)
-        cell.config(state="disabled")
-        cell.config(background="SystemButtonFace")
+        cursor = self.vModel.SpendingHistory.GetTable()
+        cursor.execute(
+            """ UPDATE 'SpendingHistory'
+                SET Category = ?
+                WHERE `index` = ?
+                """,
+            [category, cell.iRow]
+        )
+        self.vModel.connection.commit()
+        cell.parent.Refresh()
         self.destroy()
