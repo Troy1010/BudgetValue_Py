@@ -1,5 +1,5 @@
 import BudgetValue as BV
 
-vModel = BV.Model.Model()
-app = BV.View.View(vModel)
+vModel = BV.Model.Root()
+app = BV.View.Root(vModel)
 app.mainloop()

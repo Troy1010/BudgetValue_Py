@@ -7,7 +7,7 @@ import BudgetValue as BV
 import itertools
 
 
-class SpendingHistory(tk.Frame):
+class Root(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel

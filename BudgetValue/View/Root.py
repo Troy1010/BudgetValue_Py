@@ -5,16 +5,17 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
+from BudgetValue.View import SpendingHistory
 
 
-class View(tk.Tk):
+class Root(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (BV.View.SpendingHistory.SpendingHistory, PaycheckPlan, NetWorth,
+        cTabPages = (SpendingHistory.Root, PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
@@ -33,7 +34,7 @@ class View(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(BV.View.SpendingHistory.SpendingHistory)
+        vTabBar.ShowTab(SpendingHistory.Root)
 
 
 class MenuBar(tk.Menu):
