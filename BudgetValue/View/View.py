@@ -6,11 +6,8 @@ from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
 
-from .SpendingHistory.SpendingHistory import SpendingHistory
-
 
 class View(tk.Tk):
-    SpendingHistory = SpendingHistory
 
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -18,7 +15,7 @@ class View(tk.Tk):
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (BV.View.SpendingHistory, PaycheckPlan, NetWorth,
+        cTabPages = (BV.View.SpendingHistory.SpendingHistory, PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
@@ -37,7 +34,7 @@ class View(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(BV.View.SpendingHistory)
+        vTabBar.ShowTab(BV.View.SpendingHistory.SpendingHistory)
 
 
 class MenuBar(tk.Menu):

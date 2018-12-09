@@ -1,5 +1,6 @@
-from .View.View import View
-from .Model.Model import Model
+import View
+import Model
 from .Misc import GetAllChildren
+
 
 __all__ = ['View', 'Model', 'GetAllChildren']
