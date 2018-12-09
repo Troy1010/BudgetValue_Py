@@ -12,5 +12,6 @@ class Root():
             + "/Documents/BudgetValue/SpendingsHistory.db"
         TM.TryMkdir(os.path.dirname(self.sPath))
         self.connection = sqlite3.connect(self.sPath)
+        self.connection.row_factory = sqlite3.Row
         self.SpendingHistory = BV.Model.SpendingHistory(self)
         self.Categories = BV.Model.Categories(self)
