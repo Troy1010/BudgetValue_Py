@@ -50,7 +50,10 @@ class Table(tk.Canvas):
 
     def HighlightCell(self, cell):
         if self.oldCell is not None:
-            self.oldCell.config(background="SystemButtonFace")
+            try:
+                self.oldCell.config(background="SystemButtonFace")
+            except tk.TclError:  # cell no longer exists
+                pass
         self.oldCell = cell
         cell.config(background="grey")
 
