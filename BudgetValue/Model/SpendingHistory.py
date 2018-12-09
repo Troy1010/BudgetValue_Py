@@ -10,14 +10,14 @@ class SpendingHistory():
         self.vModel = vModel
 
     def Import(self, sFilePath):
-        columns = ["Catagory", "Timestamp",
+        columns = ["Category", "Timestamp",
                    "Title", "Amount", "Description"]
         # Determine data
         data = []
         extension = os.path.splitext(sFilePath)[1][1:]
         if extension == 'csv':
             for index, row in pd.read_csv(sFilePath).iterrows():
-                data.append(["<DefaultCatagory>", row[0], row[2],
+                data.append(["<DefaultCategory>", row[0], row[2],
                              row[3] if not pd.isnull(row[3]) else row[4], row[5]])
         else:
             BVLog.debug("Unrecognized file extension:" + extension)
@@ -39,14 +39,9 @@ class SpendingHistory():
         cursor = self.vModel.connection.cursor()
         try:
             cursor.execute("SELECT * FROM 'SpendingHistory'")
-        except sqlite3.OperationalError:
+        except sqlite3.OperationalError:  # SpendingHistory doesn't exist
             pass
         return cursor
 
     def GetHeader(self):
-        cursor = self.vModel.connection.cursor()
-        try:
-            cursor.execute("SELECT * FROM 'SpendingHistory'")
-        except sqlite3.OperationalError:
-            return []
-        return [description[0] for description in cursor.description]
+        return [description[0] for description in self.GetTable().description]

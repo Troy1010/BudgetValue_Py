@@ -1,6 +1,6 @@
-from .Root import Root
+from .Root_SpendingHistory import Root
 from .Header import Header
 from .Table import Table
-from . import SelectCatagoryPopup
+from .SelectCategoryPopup import SelectCategoryPopup
 
-__all__ = ['Root', 'Header', 'SelectCatagoryPopup', 'Table']
+__all__ = ['Root', 'Header', 'SelectCategoryPopup', 'Table']

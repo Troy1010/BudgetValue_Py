@@ -13,4 +13,4 @@ class Root():
         TM.TryMkdir(os.path.dirname(self.sPath))
         self.connection = sqlite3.connect(self.sPath)
         self.SpendingHistory = BV.Model.SpendingHistory(self)
-        self.Catagories = BV.Model.Catagories(self)
+        self.Categories = BV.Model.Categories(self)
