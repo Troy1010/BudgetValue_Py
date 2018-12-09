@@ -19,14 +19,6 @@ class SelectCategoryPopup(tk.Frame):
             b.pack(fill=tk.BOTH, expand=True)
 
     def SelectCategory(self, category, cell):
-        cursor = self.vModel.SpendingHistory.GetTable()
-        cursor.execute(
-            """ UPDATE 'SpendingHistory'
-                SET Category = ?
-                WHERE `index` = ?
-                """,
-            [category, cell.iRow]
-        )
-        self.vModel.connection.commit()
+        self.vModel.SpendingHistory.Update(cell.iRow, "Category", category)
         cell.parent.Refresh()
         self.destroy()

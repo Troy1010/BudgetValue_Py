@@ -48,3 +48,14 @@ class SpendingHistory():
         except TypeError:  # GetTable() was not iterable
             header = []
         return header
+
+    def Update(self, row, column, value):
+        cursor = self.GetTable()
+        cursor.execute(
+            """ UPDATE 'SpendingHistory'
+                SET """ + column + """ = ?
+                WHERE `index` = ?
+                """,
+            [value, row]
+        )
+        self.vModel.connection.commit()
