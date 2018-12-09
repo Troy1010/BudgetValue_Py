@@ -8,6 +8,8 @@ import itertools
 
 
 class Root(tk.Frame):
+    name = "Spending History"
+
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel

@@ -58,7 +58,7 @@ class TabBar(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.cTabButtons = {}
         for i, page in enumerate(cTabPages):
-            vButton = tk.Button(self, text=page.__name__, width=15, font=Fonts.FONT_MEDIUM,
+            vButton = tk.Button(self, text=page.name, width=15, font=Fonts.FONT_MEDIUM,
                                 command=lambda page=page: self.ShowTab(page))
             self.cTabButtons[page] = vButton
             vButton.grid(row=0, column=i)
@@ -74,6 +74,8 @@ class TabBar(tk.Frame):
 
 
 class PaycheckPlan(tk.Frame):
+    name = "Paycheck Plan"
+
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = ttk.Label(self, text="Paycheck Plan",
@@ -85,6 +87,8 @@ class PaycheckPlan(tk.Frame):
 
 
 class NetWorth(tk.Frame):
+    name = "Net Worth"
+
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = ttk.Label(self, text="Net Worth",
@@ -96,6 +100,8 @@ class NetWorth(tk.Frame):
 
 
 class Spendables(tk.Frame):
+    name = "Spendables"
+
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = ttk.Label(self, text="Spendables",
@@ -107,6 +113,8 @@ class Spendables(tk.Frame):
 
 
 class Reports(tk.Frame):
+    name = "Reports"
+
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = ttk.Label(self, text="Reports",
