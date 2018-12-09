@@ -49,13 +49,13 @@ class SpendingHistory():
             header = []
         return header
 
-    def Update(self, row, column, value):
+    def Update(self, cRowColumnPair, value):
         cursor = self.GetTable()
         cursor.execute(
             """ UPDATE 'SpendingHistory'
-                SET """ + column + """ = ?
+                SET """ + str(cRowColumnPair[1]) + """ = ?
                 WHERE `index` = ?
                 """,
-            [value, row]
+            [value, cRowColumnPair[0]]
         )
         self.vModel.connection.commit()

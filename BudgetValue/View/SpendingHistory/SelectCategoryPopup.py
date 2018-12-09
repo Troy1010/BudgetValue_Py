@@ -19,6 +19,6 @@ class SelectCategoryPopup(tk.Frame):
             b.pack(fill=tk.BOTH, expand=True)
 
     def SelectCategory(self, category, cell):
-        self.vModel.SpendingHistory.Update(cell.iRow, "Category", category)
+        self.vModel.SpendingHistory.Update((cell.iRow, "Category"), category)
         cell.parent.Refresh()
         self.destroy()
