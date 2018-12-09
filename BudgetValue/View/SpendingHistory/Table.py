@@ -37,7 +37,7 @@ class Table(tk.Canvas):
         for cell in self.vTableWindow.children.values():
             if cell.grid_info()['column'] == 0:
                 cell.bind(
-                    '<Button-1>', lambda event, cell=cell: self.MakePopup_SelectCatagory(cell))
+                    '<Button-1>', lambda event, cell=cell: self.OpenSelectCatagoryPopup(cell))
 
     def onFrameConfigure(self):
         '''Reset the scroll region to encompass the inner frame'''
@@ -46,8 +46,18 @@ class Table(tk.Canvas):
     def onMousewheel(self, event):
         self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    def MakePopup_SelectCatagory(self, cell):
-        vPopup = BV.View.SpendingHistory.SelectCatagoryPopup(cell.parent)
-        vPopup.place(x=cell.winfo_x()
-                     + cell.winfo_width(), y=cell.winfo_y())
+    oldCell = None
+
+    def HighlightCell(self, cell):
+        if self.oldCell is not None:
+            self.oldCell.config(background="SystemButtonFace")
+        self.oldCell = cell
+        cell.config(background="grey")
+
+    def OpenSelectCatagoryPopup(self, cell):
+        self.HighlightCell(cell)
+        vPopup = BV.View.SpendingHistory.SelectCatagoryPopup.Root(
+            cell.parent, self.vModel)
+        vPopup.place(x=0
+                     + cell.winfo_width(), y=0)
         vPopup.tkraise()

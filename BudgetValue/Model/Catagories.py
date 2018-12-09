@@ -5,3 +5,15 @@ import TM_CommonPy as TM  # noqa
 class Catagories():
     def __init__(self, vModel):
         self.vModel = vModel
+        self.main_list = [
+            "Rent",
+            "Hair",
+            "Commute",
+            "Christmas",
+            "Food",
+            "Food-Vanity",
+            "Emergency",
+            "Improvements",
+            "Activities"
+        ]
+        self.favorites = []
