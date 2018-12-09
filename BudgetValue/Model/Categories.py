@@ -5,7 +5,7 @@ import TM_CommonPy as TM  # noqa
 class Categories():
     def __init__(self, vModel):
         self.vModel = vModel
-        self.main_list = [
+        default_catagory_names = [
             "<Default Category>",
             "Rent",
             "Hair",
@@ -17,4 +17,13 @@ class Categories():
             "Improvements",
             "Activities"
         ]
+        self.main_list = []
+        for i, vItem in enumerate(default_catagory_names):
+            self.main_list.append(Category(vItem))
         self.favorites = []
+
+
+class Category():
+    def __init__(self, name):
+        self.name = name
+        self.bFavorite = False

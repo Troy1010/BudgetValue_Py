@@ -13,12 +13,13 @@ class SelectCategoryPopup(tk.Frame):
             self.__class__.previous_popup.destroy()
         self.__class__.previous_popup = self
 
-        for vItem in vModel.Categories.main_list:
-            b = tk.Button(self, text=vItem,
-                          command=lambda vItem=vItem, cell=cell, self=self: self.SelectCategory(vItem, cell))
+        for vCategory in vModel.Categories.main_list:
+            b = tk.Button(self, text=vCategory.name,
+                          command=lambda vCategory=vCategory, cell=cell, self=self: self.SelectCategory(vCategory, cell))
             b.pack(fill=tk.BOTH, expand=True)
 
-    def SelectCategory(self, category, cell):
-        self.vModel.SpendingHistory.Update((cell.iRow, "Category"), category)
+    def SelectCategory(self, vCategory, cell):
+        self.vModel.SpendingHistory.Update(
+            (cell.iRow, "Category"), vCategory.name)
         cell.parent.Refresh()
         self.destroy()
