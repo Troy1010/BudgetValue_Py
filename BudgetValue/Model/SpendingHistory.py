@@ -26,13 +26,11 @@ class SpendingHistory():
         sheet = pd.DataFrame(columns=columns, data=data)
         name = "SpendingHistory"
         try:
-            sheet.to_sql(
-                name, self.vModel.connection, index=False)
-        except ValueError:
-            BVLog.debug("Sheet already exists:" + name)
             self.vModel.connection.execute("DROP TABLE " + name)
-            sheet.to_sql(
-                name, self.vModel.connection, index=False)
+        except sqlite3.OperationalError:  # table already doesn't exist
+            pass
+        sheet.to_sql(
+            name, self.vModel.connection, index=True)
         self.vModel.connection.commit()
 
     def GetTable(self):
@@ -44,4 +42,9 @@ class SpendingHistory():
         return cursor
 
     def GetHeader(self):
-        return [description[0] for description in self.GetTable().description]
+        try:
+            header = [description[0]
+                      for description in self.GetTable().description]
+        except TypeError:  # GetTable() was not iterable
+            header = []
+        return header
