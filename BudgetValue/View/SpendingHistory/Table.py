@@ -57,7 +57,6 @@ class Table(tk.Canvas):
     def OpenSelectCatagoryPopup(self, cell):
         self.HighlightCell(cell)
         vPopup = BV.View.SpendingHistory.SelectCatagoryPopup.Root(
-            cell.parent, self.vModel)
-        vPopup.place(x=0
-                     + cell.winfo_width(), y=0)
+            cell.parent, cell, self.vModel)
+        vPopup.place(x=0 + cell.winfo_width(), y=0)
         vPopup.tkraise()

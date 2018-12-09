@@ -6,6 +6,7 @@ class Catagories():
     def __init__(self, vModel):
         self.vModel = vModel
         self.main_list = [
+            "<Default Catagory>",
             "Rent",
             "Hair",
             "Commute",
