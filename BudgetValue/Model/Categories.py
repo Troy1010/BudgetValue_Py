@@ -23,6 +23,9 @@ class Categories():
             self.main_list.append(Category(vItem))
         self.favorites = []
 
+    def GetTrueCategories(self):
+        return [category for category in self.main_list if "<" not in category.name]
+
 
 class Category():
     def __init__(self, name):
