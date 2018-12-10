@@ -15,3 +15,4 @@ class Root():
         self.connection.row_factory = sqlite3.Row
         self.SpendingHistory = BV.Model.SpendingHistory(self)
         self.Categories = BV.Model.Categories(self)
+        self.PaycheckPlan = BV.Model.PaycheckPlan(self)
