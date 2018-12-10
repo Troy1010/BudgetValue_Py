@@ -18,6 +18,14 @@ class GetAllChildren_Helper():
             self.AppendChildren(vChild)
 
 
-def select_all(widget):
+def select_text(widget):
     widget.select_range(0, 'end')
     widget.icursor('end')
+
+
+def GetRow(cell):
+    return cell.grid_info()['row']
+
+
+def GetCell(table, cRowColumnPair):
+    return table.grid_slaves(cRowColumnPair[0], cRowColumnPair[1])[0]

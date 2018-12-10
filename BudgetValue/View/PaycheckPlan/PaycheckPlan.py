@@ -43,15 +43,16 @@ class PaycheckPlan(tk.Frame):
 
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)
-        BV.select_all(cell)
+        BV.select_text(cell)
 
     def Entry_FocusOut(self, event, cell):
         cell.config(justify=tk.RIGHT)
         self.SaveCategoryPlan(cell)
-        amountPerWeek = None
         if cell.category in self.vModel.PaycheckPlan.cCategoryPlans:
-            amountPerWeek = self.vModel.PaycheckPlan.cCategoryPlans[cell.category].amountPerWeek
-        self.SetEntry(self.grid_slaves(cell.grid_info()['row'], 3)[0], amountPerWeek)
+            category_plan = self.vModel.PaycheckPlan.cCategoryPlans[cell.category]
+            self.SetEntry(BV.GetCell(self, (BV.GetRow(cell), 3)), category_plan.amountPerWeek)
+        else:
+            self.SetEntry(BV.GetCell(self, (BV.GetRow(cell), 3)), None)
 
     def Entry_Return(self, event, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
