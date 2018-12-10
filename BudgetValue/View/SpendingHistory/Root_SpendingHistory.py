@@ -75,8 +75,8 @@ class Root(tk.Frame):
     def GetColWidths(self, vModel):
         cColWidths = {}
         for row in itertools.chain([vModel.SpendingHistory.GetHeader()], vModel.SpendingHistory.GetTable()):
-            for j, vItem in enumerate(row):
+            for j, vItem in enumerate(row[1:]):
                 cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
-                if j < len(row) - 1:
+                if vItem != row[-1]:
                     cColWidths[j] = min(30, cColWidths[j])
         return cColWidths

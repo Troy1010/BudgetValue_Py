@@ -16,11 +16,9 @@ class Header(tk.Frame):
                 vWidget.grid_forget()
                 vWidget.destroy()
         # Place new data
-        for j, vItem in enumerate(self.vModel.SpendingHistory.GetHeader()):
-            if j == 0:
-                continue
+        for j, vItem in enumerate(self.vModel.SpendingHistory.GetHeader()[1:]):
             b = tk.Text(self, font=Fonts.FONT_SMALL_BOLD,
                         borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
             b.insert(1.0, str(vItem))
-            b.grid(row=0, column=j - 1)
+            b.grid(row=0, column=j)
             b.configure(state="disabled")
