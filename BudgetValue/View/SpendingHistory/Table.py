@@ -39,8 +39,7 @@ class Table(tk.Canvas):
         # Popup - Select Category
         for cell in self.vTableWindow.children.values():
             if cell.grid_info()['column'] == 0:
-                cell.bind(
-                    '<Button-1>', lambda event, cell=cell: self.OpenSelectCategoryPopup(cell))
+                cell.bind('<Button-1>', lambda event, cell=cell: BV.View.SpendingHistory.SelectCategoryPopup(cell, self.vModel))
 
     def onFrameConfigure(self):
         '''Reset the scroll region to encompass the inner frame'''
@@ -49,20 +48,14 @@ class Table(tk.Canvas):
     def onMousewheel(self, event):
         self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    oldCell = None
-
-    def HighlightCell(self, cell):
-        if self.oldCell is not None:
-            try:
-                self.oldCell.config(background="SystemButtonFace")
-            except tk.TclError:  # cell no longer exists
-                pass
-        self.oldCell = cell
-        cell.config(background="grey")
-
-    def OpenSelectCategoryPopup(self, cell):
-        self.HighlightCell(cell)
-        vPopup = BV.View.SpendingHistory.SelectCategoryPopup(
-            cell.parent, cell, self.vModel)
-        vPopup.place(x=0 + cell.winfo_width(), y=0)
-        vPopup.tkraise()
+    def Update(self, cRowColumnPair, value):
+        self.vModel.SpendingHistory.Update(cRowColumnPair, value)
+        if isinstance(cRowColumnPair[1], str):
+            column = self.vModel.SpendingHistory.GetHeader()[1:].index(cRowColumnPair[1])  # View's table is missing the index column
+        else:
+            column = cRowColumnPair[1]
+        cell = self.vTableWindow.grid_slaves(cRowColumnPair[0], column)[0]
+        cell.config(state="normal")
+        cell.delete("1.0", tk.END)
+        cell.insert(1.0, value)
+        cell.config(state="disabled")
