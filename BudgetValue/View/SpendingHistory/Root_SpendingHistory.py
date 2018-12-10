@@ -40,18 +40,14 @@ class Root(tk.Frame):
         self.vTable.config(xscrollcommand=vScrollbar_X.set)
         vScrollbar_X.config(command=self.vTable.xview)
         # ButtonBar - continued
-        vButton_ImportHistory = ttk.Button(self.vButtonFrame, text="Import Spending History",
-                                           command=lambda self=self: self.ImportHistory())
+        vButton_ImportHistory = ttk.Button(self.vButtonFrame, text="Import Spending History", command=lambda self=self: self.ImportHistory())
         vButton_ImportHistory.pack(side=tk.LEFT, anchor='w')
-        vButton_Pop = ttk.Button(self.vButtonFrame, text="Pop",
-                                 command=lambda self=self: self.Pop())
+        vButton_Pop = ttk.Button(self.vButtonFrame, text="Pop", command=lambda self=self: self.Pop())
         vButton_Pop.pack(side=tk.LEFT, anchor='w')
-        self.vButton_PopView = ttk.Button(
-            self.vButtonFrame, text='0')
+        self.vButton_PopView = ttk.Button(self.vButtonFrame, text='0')
         self.vButton_PopView.pack(side=tk.LEFT, anchor='w')
         self.stream = rx.subjects.Subject()
-        self.stream.subscribe(
-            lambda value, self=self: self.StreamOnNextHandler(value))
+        self.stream.subscribe(lambda value, self=self: self.StreamOnNextHandler(value))
         self.stream.on_next(4)
         #
         self.Refresh()
