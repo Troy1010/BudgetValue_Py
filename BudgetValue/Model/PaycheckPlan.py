@@ -16,8 +16,8 @@ class PaycheckPlan():
             self.amount = amount
             self.period = period
 
-        def ToFloat(self, value):
-            if not value:
+        def MakeValid(self, value):
+            if not value or value == 0:
                 return None
             else:
                 return float(value)
@@ -31,7 +31,7 @@ class PaycheckPlan():
 
         @amount.setter
         def amount(self, value):
-            self._amount = self.ToFloat(value)
+            self._amount = self.MakeValid(value)
 
         @property
         def period(self):
@@ -39,7 +39,7 @@ class PaycheckPlan():
 
         @period.setter
         def period(self, value):
-            self._period = self.ToFloat(value)
+            self._period = self.MakeValid(value)
 
         @property
         def amountPerWeek(self):

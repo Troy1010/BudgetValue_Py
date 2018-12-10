@@ -1,6 +1,7 @@
 from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
 from BudgetValue.View import Fonts
+import BudgetValue as BV
 
 
 class PaycheckPlan(tk.Frame):
@@ -42,6 +43,7 @@ class PaycheckPlan(tk.Frame):
 
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)
+        BV.select_all(cell)
 
     def Entry_FocusOut(self, event, cell):
         cell.config(justify=tk.RIGHT)
