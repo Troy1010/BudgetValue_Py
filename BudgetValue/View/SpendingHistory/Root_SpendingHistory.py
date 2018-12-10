@@ -5,6 +5,8 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import itertools
+import tkinter.messagebox  # noqa
+import rx
 
 
 class Root(tk.Frame):
@@ -41,8 +43,24 @@ class Root(tk.Frame):
         vButton_ImportHistory = ttk.Button(self.vButtonFrame, text="Import Spending History",
                                            command=lambda self=self: self.ImportHistory())
         vButton_ImportHistory.pack(side=tk.LEFT, anchor='w')
+        vButton_Pop = ttk.Button(self.vButtonFrame, text="Pop",
+                                 command=lambda self=self: self.Pop())
+        vButton_Pop.pack(side=tk.LEFT, anchor='w')
+        self.vButton_PopView = ttk.Button(
+            self.vButtonFrame, text='0')
+        self.vButton_PopView.pack(side=tk.LEFT, anchor='w')
+        self.stream = rx.subjects.Subject()
+        self.stream.subscribe(
+            lambda value, self=self: self.StreamOnNextHandler(value))
+        self.stream.on_next(4)
         #
         self.Refresh()
+
+    def StreamOnNextHandler(self, value):
+        self.vButton_PopView.config(text=str(value))
+
+    def Pop(self):
+        self.stream.on_next(int(self.vButton_PopView.cget("text")) + 1)
 
     def Refresh(self):
         self.vTableFrame.cColWidths = self.GetColWidths(self.vModel)
