@@ -6,6 +6,7 @@ from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
 from BudgetValue.View import SpendingHistory
+from BudgetValue.View import PaycheckPlan
 
 
 class Root(tk.Tk):
@@ -15,7 +16,7 @@ class Root(tk.Tk):
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (SpendingHistory.Root, PaycheckPlan, NetWorth,
+        cTabPages = (SpendingHistory.Root, PaycheckPlan.PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
@@ -25,8 +26,7 @@ class Root(tk.Tk):
         vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
         # TabPageContainer
         vTabPageContainer = tk.Frame(self, borderwidth=2)
-        vTabPageContainer.pack(side=tk.TOP, anchor='nw',
-                               expand=True, fill="both")
+        vTabPageContainer.pack(side=tk.TOP, anchor='nw', expand=True, fill="both")
         vTabPageContainer.grid_rowconfigure(0, weight=1)
         vTabPageContainer.grid_columnconfigure(0, weight=1)
         for vPage in cTabPages:
@@ -34,7 +34,7 @@ class Root(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(SpendingHistory.Root)
+        vTabBar.ShowTab(PaycheckPlan.PaycheckPlan)
 
 
 class MenuBar(tk.Menu):
@@ -71,19 +71,6 @@ class TabBar(tk.Frame):
     def ShowTab(self, frame):
         self.HighlightButton(self.cTabButtons[frame])
         self.cTabPageFrames[frame].tkraise()
-
-
-class PaycheckPlan(tk.Frame):
-    name = "Paycheck Plan"
-
-    def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent)
-        vLabel = ttk.Label(self, text="Paycheck Plan",
-                           font=Fonts.FONT_MEDIUM)
-        vLabel.pack(pady=10, padx=10)
-
-        vButton1 = ttk.Button(self, text="Spending History",)
-        vButton1.pack()
 
 
 class NetWorth(tk.Frame):

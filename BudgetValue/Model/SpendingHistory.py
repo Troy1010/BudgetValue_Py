@@ -43,8 +43,7 @@ class SpendingHistory():
 
     def GetHeader(self):
         try:
-            header = [description[0]
-                      for description in self.GetTable().description]
+            header = [description[0] for description in self.GetTable().description]
         except TypeError:  # GetTable() was not iterable
             header = []
         return header
