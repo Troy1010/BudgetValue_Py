@@ -15,7 +15,8 @@ class Categories():
             "Food-Vanity",
             "Emergency",
             "Improvements",
-            "Activities"
+            "Activities",
+            "Savings"
         ]
         self.main_list = []
         for i, vItem in enumerate(default_catagory_names):
