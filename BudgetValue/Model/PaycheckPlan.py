@@ -16,5 +16,39 @@ class PaycheckPlan():
             self.amount = amount
             self.period = period
 
+        def ToFloat(self, value):
+            if not value:
+                return None
+            else:
+                return float(value)
+
         def IsEmpty(self):
             return not (self.amount or self.period)
+
+        @property
+        def amount(self):
+            return self._amount
+
+        @amount.setter
+        def amount(self, value):
+            self._amount = self.ToFloat(value)
+
+        @property
+        def period(self):
+            return self._period
+
+        @period.setter
+        def period(self, value):
+            self._period = self.ToFloat(value)
+
+        @property
+        def amountPerWeek(self):
+            try:
+                returning = self.amount / self.period
+            except (ZeroDivisionError, TypeError):  # period was None
+                returning = None
+            return returning
+
+        @amountPerWeek.setter
+        def amountPerWeek(self, value):
+            self.amount = value*self.period

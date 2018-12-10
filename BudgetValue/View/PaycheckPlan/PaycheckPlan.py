@@ -14,6 +14,7 @@ class PaycheckPlan(tk.Frame):
             self.MakeText((i, 0), category)
             self.MakeEntry((i, 1), category)
             self.MakeEntry((i, 2), category)
+            self.MakeEntry((i, 3), category)
 
     def MakeText(self, cRowColumnPair, category):
         w = tk.Text(self, font=Fonts.FONT_SMALL, width=15,
@@ -32,12 +33,23 @@ class PaycheckPlan(tk.Frame):
         w.bind("<Return>", lambda event, w=w: self.Entry_Return(event, w))
         w.category = category
 
+    def SetEntry(self, entry, value):
+        entry.delete(0, tk.END)
+        if value:
+            if value.is_integer():
+                value = int(value)
+            entry.insert(0, value)
+
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)
 
     def Entry_FocusOut(self, event, cell):
         cell.config(justify=tk.RIGHT)
         self.SaveCategoryPlan(cell)
+        amountPerWeek = None
+        if cell.category in self.vModel.PaycheckPlan.cCategoryPlans:
+            amountPerWeek = self.vModel.PaycheckPlan.cCategoryPlans[cell.category].amountPerWeek
+        self.SetEntry(self.grid_slaves(cell.grid_info()['row'], 3)[0], amountPerWeek)
 
     def Entry_Return(self, event, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
