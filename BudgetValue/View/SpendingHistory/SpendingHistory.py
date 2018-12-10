@@ -9,7 +9,7 @@ import tkinter.messagebox  # noqa
 import rx
 
 
-class Root(tk.Frame):
+class SpendingHistory(tk.Frame):
     name = "Spending History"
 
     def __init__(self, parent, vModel):

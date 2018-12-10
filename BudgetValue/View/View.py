@@ -9,14 +9,14 @@ from BudgetValue.View import SpendingHistory
 from BudgetValue.View import PaycheckPlan
 
 
-class Root(tk.Tk):
+class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (SpendingHistory.Root, PaycheckPlan.PaycheckPlan, NetWorth,
+        cTabPages = (SpendingHistory.SpendingHistory, PaycheckPlan.PaycheckPlan, NetWorth,
                      Spendables, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)

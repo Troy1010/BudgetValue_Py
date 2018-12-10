@@ -1,6 +1,6 @@
-from .Root_View import Root
+from .View import View
 from . import Fonts
 from . import SpendingHistory
 
 
-__all__ = ['Root', 'SpendingHistory', 'Fonts']
+__all__ = ['View', 'SpendingHistory', 'Fonts']

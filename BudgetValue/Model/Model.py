@@ -6,7 +6,7 @@ import os
 import pathlib
 
 
-class Root():
+class Model():
     def __init__(self):
         self.sPath = str(pathlib.Path.home()) \
             + "/Documents/BudgetValue/SpendingsHistory.db"

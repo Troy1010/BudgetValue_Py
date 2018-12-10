@@ -1,6 +1,6 @@
 from .Categories import Categories
-from .Root_Model import Root
+from .Model import Model
 from .SpendingHistory import SpendingHistory
 from .PaycheckPlan import PaycheckPlan
 
-__all__ = ['Categories', 'Root', 'SpendingHistory', 'PaycheckPlan']
+__all__ = ['Categories', 'Model', 'SpendingHistory', 'PaycheckPlan']
