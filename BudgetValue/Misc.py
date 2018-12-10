@@ -16,3 +16,8 @@ class GetAllChildren_Helper():
         for vChild in vItem.winfo_children():
             self.cChildren.append(vChild)
             self.AppendChildren(vChild)
+
+
+def select_all(widget):
+    widget.select_range(0, 'end')
+    widget.icursor('end')
