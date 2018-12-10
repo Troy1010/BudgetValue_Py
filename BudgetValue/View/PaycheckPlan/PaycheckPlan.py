@@ -39,8 +39,16 @@ class PaycheckPlan(tk.Frame):
         cell.config(justify=tk.RIGHT)
         self.SaveCategoryPlan(cell)
 
-    def Entry_Return(self, event, w):
-        w.winfo_toplevel().focus_set()
+    def Entry_Return(self, event, cell):
+        list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
+        if list_of_cell_to_the_right:
+            list_of_cell_to_the_right[0].focus_set()
+            return
+        list_of_first_entry_in_next_row = self.grid_slaves(cell.grid_info()['row'] + 1, 1)
+        if list_of_first_entry_in_next_row:
+            list_of_first_entry_in_next_row[0].focus_set()
+            return
+        cell.winfo_toplevel().focus_set()
 
     def SaveCategoryPlan(self, cell):
         if cell.category not in self.vModel.PaycheckPlan.cCategoryPlans:
@@ -48,3 +56,5 @@ class PaycheckPlan(tk.Frame):
         category_plan = self.vModel.PaycheckPlan.cCategoryPlans[cell.category]
         category_plan.amount = self.grid_slaves(cell.grid_info()['row'], 1)[0].get()
         category_plan.period = self.grid_slaves(cell.grid_info()['row'], 2)[0].get()
+        if category_plan.IsEmpty():
+            del self.vModel.PaycheckPlan.cCategoryPlans[cell.category]
