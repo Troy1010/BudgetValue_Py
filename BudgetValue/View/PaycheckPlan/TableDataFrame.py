@@ -5,7 +5,7 @@ import TM_CommonPy as TM
 import BudgetValue as BV
 
 
-class TableWindow(TM.tk.TableFrame):
+class TableDataFrame(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
