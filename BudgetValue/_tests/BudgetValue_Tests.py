@@ -2,6 +2,7 @@ import os
 import unittest
 import TM_CommonPy as TM
 from nose.plugins.attrib import attr
+from ._Logger import BVLog_LogTests
 # Settings
 bPostDelete = False
 # Globals
@@ -9,7 +10,7 @@ vCounter = TM.Counter()
 
 
 class Test_BudgetValue(unittest.TestCase):
-    sTestWorkspace = "_TestWorkspace_SameFolder/"
+    sTestWorkspace = "TestWorkspace/"
 
     @classmethod
     def setUpClass(self):
@@ -29,4 +30,9 @@ class Test_BudgetValue(unittest.TestCase):
     # ------Tests
     @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
     def test_Dummy(self):
+        self.assertTrue(True)
+
+    @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
+    def test_MakeValid_Money(self):
+        BVLog_LogTests.debug("qwer")
         self.assertTrue(True)

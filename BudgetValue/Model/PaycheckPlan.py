@@ -8,7 +8,7 @@ class PaycheckPlan():
     def Narrate(self):
         cReturning = []
         for k, v in self.cCategoryPlans.items():
-            cReturning.append("Category:" + k.name + " amount:" + v.amount + " period:" + v.period)
+            cReturning.append("Category:" + k.name + " amount:" + str(v.amount) + " period:" + str(v.period))
         return "PaycheckPlan..\n\t" + "\n\t".join(cReturning)
 
     class CategoryPlan():

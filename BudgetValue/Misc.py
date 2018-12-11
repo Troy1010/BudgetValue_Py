@@ -1,3 +1,6 @@
+import TM_CommonPy as TM
+
+
 def GetAllChildren(vItem, bIncludeRoot=False):
     return GetAllChildren_Helper(vItem, bIncludeRoot=bIncludeRoot).GetAllChildren()
 
@@ -18,14 +21,7 @@ class GetAllChildren_Helper():
             self.AppendChildren(vChild)
 
 
-def select_text(widget):
-    widget.select_range(0, 'end')
-    widget.icursor('end')
-
-
-def GetRow(cell):
-    return cell.grid_info()['row']
-
-
-def GetCell(table, cRowColumnPair):
-    return table.grid_slaves(cRowColumnPair[0], cRowColumnPair[1])[0]
+def MakeValid_Money(value):
+    if value.is_integer():
+        return int(value)
+    return float('{0:.2f}'.format(TM.Ceil(value, 2)))

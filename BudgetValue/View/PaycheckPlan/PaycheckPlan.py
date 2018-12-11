@@ -1,10 +1,10 @@
 from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
 from BudgetValue.View import Fonts
-import BudgetValue as BV
+import TM_CommonPy as TM
 
 
-class PaycheckPlan(tk.Frame):
+class PaycheckPlan(TM.tk.TableFrame):
     name = "Paycheck Plan"
 
     def __init__(self, parent, vModel):
@@ -26,33 +26,26 @@ class PaycheckPlan(tk.Frame):
         w.category = category
 
     def MakeEntry(self, cRowColumnPair, category):
-        w = tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
-                     borderwidth=2, relief='ridge', background='SystemButtonFace')
+        w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
+                        borderwidth=2, relief='ridge', background='SystemButtonFace')
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
         w.bind("<FocusIn>", lambda event, w=w: self.Entry_FocusIn(event, w))
         w.bind("<FocusOut>", lambda event, w=w: self.Entry_FocusOut(event, w))
         w.bind("<Return>", lambda event, w=w: self.Entry_Return(event, w))
         w.category = category
-
-    def SetEntry(self, entry, value):
-        entry.delete(0, tk.END)
-        if value:
-            if value.is_integer():
-                value = int(value)
-            entry.insert(0, value)
+        # w.MakeValid =
 
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)
-        BV.select_text(cell)
+        cell.select_text()
+        cell.text_at_focus_in = cell.text
 
     def Entry_FocusOut(self, event, cell):
         cell.config(justify=tk.RIGHT)
-        self.SaveCategoryPlan(cell)
-        if cell.category in self.vModel.PaycheckPlan.cCategoryPlans:
-            category_plan = self.vModel.PaycheckPlan.cCategoryPlans[cell.category]
-            self.SetEntry(BV.GetCell(self, (BV.GetRow(cell), 3)), category_plan.amountPerWeek)
-        else:
-            self.SetEntry(BV.GetCell(self, (BV.GetRow(cell), 3)), None)
+        if cell.text_at_focus_in != cell.text:
+            cell.text = cell.text  # validation
+            self.MakeRowValid(cell.row, cell)
+        self.SaveCategoryPlan(cell.row)
 
     def Entry_Return(self, event, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
@@ -65,11 +58,30 @@ class PaycheckPlan(tk.Frame):
             return
         cell.winfo_toplevel().focus_set()
 
-    def SaveCategoryPlan(self, cell):
-        if cell.category not in self.vModel.PaycheckPlan.cCategoryPlans:
-            self.vModel.PaycheckPlan.cCategoryPlans[cell.category] = self.vModel.PaycheckPlan.CategoryPlan()
-        category_plan = self.vModel.PaycheckPlan.cCategoryPlans[cell.category]
-        category_plan.amount = self.grid_slaves(cell.grid_info()['row'], 1)[0].get()
-        category_plan.period = self.grid_slaves(cell.grid_info()['row'], 2)[0].get()
+    def MakeRowValid(self, row, cellThatChanged):
+        if not cellThatChanged.text:
+            return
+        amount = self.GetCell(row, 1).text
+        period = self.GetCell(row, 2).text
+        amountPerWeek = self.GetCell(row, 3).text
+        if cellThatChanged.column in [1, 2]:
+            try:
+                self.GetCell(row, 3).text = float(amount) / float(period)
+            except ValueError:
+                pass
+        elif cellThatChanged.column == 3:
+            try:
+                self.GetCell(row, 1).text = float(amountPerWeek) * float(period)
+            except ValueError:
+                pass
+
+    def SaveCategoryPlan(self, row):
+        category = self.GetCell(row, 0).category
+        if category not in self.vModel.PaycheckPlan.cCategoryPlans:
+            self.vModel.PaycheckPlan.cCategoryPlans[category] = self.vModel.PaycheckPlan.CategoryPlan()
+        category_plan = self.vModel.PaycheckPlan.cCategoryPlans[category]
+        category_plan.amount = self.grid_slaves(row, 1)[0].get()
+        category_plan.period = self.grid_slaves(row, 2)[0].get()
         if category_plan.IsEmpty():
-            del self.vModel.PaycheckPlan.cCategoryPlans[cell.category]
+            del self.vModel.PaycheckPlan.cCategoryPlans[category]
+        print(self.vModel.PaycheckPlan.Narrate())
