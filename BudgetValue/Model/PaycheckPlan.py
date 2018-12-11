@@ -1,13 +1,13 @@
 
 
-class PaycheckPlan():
+class PaycheckPlan(dict):
     def __init__(self, vModel):
         self.vModel = vModel
-        self.cCategoryPlans = dict()
+        self.cPlansByCategory = dict()
 
     def Narrate(self):
         cReturning = []
-        for k, v in self.cCategoryPlans.items():
+        for k, v in self.cPlansByCategory.items():
             cReturning.append("Category:" + k.name + " amount:" + str(v.amount) + " period:" + str(v.period))
         return "PaycheckPlan..\n\t" + "\n\t".join(cReturning)
 

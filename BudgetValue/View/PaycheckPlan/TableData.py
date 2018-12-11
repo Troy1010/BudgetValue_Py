@@ -3,6 +3,8 @@ import tkinter as tk
 from BudgetValue.View import Fonts
 import TM_CommonPy as TM
 import BudgetValue as BV
+import decimal
+from decimal import Decimal
 
 
 class TableData(TM.tk.TableFrame):
@@ -59,37 +61,42 @@ class TableData(TM.tk.TableFrame):
     def MakeRowValid(self, row, cellThatChanged):
         if not cellThatChanged.text:
             return
-        amount = self.GetCell(row, 1).text
-        period = self.GetCell(row, 2).text
-        amountPerWeek = self.GetCell(row, 3).text
-        if cellThatChanged.column == 1:
+        # Get values of row
+        try:
+            amount = Decimal(str(self.GetCell(row, 1).text))
+        except decimal.InvalidOperation:  # cell was empty
+            amount = None
+        try:
+            period = Decimal(str(self.GetCell(row, 2).text))
+        except decimal.InvalidOperation:  # cell was empty
+            period = None
+        try:
+            plan = Decimal(str(self.GetCell(row, 3).text))
+        except decimal.InvalidOperation:  # cell was empty
+            plan = None
+        # if we can complete the row, do so.
+        if cellThatChanged.column != 3 and amount and period:
             try:
-                self.GetCell(row, 3).text = float(amount) / float(period)
+                self.GetCell(row, 3).text = amount / period
             except ValueError:
                 pass
-        elif cellThatChanged.column == 2:
-            if self.GetCell(row, 1).text:
-                try:
-                    self.GetCell(row, 3).text = float(amount) / float(period)
-                except ValueError:
-                    pass
-            else:
-                try:
-                    self.GetCell(row, 1).text = float(amountPerWeek) * float(period)
-                except ValueError:
-                    pass
-        elif cellThatChanged.column == 3:
+        elif cellThatChanged.column != 2 and amount and plan:
             try:
-                self.GetCell(row, 2).text = float(amount) / float(amountPerWeek)
+                self.GetCell(row, 2).text = amount / plan
+            except ValueError:
+                pass
+        elif cellThatChanged.column != 1 and period and plan:
+            try:
+                self.GetCell(row, 1).text = plan * period
             except ValueError:
                 pass
 
     def SaveCategoryPlan(self, row):
         category = self.GetCell(row, 0).category
-        if category not in self.vModel.PaycheckPlan.cCategoryPlans:
-            self.vModel.PaycheckPlan.cCategoryPlans[category] = self.vModel.PaycheckPlan.CategoryPlan()
-        category_plan = self.vModel.PaycheckPlan.cCategoryPlans[category]
+        if category not in self.vModel.PaycheckPlan.cPlansByCategory:
+            self.vModel.PaycheckPlan.cPlansByCategory[category] = self.vModel.PaycheckPlan.CategoryPlan()
+        category_plan = self.vModel.PaycheckPlan.cPlansByCategory[category]
         category_plan.amount = self.grid_slaves(row, 1)[0].get()
         category_plan.period = self.grid_slaves(row, 2)[0].get()
         if category_plan.IsEmpty():
-            del self.vModel.PaycheckPlan.cCategoryPlans[category]
+            del self.vModel.PaycheckPlan.cPlansByCategory[category]
