@@ -20,7 +20,7 @@ class SelectCategoryPopup(tk.Frame):
         # Highlight cell
         cell.config(background="grey")
 
-        for vCategory in vModel.Categories.main_list:
+        for vCategory in vModel.Categories:
             b = tk.Button(self, text=vCategory.name,
                           command=lambda vCategory=vCategory, cell=cell, self=self: self.SelectCategory(vCategory, cell))
             b.pack(fill=tk.BOTH, expand=True)

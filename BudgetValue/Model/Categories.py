@@ -2,7 +2,7 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 
 
-class Categories():
+class Categories(list):
     def __init__(self, vModel):
         self.vModel = vModel
         default_catagory_names = [
@@ -18,13 +18,12 @@ class Categories():
             "Activities",
             "Savings"
         ]
-        self.main_list = []
         for i, vItem in enumerate(default_catagory_names):
-            self.main_list.append(Category(vItem))
+            self.append(Category(vItem))
         self.favorites = []
 
     def GetTrueCategories(self):
-        return [category for category in self.main_list if "<" not in category.name]
+        return [category for category in self if "<" not in category.name]
 
 
 class Category():
