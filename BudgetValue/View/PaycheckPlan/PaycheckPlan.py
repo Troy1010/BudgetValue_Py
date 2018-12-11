@@ -34,7 +34,7 @@ class PaycheckPlan(TM.tk.TableFrame):
         w.bind("<FocusOut>", lambda event, w=w: self.Entry_FocusOut(event, w))
         w.bind("<Return>", lambda event, w=w: self.Entry_Return(event, w))
         w.category = category
-        w.MakeValid = BV.MakeValid_Money
+        w.ValidationHandler = BV.MakeValid_Money
 
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)
@@ -44,7 +44,7 @@ class PaycheckPlan(TM.tk.TableFrame):
     def Entry_FocusOut(self, event, cell):
         cell.config(justify=tk.RIGHT)
         if cell.text_at_focus_in != cell.text:
-            cell.text = cell.text  # make valid
+            cell.MakeValid()
             self.MakeRowValid(cell.row, cell)
         self.SaveCategoryPlan(cell.row)
 
@@ -65,11 +65,22 @@ class PaycheckPlan(TM.tk.TableFrame):
         amount = self.GetCell(row, 1).text
         period = self.GetCell(row, 2).text
         amountPerWeek = self.GetCell(row, 3).text
-        if cellThatChanged.column in [1, 2]:
+        if cellThatChanged.column == 1:
             try:
                 self.GetCell(row, 3).text = float(amount) / float(period)
             except ValueError:
                 pass
+        elif cellThatChanged.column == 2:
+            if self.GetCell(row, 1).text:
+                try:
+                    self.GetCell(row, 3).text = float(amount) / float(period)
+                except ValueError:
+                    pass
+            else:
+                try:
+                    self.GetCell(row, 1).text = float(amountPerWeek) * float(period)
+                except ValueError:
+                    pass
         elif cellThatChanged.column == 3:
             try:
                 self.GetCell(row, 1).text = float(amountPerWeek) * float(period)
