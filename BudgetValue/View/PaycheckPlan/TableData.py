@@ -93,10 +93,10 @@ class TableData(TM.tk.TableFrame):
 
     def SaveCategoryPlan(self, row):
         category = self.GetCell(row, 0).category
-        if category not in self.vModel.PaycheckPlan.cPlansByCategory:
-            self.vModel.PaycheckPlan.cPlansByCategory[category] = self.vModel.PaycheckPlan.CategoryPlan()
-        category_plan = self.vModel.PaycheckPlan.cPlansByCategory[category]
+        if category not in self.vModel.PaycheckPlan:
+            self.vModel.PaycheckPlan[category] = self.vModel.PaycheckPlan.CategoryPlan()
+        category_plan = self.vModel.PaycheckPlan[category]
         category_plan.amount = self.grid_slaves(row, 1)[0].get()
         category_plan.period = self.grid_slaves(row, 2)[0].get()
         if category_plan.IsEmpty():
-            del self.vModel.PaycheckPlan.cPlansByCategory[category]
+            del self.vModel.PaycheckPlan[category]

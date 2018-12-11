@@ -1,17 +1,18 @@
+import BudgetValue as BV
 
 
 class PaycheckPlan(dict):
     def __init__(self, vModel):
         self.vModel = vModel
-        self.cPlansByCategory = dict()
 
     def Narrate(self):
         cReturning = []
-        for k, v in self.cPlansByCategory.items():
+        for k, v in self.items():
             cReturning.append("Category:" + k.name + " amount:" + str(v.amount) + " period:" + str(v.period))
         return "PaycheckPlan..\n\t" + "\n\t".join(cReturning)
 
     class CategoryPlan():
+
         def __init__(self, category=None, amount=None, period=None):
             self.amount = amount
             self.period = period
@@ -20,7 +21,7 @@ class PaycheckPlan(dict):
             if not value or value == 0:
                 return None
             else:
-                return float(value)
+                return BV.MakeValid_Money(value)
 
         def IsEmpty(self):
             return not (self.amount or self.period)
