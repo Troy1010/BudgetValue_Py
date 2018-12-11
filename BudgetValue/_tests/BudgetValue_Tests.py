@@ -42,3 +42,8 @@ class Test_BudgetValue(unittest.TestCase):
         v = BV.MakeValid_Money(v)
         BVLog_LogTests.debug(v)
         self.assertEqual(v, decimal.Decimal(repr(4)))
+
+    def test_PaycheckPlanRaisesSetKeyTypeError(self):
+        with self.assertRaises(TypeError):
+            vModel = BV.Model.Model()
+            vModel.PaycheckPlan["qwer"] = 1
