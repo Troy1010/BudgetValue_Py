@@ -1,4 +1,5 @@
 import decimal
+from decimal import Decimal
 
 
 def GetAllChildren(vItem, bIncludeRoot=False):
@@ -22,7 +23,7 @@ class GetAllChildren_Helper():
 
 
 def MakeValid_Money(value):
-    returning = decimal.Decimal(str(value)).quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_UP)
+    returning = Decimal(str(value)).quantize(Decimal('0.01'), rounding=decimal.ROUND_UP)
     if returning % 1 == 0:
-        returning = returning.quantize(decimal.Decimal('1.'))
+        returning = returning.quantize(Decimal('1.'))
     return returning
