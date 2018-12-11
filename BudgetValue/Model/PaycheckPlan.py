@@ -17,7 +17,7 @@ class PaycheckPlan(dict):
             self.amount = amount
             self.period = period
 
-        def MakeValid(self, value):
+        def ValidationHandler(self, value):
             if not value or value == 0:
                 return None
             else:
@@ -32,7 +32,7 @@ class PaycheckPlan(dict):
 
         @amount.setter
         def amount(self, value):
-            self._amount = self.MakeValid(value)
+            self._amount = self.ValidationHandler(value)
 
         @property
         def period(self):
@@ -40,7 +40,7 @@ class PaycheckPlan(dict):
 
         @period.setter
         def period(self, value):
-            self._period = self.MakeValid(value)
+            self._period = self.ValidationHandler(value)
 
         @property
         def amountPerWeek(self):
