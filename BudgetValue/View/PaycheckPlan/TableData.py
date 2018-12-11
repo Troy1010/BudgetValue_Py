@@ -11,12 +11,28 @@ class TableData(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
+        self.Refresh()
 
-        for i, category in enumerate(vModel.Categories.GetTrueCategories()):
+    def Refresh(self):
+        # remove old
+        for child in BV.GetAllChildren(self):
+            child.grid_forget()
+            child.destroy()
+        # add new
+        for i, category in enumerate(self.vModel.Categories.GetTrueCategories()):
             self.MakeText((i, 0), category)
-            self.MakeEntry((i, 1), category)
-            self.MakeEntry((i, 2), category)
+            try:
+                amount = self.vModel.PaycheckPlan[category].amount
+            except KeyError:
+                amount = None
+            self.MakeEntry((i, 1), category, amount)
+            try:
+                period = self.vModel.PaycheckPlan[category].period
+            except KeyError:
+                period = None
+            cell = self.MakeEntry((i, 2), category, period)
             self.MakeEntry((i, 3), category)
+            self.MakeRowValid(i, cell)
 
     def MakeText(self, cRowColumnPair, category):
         w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, borderwidth=2, height=1, relief='ridge', background='SystemButtonFace')
@@ -25,7 +41,7 @@ class TableData(TM.tk.TableFrame):
         w.configure(state="disabled")
         w.category = category
 
-    def MakeEntry(self, cRowColumnPair, category):
+    def MakeEntry(self, cRowColumnPair, category, text=None):
         w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
                         borderwidth=2, relief='ridge', background='SystemButtonFace')
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
@@ -34,6 +50,9 @@ class TableData(TM.tk.TableFrame):
         w.bind("<Return>", lambda event, w=w: self.Entry_Return(event, w))
         w.category = category
         w.ValidationHandler = BV.MakeValid_Money
+        if text:
+            w.text = text
+        return w
 
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)

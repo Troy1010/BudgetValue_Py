@@ -31,9 +31,9 @@ class PaycheckPlan(dict):
         return "\n\t".join(cReturning)
 
     def Save(self):
-        data = dict(self)
-        for k, v in data.items():
-            data[k] = dict(v)
+        data = dict()
+        for category, category_plan in dict(self).items():
+            data[category.name] = dict(category_plan)
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -41,9 +41,9 @@ class PaycheckPlan(dict):
         with open(self.sSaveFile, 'rb') as f:
             data = pickle.load(f)
         for k, v in data.items():
-            self[k] = self.CategoryPlan()
+            self[self.vModel.Categories[k]] = self.CategoryPlan()
             for k2, v2 in v.items():
-                self[k][k2] = v2
+                self[self.vModel.Categories[k]][k2] = v2
 
     class CategoryPlan(dict):
 

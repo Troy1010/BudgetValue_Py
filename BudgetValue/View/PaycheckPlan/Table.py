@@ -17,3 +17,6 @@ class Table(tk.Frame):
         #  Assign TableData to Canvas
         self.vTableData = TableData(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTableData, anchor='nw')
+
+    def Refresh(self):
+        self.vTableData.Refresh()

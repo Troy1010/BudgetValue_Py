@@ -20,10 +20,10 @@ class PaycheckPlan(tk.Frame):
         vButton_Load.pack(side=tk.LEFT, anchor='w')
         vButton_Print = ttk.Button(self.vButtonBar, text="Print", command=lambda self=self: print(self.vModel.PaycheckPlan.Narrate()))
         vButton_Print.pack(side=tk.LEFT, anchor='w')
-
         # Table
         self.vTable = Table(self, vModel)
         self.vTable.pack(side=tk.TOP, expand=True, fill="both")
 
     def Load(self):
         self.vModel.PaycheckPlan.Load()
+        self.vTable.Refresh()
