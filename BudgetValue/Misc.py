@@ -1,4 +1,4 @@
-import TM_CommonPy as TM
+import decimal
 
 
 def GetAllChildren(vItem, bIncludeRoot=False):
@@ -22,6 +22,7 @@ class GetAllChildren_Helper():
 
 
 def MakeValid_Money(value):
-    if value.is_integer():
-        return int(value)
-    return float('{0:.2f}'.format(TM.Ceil(value, 2)))
+    returning = decimal.Decimal(str(value)).quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_UP)
+    if returning % 1 == 0:
+        returning = returning.quantize(decimal.Decimal('1.'))
+    return returning

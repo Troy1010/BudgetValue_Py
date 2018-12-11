@@ -3,6 +3,8 @@ import unittest
 import TM_CommonPy as TM
 from nose.plugins.attrib import attr
 from ._Logger import BVLog_LogTests
+import BudgetValue as BV
+import decimal
 # Settings
 bPostDelete = False
 # Globals
@@ -29,10 +31,14 @@ class Test_BudgetValue(unittest.TestCase):
 
     # ------Tests
     @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
-    def test_Dummy(self):
-        self.assertTrue(True)
+    def test_MakeValid_Money_float(self):
+        v = 1.234
+        v = BV.MakeValid_Money(v)
+        BVLog_LogTests.debug(v)
+        self.assertEqual(v, decimal.Decimal(repr(1.24)))
 
-    @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
-    def test_MakeValid_Money(self):
-        BVLog_LogTests.debug("qwer")
-        self.assertTrue(True)
+    def test_MakeValid_Money_int(self):
+        v = 4
+        v = BV.MakeValid_Money(v)
+        BVLog_LogTests.debug(v)
+        self.assertEqual(v, decimal.Decimal(repr(4)))

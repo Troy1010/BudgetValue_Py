@@ -2,6 +2,7 @@ from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
 from BudgetValue.View import Fonts
 import TM_CommonPy as TM
+import BudgetValue as BV
 
 
 class PaycheckPlan(TM.tk.TableFrame):
@@ -33,7 +34,7 @@ class PaycheckPlan(TM.tk.TableFrame):
         w.bind("<FocusOut>", lambda event, w=w: self.Entry_FocusOut(event, w))
         w.bind("<Return>", lambda event, w=w: self.Entry_Return(event, w))
         w.category = category
-        # w.MakeValid =
+        w.MakeValid = BV.MakeValid_Money
 
     def Entry_FocusIn(self, event, cell):
         cell.config(justify=tk.LEFT)
@@ -43,7 +44,7 @@ class PaycheckPlan(TM.tk.TableFrame):
     def Entry_FocusOut(self, event, cell):
         cell.config(justify=tk.RIGHT)
         if cell.text_at_focus_in != cell.text:
-            cell.text = cell.text  # validation
+            cell.text = cell.text  # make valid
             self.MakeRowValid(cell.row, cell)
         self.SaveCategoryPlan(cell.row)
 
@@ -84,4 +85,3 @@ class PaycheckPlan(TM.tk.TableFrame):
         category_plan.period = self.grid_slaves(row, 2)[0].get()
         if category_plan.IsEmpty():
             del self.vModel.PaycheckPlan.cCategoryPlans[category]
-        print(self.vModel.PaycheckPlan.Narrate())
