@@ -5,7 +5,7 @@ import TM_CommonPy as TM
 import BudgetValue as BV
 
 
-class TableDataFrame(TM.tk.TableFrame):
+class TableData(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
@@ -17,8 +17,7 @@ class TableDataFrame(TM.tk.TableFrame):
             self.MakeEntry((i, 3), category)
 
     def MakeText(self, cRowColumnPair, category):
-        w = tk.Text(self, font=Fonts.FONT_SMALL, width=15,
-                    borderwidth=2, height=1, relief='ridge', background='SystemButtonFace')
+        w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, borderwidth=2, height=1, relief='ridge', background='SystemButtonFace')
         w.insert(1.0, category.name)
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
         w.configure(state="disabled")
@@ -81,7 +80,7 @@ class TableDataFrame(TM.tk.TableFrame):
                     pass
         elif cellThatChanged.column == 3:
             try:
-                self.GetCell(row, 1).text = float(amountPerWeek) * float(period)
+                self.GetCell(row, 2).text = float(amount) / float(amountPerWeek)
             except ValueError:
                 pass
 
