@@ -4,23 +4,18 @@ import os
 
 
 class PaycheckPlan(dict):
-
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
+        self.Load()
 
     def __setitem__(self, key, val):
         # Keys must be a BV.Model.Category
         if not isinstance(key, BV.Model.Category):
-            raise TypeError("Keys of " + __class__.__name__ + " must be a "+str(BV.Model.Category)+" object")
-        # Remove a key with an identical name
-        vDeleteMe = None
-        for k in self:
-            if k.name == key.name:
-                vDeleteMe = k
-                break
-        if vDeleteMe:
-            del self[vDeleteMe]
+            raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(BV.Model.Category) + " object")
+        # Remove keys with identical names
+        for k in [k for k in self if k.name == key.name]:
+            del self[k]
         #
         dict.__setitem__(self, key, val)
 
@@ -40,6 +35,8 @@ class PaycheckPlan(dict):
     def Load(self):
         with open(self.sSaveFile, 'rb') as f:
             data = pickle.load(f)
+        if not data:
+            return
         for k, v in data.items():
             self[self.vModel.Categories[k]] = self.CategoryPlan()
             for k2, v2 in v.items():
