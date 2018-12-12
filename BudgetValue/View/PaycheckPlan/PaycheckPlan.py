@@ -2,12 +2,14 @@ from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
 from tkinter import ttk
 from .Table import Table
+import BudgetValue as BV
 
 
 class PaycheckPlan(tk.Frame):
     name = "Paycheck Plan"
 
     def __init__(self, parent, vModel):
+        assert isinstance(vModel, BV.Model.Model)
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
