@@ -11,7 +11,6 @@ class TableData(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
-        self.Refresh()
 
     def Refresh(self):
         # remove old
