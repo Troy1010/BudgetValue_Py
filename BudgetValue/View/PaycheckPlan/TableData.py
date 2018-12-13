@@ -9,7 +9,7 @@ from BudgetValue.Model import CategoryType  # noqa
 
 class TableData(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent, background='grey')
+        tk.Frame.__init__(self, parent)
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
@@ -41,7 +41,6 @@ class TableData(TM.tk.TableFrame):
             else:
                 self.MakeText((row, 0), category, text=category.name, columnspan=3)
                 self.MakeEntry((row, 3), category, text=amount)
-
             row += 1
 
     def MakeText(self, cRowColumnPair, category, text=None, columnspan=1):
