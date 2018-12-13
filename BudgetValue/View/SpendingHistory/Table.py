@@ -30,8 +30,7 @@ class Table(tk.Canvas):
                 b.iRow = i
         self.update_idletasks()
         # Make scrollable
-        self.vTableWindow.bind(
-            "<Configure>", lambda event: self.onFrameConfigure())
+        self.vTableWindow.bind("<Configure>", lambda event: self.onFrameConfigure())
         for vWidget in BV.GetAllChildren(self, bIncludeRoot=True):
             vWidget.bind("<MouseWheel>", self.onMousewheel)
         # Popup - Select Category
