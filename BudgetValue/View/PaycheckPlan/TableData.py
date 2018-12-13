@@ -23,7 +23,6 @@ class TableData(TM.tk.TableFrame):
         row = 0
         prev_type = None
         for category in self.vModel.Categories.Select(types_exclude=[CategoryType.extra]):
-            assert isinstance(category, BV.Model.Category)
             # make separation labels
             if prev_type != category.type:
                 prev_type = category.type
