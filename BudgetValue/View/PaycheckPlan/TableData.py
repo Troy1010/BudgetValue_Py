@@ -3,14 +3,16 @@ import tkinter as tk
 from BudgetValue.View import Fonts
 import TM_CommonPy as TM
 import BudgetValue as BV
-import decimal
 from decimal import Decimal
+from BudgetValue.Model import CategoryType  # noqa
 
 
 class TableData(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent, background='grey')
+        assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
+        self.parent = parent
 
     def Refresh(self):
         # remove old
@@ -18,54 +20,71 @@ class TableData(TM.tk.TableFrame):
             child.grid_forget()
             child.destroy()
         # add new
-        for i, category in enumerate(self.vModel.Categories.GetTrueCategories()):
-            self.MakeText((i, 0), category)
-            try:
-                amount = self.vModel.PaycheckPlan[category].amount
-            except KeyError:
-                amount = None
-            self.MakeEntry((i, 1), category, amount)
-            try:
-                period = self.vModel.PaycheckPlan[category].period
-            except KeyError:
-                period = None
-            cell = self.MakeEntry((i, 2), category, period)
-            self.MakeEntry((i, 3), category)
-            self.MakeRowValid(i, cell)
+        row = 0
+        prev_type = None
+        for category in self.vModel.Categories.Select(types_exclude=[CategoryType.extra]):
+            assert isinstance(category, BV.Model.Category)
+            # make separation labels
+            if prev_type != category.type:
+                prev_type = category.type
+                self.MakeSeparationLable(row, "  " + prev_type.name.capitalize())
+                row += 1
+            # generate row for category
+            amount = None if category not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category].amount
+            period = None if category not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category].period
+            if category.IsSpendable():
+                self.MakeText((row, 0), category, text=category.name)
+                self.MakeEntry((row, 1), category, text=amount)
+                self.MakeEntry((row, 2), category, text=period)
+                self.MakeEntry((row, 3), category)
+                self.MakeRowValid(row)
+            else:
+                self.MakeText((row, 0), category, text=category.name, columnspan=3)
+                self.MakeEntry((row, 3), category, text=amount)
 
-    def MakeText(self, cRowColumnPair, category):
-        w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, borderwidth=2, height=1, relief='ridge', background='SystemButtonFace')
-        w.insert(1.0, category.name)
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
-        w.configure(state="disabled")
+            row += 1
+
+    def MakeText(self, cRowColumnPair, category, text=None, columnspan=1):
+        w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, height=1,
+                    borderwidth=2, relief='ridge', background='SystemButtonFace')
+        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ew")
         w.category = category
+        if text:
+            w.insert(1.0, text)
+        w.configure(state="disabled")
 
-    def MakeEntry(self, cRowColumnPair, category, text=None):
+    def MakeEntry(self, cRowColumnPair, category, text=None, columnspan=1):
         w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
                         borderwidth=2, relief='ridge', background='SystemButtonFace')
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
-        w.bind("<FocusIn>", lambda event, w=w: self.Entry_FocusIn(event, w))
-        w.bind("<FocusOut>", lambda event, w=w: self.Entry_FocusOut(event, w))
-        w.bind("<Return>", lambda event, w=w: self.Entry_Return(event, w))
+        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan)
+        w.bind("<FocusIn>", lambda event, w=w: self.Entry_FocusIn(w))
+        w.bind("<FocusOut>", lambda event, w=w: self.Entry_FocusOut(w))
+        w.bind("<Return>", lambda event, w=w: self.Entry_Return(w))
         w.category = category
         w.ValidationHandler = BV.MakeValid_Money
         if text:
             w.text = text
         return w
 
-    def Entry_FocusIn(self, event, cell):
+    def MakeSeparationLable(self, row, text):
+        w = tk.Text(self, font=Fonts.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT, background='lightblue')
+        w.insert(1.0, text)
+        w.grid(row=row, columnspan=4, sticky="ew")
+        w.configure(state="disabled")
+
+    def Entry_FocusIn(self, cell):
         cell.config(justify=tk.LEFT)
         cell.select_text()
         cell.text_at_focus_in = cell.text
 
-    def Entry_FocusOut(self, event, cell):
+    def Entry_FocusOut(self, cell):
         cell.config(justify=tk.RIGHT)
         if cell.text_at_focus_in != cell.text:
             cell.MakeValid()
-            self.MakeRowValid(cell.row, cell)
+            self.MakeRowValid(cell.row, columnToKeep=cell.column)
         self.SaveCategoryPlan(cell.row)
 
-    def Entry_Return(self, event, cell):
+    def Entry_Return(self, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
         if list_of_cell_to_the_right:
             list_of_cell_to_the_right[0].focus_set()
@@ -76,45 +95,37 @@ class TableData(TM.tk.TableFrame):
             return
         cell.winfo_toplevel().focus_set()
 
-    def MakeRowValid(self, row, cellThatChanged):
-        if not cellThatChanged.text:
+    def MakeRowValid(self, row, columnToKeep=0):
+        if not self.GetCategoryOfRow(row).IsSpendable():
             return
         # Get values of row
-        try:
-            amount = Decimal(str(self.GetCell(row, 1).text))
-        except decimal.InvalidOperation:  # cell was empty
-            amount = None
-        try:
-            period = Decimal(str(self.GetCell(row, 2).text))
-        except decimal.InvalidOperation:  # cell was empty
-            period = None
-        try:
-            plan = Decimal(str(self.GetCell(row, 3).text))
-        except decimal.InvalidOperation:  # cell was empty
-            plan = None
+        amount = None if not self.GetCell(row, 1).text else Decimal(str(self.GetCell(row, 1).text))
+        period = None if not self.GetCell(row, 2).text else Decimal(str(self.GetCell(row, 2).text))
+        plan = None if not self.GetCell(row, 3).text else Decimal(str(self.GetCell(row, 3).text))
         # if we can complete the row, do so.
-        if cellThatChanged.column != 3 and amount and period:
-            try:
-                self.GetCell(row, 3).text = amount / period
-            except ValueError:
-                pass
-        elif cellThatChanged.column != 2 and amount and plan:
-            try:
-                self.GetCell(row, 2).text = amount / plan
-            except ValueError:
-                pass
-        elif cellThatChanged.column != 1 and period and plan:
-            try:
-                self.GetCell(row, 1).text = plan * period
-            except ValueError:
-                pass
+        if columnToKeep != 3 and amount and period:
+            self.GetCell(row, 3).text = amount / period
+        elif columnToKeep != 2 and amount and plan:
+            self.GetCell(row, 2).text = amount / plan
+        elif columnToKeep != 1 and period and plan:
+            self.GetCell(row, 1).text = plan * period
 
     def SaveCategoryPlan(self, row):
-        category = self.GetCell(row, 0).category
-        if category not in self.vModel.PaycheckPlan:
-            self.vModel.PaycheckPlan[category] = self.vModel.PaycheckPlan.CategoryPlan()
-        category_plan = self.vModel.PaycheckPlan[category]
-        category_plan.amount = self.grid_slaves(row, 1)[0].get()
-        category_plan.period = self.grid_slaves(row, 2)[0].get()
+        # Get category
+        category = self.GetCategoryOfRow(row)
+        # Make a category_plan out of the view's data
+        category_plan = self.vModel.PaycheckPlan.CategoryPlan()
+        if category.IsSpendable():
+            category_plan.amount = self.GetCell(row, 1).text
+            category_plan.period = self.GetCell(row, 2).text
+        else:
+            category_plan.amount = self.GetCell(row, 3).text
+        # Add category_plan to model
         if category_plan.IsEmpty():
-            del self.vModel.PaycheckPlan[category]
+            if category in self.vModel.PaycheckPlan:
+                del self.vModel.PaycheckPlan[category]
+        else:
+            self.vModel.PaycheckPlan[category] = category_plan
+
+    def GetCategoryOfRow(self, row):
+        return self.GetCell(row, 0).category

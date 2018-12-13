@@ -17,12 +17,17 @@ class CategoryType(AutoName):
     once = enum.auto()
     excess = enum.auto()
 
+    def IsSpendable(self):
+        return self in [self.always, self.reservoir, self.once]
+
 
 class Categories(dict):
     def __init__(self, vModel):
         self.vModel = vModel
         default_catagories = [
             Category("<Default Category>", CategoryType.extra),
+            Category("Paycheck", CategoryType.income),
+            Category("Bonus", CategoryType.income),
             Category("Rent", CategoryType.always),
             Category("Hair", CategoryType.always),
             Category("Commute", CategoryType.always),
@@ -38,12 +43,22 @@ class Categories(dict):
         for category in default_catagories:
             self[category.name] = category
 
-    def GetTrueCategories(self):
-        return [category for category in self.values() if category.type != CategoryType.extra]
+    def Select(self, types=None, types_exclude=None):
+        returning = self.values()
+        if types:
+            returning = [category for category in returning if category.type in types]
+        if types_exclude:
+            returning = [category for category in returning if category.type not in types_exclude]
+        return returning
 
 
 class Category():
     def __init__(self, name, type_):
+        assert isinstance(name, str)
+        assert isinstance(type_, CategoryType)
         self.name = name
         self.type = type_
         self.bFavorite = False
+
+    def IsSpendable(self):
+        return self.type.IsSpendable()
