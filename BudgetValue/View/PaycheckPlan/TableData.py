@@ -5,7 +5,6 @@ import TM_CommonPy as TM
 import BudgetValue as BV
 from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
-from .TableHeader import TableHeader
 
 
 class TableData(TM.tk.TableFrame):
@@ -23,8 +22,8 @@ class TableData(TM.tk.TableFrame):
         # add new
         row = 0
         # Header
-        self.vHeader = TableHeader(self)
-        self.vHeader.grid(row=row, column=0, columnspan=4)
+        for j, header_name in enumerate(['Category', 'Amount', 'Period', 'Plan']):
+            self.MakeHeader((row, j), text=header_name)
         row += 1
         # Table
         prev_type = None
@@ -69,6 +68,16 @@ class TableData(TM.tk.TableFrame):
         else:
             self.vBalanceNum.config(readonlybackground="lightgreen")
 
+    def MakeHeader(self, cRowColumnPair, text=None):
+        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
+                     background='SystemButtonFace', text=text)
+        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
+
+    def MakeSeparationLable(self, row, text):
+        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT,
+                     background='lightblue', text=text, anchor="w")
+        w.grid(row=row, columnspan=4, sticky="ew")
+
     def MakeText(self, cRowColumnPair, category, text=None, columnspan=1):
         w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, height=1,
                     borderwidth=2, relief='ridge', background='SystemButtonFace')
@@ -87,15 +96,7 @@ class TableData(TM.tk.TableFrame):
         w.bind("<Return>", lambda event, w=w: self.Entry_Return(w))
         w.category = category
         w.ValidationHandler = BV.MakeValid_Money
-        if text:
-            w.text = text
-        return w
-
-    def MakeSeparationLable(self, row, text):
-        w = tk.Text(self, font=Fonts.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT, background='lightblue')
-        w.insert(1.0, text)
-        w.grid(row=row, columnspan=4, sticky="ew")
-        w.configure(state="disabled")
+        w.text = text
 
     def Entry_FocusIn(self, cell):
         cell.config(justify=tk.LEFT)
