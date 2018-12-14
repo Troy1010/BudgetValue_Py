@@ -27,8 +27,11 @@ class PaycheckPlan(tk.Frame):
                                    command=lambda self=self: print(self.vModel.PaycheckPlan.Narrate()))
         vButton_Print.pack(side=tk.LEFT, anchor='w')
         # Table
-        self.vTable = Table(self, vModel)
-        self.vTable.pack(side=tk.TOP, expand=True, fill="both")
+        self.vCanvas = tk.Canvas(self, highlightthickness=0)
+        self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
+        self.vTable = Table(self.vCanvas, vModel)
+        self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
+        self.vTable.pack(anchor='nw')
         self.Load()
 
     def _destroy(self, event):
