@@ -5,6 +5,7 @@ import TM_CommonPy as TM
 import BudgetValue as BV
 from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
+from .TableHeader import TableHeader
 
 
 class TableData(TM.tk.TableFrame):
@@ -21,6 +22,11 @@ class TableData(TM.tk.TableFrame):
             child.destroy()
         # add new
         row = 0
+        # Header
+        self.vHeader = TableHeader(self)
+        self.vHeader.grid(row=row, column=0, columnspan=4)
+        row += 1
+        # Table
         prev_type = None
         for category in self.vModel.Categories.Select(types_exclude=[CategoryType.extra]):
             # make separation labels
@@ -41,6 +47,27 @@ class TableData(TM.tk.TableFrame):
                 self.MakeText((row, 0), category, text=category.name, columnspan=3)
                 self.MakeEntry((row, 3), category, text=amount)
             row += 1
+        # Balance
+        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
+        row += 1
+        vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
+                            relief='ridge', background='SystemButtonFace', text="Balance")
+        vBalance.grid(row=row, column=0, columnspan=3, sticky="ewn")
+        self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
+                                       borderwidth=2, relief='ridge', justify='center', state="readonly")
+        self.vBalanceNum.grid(row=row, column=3, sticky="ewns")
+        self.SetBalance()
+
+    def SetBalance(self):
+        dBalance = 0
+        for item in self.vModel.PaycheckPlan.values():
+            dBalance += item.amount
+        self.vBalanceNum.text = str(dBalance)
+        # color
+        if dBalance != 0:
+            self.vBalanceNum.config(readonlybackground="pink")
+        else:
+            self.vBalanceNum.config(readonlybackground="lightgreen")
 
     def MakeText(self, cRowColumnPair, category, text=None, columnspan=1):
         w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, height=1,
@@ -81,6 +108,7 @@ class TableData(TM.tk.TableFrame):
             cell.MakeValid()
             self.MakeRowValid(cell.row, columnToKeep=cell.column)
         self.SaveCategoryPlan(cell.row)
+        self.SetBalance()
 
     def Entry_Return(self, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
