@@ -108,7 +108,7 @@ class Table(TM.tk.TableFrame):
         if cell.text_at_focus_in != cell.text:
             cell.MakeValid()
             self.MakeRowValid(cell.row, columnToKeep=cell.column)
-        self.SaveCategoryPlan(cell.row)
+        self.SaveToModel(cell.row)
         self.SetBalance()
 
     def Entry_Return(self, cell):
@@ -137,7 +137,7 @@ class Table(TM.tk.TableFrame):
         elif columnToKeep != 1 and period and plan:
             self.GetCell(row, 1).text = plan * period
 
-    def SaveCategoryPlan(self, row):
+    def SaveToModel(self, row):
         # Get category
         category = self.GetCategoryOfRow(row)
         # Make a category_plan out of the view's data
