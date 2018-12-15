@@ -55,15 +55,26 @@ class Table(TM.tk.TableFrame):
         self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vBalanceNum.grid(row=row, column=3, sticky="ewns")
+        row += 1
+        #
+        self.excessDumpCell = self.GetCell(row-3, 3)
+        self.DistributeBalance()
         self.ShowBalance()
 
-    def DistributeBalance(self):
-        dBalance = 0
-        for category_plan in self.vModel.PaycheckPlan.values():
-            if category_plan.category.type == CategoryType.income:
-                dBalance += category_plan.amount
-            else:
-                dBalance -= category_plan.Amount
+    def DistributeBalance(self, cellToKeep=None):
+        if cellToKeep != self.excessDumpCell:
+            dBalance = self.CalculateBalance()
+            self.excessDumpCell.text = Decimal(self.excessDumpCell.text) + dBalance
+            self.SaveToModel(self.excessDumpCell.row)
+
+    def ShowBalance(self):
+        dBalance = self.CalculateBalance()
+        self.vBalanceNum.text = str(dBalance)
+        # color
+        if dBalance != 0:
+            self.vBalanceNum.config(readonlybackground="pink")
+        else:
+            self.vBalanceNum.config(readonlybackground="lightgreen")
 
     def CalculateBalance(self):
         dBalance = 0
@@ -75,15 +86,6 @@ class Table(TM.tk.TableFrame):
             else:
                 dBalance -= category_plan.amount
         return dBalance
-
-    def ShowBalance(self):
-        dBalance = self.CalculateBalance()
-        self.vBalanceNum.text = str(dBalance)
-        # color
-        if dBalance != 0:
-            self.vBalanceNum.config(readonlybackground="pink")
-        else:
-            self.vBalanceNum.config(readonlybackground="lightgreen")
 
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
@@ -124,8 +126,9 @@ class Table(TM.tk.TableFrame):
         cell.config(justify=tk.RIGHT)
         if cell.text_at_focus_in != cell.text:
             cell.MakeValid()
-            self.MakeRowValid(cell.row, columnToKeep=cell.column)
+            self.MakeRowValid(cell.row, cellToKeep=cell)
         self.SaveToModel(cell.row)
+        self.DistributeBalance(cell)
         self.ShowBalance()
 
     def Entry_Return(self, cell):
@@ -139,7 +142,8 @@ class Table(TM.tk.TableFrame):
             return
         cell.winfo_toplevel().focus_set()
 
-    def MakeRowValid(self, row, columnToKeep=0):
+    def MakeRowValid(self, row, cellToKeep=None):
+        columnToKeep = -1 if cellToKeep is None else cellToKeep.column
         if self.GetCategoryOfRow(row).IsSpendable():
             # Get values of row
             amount = None if not self.GetCell(row, 1).text else Decimal(str(self.GetCell(row, 1).text))
