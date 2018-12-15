@@ -55,7 +55,7 @@ class Table(TM.tk.TableFrame):
         self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vBalanceNum.grid(row=row, column=3, sticky="ewns")
-        self.CalculateBalance()
+        self.ShowBalance()
 
     def DistributeBalance(self):
         dBalance = 0
@@ -68,10 +68,16 @@ class Table(TM.tk.TableFrame):
     def CalculateBalance(self):
         dBalance = 0
         for category_plan in self.vModel.PaycheckPlan.values():
+            if category_plan.amount is None:
+                continue
             if category_plan.category.type == CategoryType.income:
                 dBalance += category_plan.amount
             else:
                 dBalance -= category_plan.amount
+        return dBalance
+
+    def ShowBalance(self):
+        dBalance = self.CalculateBalance()
         self.vBalanceNum.text = str(dBalance)
         # color
         if dBalance != 0:
@@ -120,7 +126,7 @@ class Table(TM.tk.TableFrame):
             cell.MakeValid()
             self.MakeRowValid(cell.row, columnToKeep=cell.column)
         self.SaveToModel(cell.row)
-        self.CalculateBalance()
+        self.ShowBalance()
 
     def Entry_Return(self, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
