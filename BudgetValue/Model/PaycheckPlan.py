@@ -4,6 +4,8 @@ import os
 
 
 class PaycheckPlan(dict):
+    """inherits from dict to make pickling easier"""
+
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
@@ -33,29 +35,36 @@ class PaycheckPlan(dict):
             pickle.dump(data, f)
 
     def Load(self):
+        if not os.path.exists(self.sSaveFile):
+            return
         with open(self.sSaveFile, 'rb') as f:
             data = pickle.load(f)
         if not data:
             return
         for k, v in data.items():
-            self[self.vModel.Categories[k]] = self.CategoryPlan()
+            self[self.vModel.Categories[k]] = self.CategoryPlan(self.vModel.Categories[k])
             for k2, v2 in v.items():
                 self[self.vModel.Categories[k]][k2] = v2
 
     class CategoryPlan(dict):
+        """inherits from dict to make pickling easier"""
 
-        def __init__(self, amount=None, period=None):
+        def __init__(self, category, amount=None, period=None):
+            self.category = category
             self.amount = amount
             self.period = period
 
-        def ValidationHandler(self, value):
-            if not value or value == 0:
-                return None
-            else:
-                return BV.MakeValid_Money(value)
-
         def IsEmpty(self):
             return not (self.amount or self.period)
+
+        @property
+        def category(self):
+            return self["category"]
+
+        @category.setter
+        def category(self, value):
+            assert isinstance(value, BV.Model.Category)
+            self["category"] = value
 
         @property
         def amount(self):
@@ -63,7 +72,7 @@ class PaycheckPlan(dict):
 
         @amount.setter
         def amount(self, value):
-            self["amount"] = self.ValidationHandler(value)
+            self["amount"] = None if not value or value == 0 else BV.MakeValid_Money(value)
 
         @property
         def period(self):
@@ -71,16 +80,16 @@ class PaycheckPlan(dict):
 
         @period.setter
         def period(self, value):
-            self["period"] = self.ValidationHandler(value)
+            self["period"] = None if not value or value == 0 else BV.MakeValid_Money(value)
 
         @property
-        def amountPerWeek(self):
+        def amountOverPeriod(self):
             try:
-                returning = self.amount / self.period
+                returning = self.amountOverPeriod / self.period
             except (ZeroDivisionError, TypeError):  # period was None
                 returning = None
             return returning
 
-        @amountPerWeek.setter
-        def amountPerWeek(self, value):
-            self.amount = value*self.period
+        @amountOverPeriod.setter
+        def amountOverPeriod(self, value):
+            self.amountOverPeriod = value*self.period

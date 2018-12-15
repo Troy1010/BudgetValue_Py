@@ -38,9 +38,9 @@ class Table(TM.tk.TableFrame):
             period = None if category not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category].period
             if category.IsSpendable():
                 self.MakeText((row, 0), category, text=category.name)
-                self.MakeEntry((row, 1), category, text=amount)
+                self.MakeEntry((row, 1), category)
                 self.MakeEntry((row, 2), category, text=period)
-                self.MakeEntry((row, 3), category)
+                self.MakeEntry((row, 3), category, text=amount)
                 self.MakeRowValid(row)
             else:
                 self.MakeText((row, 0), category, text=category.name, columnspan=3)
@@ -55,12 +55,23 @@ class Table(TM.tk.TableFrame):
         self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vBalanceNum.grid(row=row, column=3, sticky="ewns")
-        self.SetBalance()
+        self.CalculateBalance()
 
-    def SetBalance(self):
+    def DistributeBalance(self):
         dBalance = 0
-        for item in self.vModel.PaycheckPlan.values():
-            dBalance += item.amount
+        for category_plan in self.vModel.PaycheckPlan.values():
+            if category_plan.category.type == CategoryType.income:
+                dBalance += category_plan.amount
+            else:
+                dBalance -= category_plan.Amount
+
+    def CalculateBalance(self):
+        dBalance = 0
+        for category_plan in self.vModel.PaycheckPlan.values():
+            if category_plan.category.type == CategoryType.income:
+                dBalance += category_plan.amount
+            else:
+                dBalance -= category_plan.amount
         self.vBalanceNum.text = str(dBalance)
         # color
         if dBalance != 0:
@@ -109,7 +120,7 @@ class Table(TM.tk.TableFrame):
             cell.MakeValid()
             self.MakeRowValid(cell.row, columnToKeep=cell.column)
         self.SaveToModel(cell.row)
-        self.SetBalance()
+        self.CalculateBalance()
 
     def Entry_Return(self, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
@@ -123,27 +134,26 @@ class Table(TM.tk.TableFrame):
         cell.winfo_toplevel().focus_set()
 
     def MakeRowValid(self, row, columnToKeep=0):
-        if not self.GetCategoryOfRow(row).IsSpendable():
-            return
-        # Get values of row
-        amount = None if not self.GetCell(row, 1).text else Decimal(str(self.GetCell(row, 1).text))
-        period = None if not self.GetCell(row, 2).text else Decimal(str(self.GetCell(row, 2).text))
-        plan = None if not self.GetCell(row, 3).text else Decimal(str(self.GetCell(row, 3).text))
-        # if we can complete the row, do so.
-        if columnToKeep != 3 and amount and period:
-            self.GetCell(row, 3).text = amount / period
-        elif columnToKeep != 2 and amount and plan:
-            self.GetCell(row, 2).text = amount / plan
-        elif columnToKeep != 1 and period and plan:
-            self.GetCell(row, 1).text = plan * period
+        if self.GetCategoryOfRow(row).IsSpendable():
+            # Get values of row
+            amount = None if not self.GetCell(row, 1).text else Decimal(str(self.GetCell(row, 1).text))
+            period = None if not self.GetCell(row, 2).text else Decimal(str(self.GetCell(row, 2).text))
+            plan = None if not self.GetCell(row, 3).text else Decimal(str(self.GetCell(row, 3).text))
+            # if we can complete the row, do so.
+            if columnToKeep != 3 and amount and period:
+                self.GetCell(row, 3).text = amount / period
+            elif columnToKeep != 2 and amount and plan:
+                self.GetCell(row, 2).text = amount / plan
+            elif columnToKeep != 1 and period and plan:
+                self.GetCell(row, 1).text = plan * period
 
     def SaveToModel(self, row):
         # Get category
         category = self.GetCategoryOfRow(row)
         # Make a category_plan out of the view's data
-        category_plan = self.vModel.PaycheckPlan.CategoryPlan()
+        category_plan = self.vModel.PaycheckPlan.CategoryPlan(category)
         if category.IsSpendable():
-            category_plan.amount = self.GetCell(row, 1).text
+            category_plan.amount = self.GetCell(row, 3).text
             category_plan.period = self.GetCell(row, 2).text
         else:
             category_plan.amount = self.GetCell(row, 3).text
