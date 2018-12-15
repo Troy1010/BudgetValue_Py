@@ -10,8 +10,7 @@ class SpendingHistory():
         self.vModel = vModel
 
     def Import(self, sFilePath):
-        columns = ["Category", "Timestamp",
-                   "Title", "Amount", "Description"]
+        columns = ["Category", "Timestamp", "Title", "Amount", "Description"]
         # Determine data
         data = []
         extension = os.path.splitext(sFilePath)[1][1:]
@@ -29,8 +28,7 @@ class SpendingHistory():
             self.vModel.connection.execute("DROP TABLE " + name)
         except sqlite3.OperationalError:  # table already doesn't exist
             pass
-        sheet.to_sql(
-            name, self.vModel.connection, index=True)
+        sheet.to_sql(name, self.vModel.connection, index=True)
         self.vModel.connection.commit()
 
     def GetTable(self):

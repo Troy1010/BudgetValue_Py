@@ -15,3 +15,4 @@ class Model():
         self.SpendingHistory = BV.Model.SpendingHistory(self)
         self.Categories = BV.Model.Categories(self)
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
+        self.NetWorth = BV.Model.NetWorth(self)

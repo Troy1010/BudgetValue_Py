@@ -4,5 +4,6 @@ from .Categories import Categories
 from .Model import Model
 from .SpendingHistory import SpendingHistory
 from .PaycheckPlan import PaycheckPlan
+from .NetWorth import NetWorth
 
-__all__ = ['Categories', 'Category', 'Model', 'SpendingHistory', 'PaycheckPlan', 'CategoryType']
+__all__ = ['Categories', 'Category', 'Model', 'SpendingHistory', 'PaycheckPlan', 'CategoryType', 'NetWorth']
