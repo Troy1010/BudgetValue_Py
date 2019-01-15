@@ -1,6 +1,7 @@
 import BudgetValue as BV
 import os
 import pickle
+import TM_CommonPy as TM
 
 
 class NetWorth(list):
@@ -25,7 +26,7 @@ class NetWorth(list):
             return
         for net_worth_row in data:
             self.append(NetWorthRow())
-            for k, v in net_worth_row:
+            for k, v in net_worth_row.items():
                 self[-1][k] = v
 
     def AddRow(self):

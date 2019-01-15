@@ -4,11 +4,12 @@ BudgetValue
 		Security
 		Be able to import from blank table
 	PaycheckPlan-DistributeBalance
-get TM_Log to work
-	1) set log in _Logger
-	2) Open log during tests
-	3) Open log in program the tests are testing
-	4) both opens write to same log
+TM_Log
+	Sometimes TM_Log has a permission error and nothing from the 2nd process writes to log.
+		1) set log in _Logger
+		2) Open log during tests
+		3) Open log in program the tests are testing
+		4) both opens write to same log
 ---------------------------------------------------------- Things I'm currently working on
 NetWorth
 	Be able to input an example NetWorth
