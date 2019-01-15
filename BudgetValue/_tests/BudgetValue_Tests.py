@@ -31,18 +31,24 @@ class Test_BudgetValue(unittest.TestCase):
 
     # ------Tests
     @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
+    def test_rewqrweqr(self):
+        BV.Misc.Hello()
+
+    @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
     def test_MakeValid_Money_float(self):
         v = 1.234
         v = BV.MakeValid_Money(v)
         BVLog_LogTests.debug(v)
         self.assertEqual(v, decimal.Decimal(repr(1.24)))
 
+    @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
     def test_MakeValid_Money_int(self):
         v = 4
         v = BV.MakeValid_Money(v)
         BVLog_LogTests.debug(v)
         self.assertEqual(v, decimal.Decimal(repr(4)))
 
+    @attr(**{'count': vCounter(), __name__.rsplit(".", 1)[-1]: True})
     def test_PaycheckPlanRaisesSetKeyTypeError(self):
         with self.assertRaises(TypeError):
             vModel = BV.Model.Model()

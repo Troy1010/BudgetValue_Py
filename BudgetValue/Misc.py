@@ -1,5 +1,10 @@
 import decimal
 from decimal import Decimal
+from ._Logger import BVLog
+
+
+def Hello():
+    BVLog.debug("Hello")
 
 
 def GetAllChildren(vItem, bIncludeRoot=False):

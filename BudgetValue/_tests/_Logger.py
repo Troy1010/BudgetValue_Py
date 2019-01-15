@@ -9,8 +9,8 @@ vConsoleHandlerThreshold = logging.WARNING
 vFileHandlerThreshold = logging.DEBUG
 
 BVLog_LogTests = logging.getLogger(__name__)
-BVLog_LogTests.info = TM.LoggingHeaderDecorator(BVLog_LogTests.info)
-BVLog_LogTests.debug = TM.LoggingHeaderDecorator(BVLog_LogTests.debug)
+# BVLog_LogTests.info = TM.LoggingHeaderDecorator(BVLog_LogTests.info)
+# BVLog_LogTests.debug = TM.LoggingHeaderDecorator(BVLog_LogTests.debug)
 BVLog_LogTests.setLevel(vMasterThreshold)
 vFormatter = logging.Formatter('%(message)s')
 # ---ConsoleHandler
