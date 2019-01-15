@@ -1,0 +1,6 @@
+
+SpendingsHistory table
+	Columns resizable
+	Why does it move right 1 pixel when expanded?
+---------------------------------------------------------- Things I'm currently working on
+---------------------------------------------------------- Things I've done

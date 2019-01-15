@@ -1,0 +1,57 @@
+
+BudgetValue
+	Import History
+		Security
+		Be able to import from blank table
+	SpendingsHistory table
+		Columns resizable
+		Why does it move right 1 pixel when expanded?
+	PaycheckPlan-DistributeBalance
+get TM_Log to work
+	1) set log in _Logger
+	2) Open log during tests
+	3) Open log in program the tests are testing
+	4) both opens write to same log
+---------------------------------------------------------- Things I'm currently working on
+NetWorth
+	Be able to input an example NetWorth
+		AddRow
+---------------------------------------------------------- Things I've done
+BudgetValue
+	Model-PaycheckPlan-Balance
+	Model-PaycheckPlan-Types of categories, income
+	Make intellisense work for model
+	Model-PaycheckPlan-Save on close
+	Model-PaycheckPlan-integrate cPlansByCategory into its parent
+	PaycheckPlan-Header
+	SpendingHistory- Select Catagory Popup
+	Use RX
+	Validate money entries
+	Restructure
+	Menu
+		File
+			Import SpendingsHistory
+		Edit
+		Settings
+			Preferences..
+	Expandable
+	Import History
+		Reformatting
+BudgetValue-Make tabs
+	Serialize uploaded history
+	Tabs
+		Tasks
+			Spending History
+				Import history
+				Catagorize
+					add a spend
+					edit a spend
+			Paycheck Plan
+				Edit
+			Net Worth
+				Edit
+		Results
+			Spendables
+				Override
+			Reports
+BudgetValue-Skeleton
