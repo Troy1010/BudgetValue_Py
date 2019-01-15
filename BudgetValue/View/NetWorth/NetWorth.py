@@ -16,7 +16,7 @@ class NetWorth(tk.Frame):
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
         vButton_AddRow = ttk.Button(self.vButtonBar, text="AddRow",
-                                    command=lambda self=self: self.vModel.NetWorth.AddRow())
+                                    command=lambda self=self: self.AddRow())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
         # Table
         self.vCanvas = tk.Canvas(self, highlightthickness=0)
@@ -25,6 +25,10 @@ class NetWorth(tk.Frame):
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
         self.Load()
+
+    def AddRow(self):
+        self.vModel.NetWorth.AddRow()
+        self.vTable.Refresh()
 
     def _destroy(self):
         self.vModel.NetWorth.Save()

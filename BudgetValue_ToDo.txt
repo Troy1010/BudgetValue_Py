@@ -13,8 +13,10 @@ TM_Log
 ---------------------------------------------------------- Things I'm currently working on
 NetWorth
 	Be able to input an example NetWorth
-		AddRow
+		RemoveRow
+		Validation
 ---------------------------------------------------------- Things I've done
+NetWorth-Be able to input an example NetWorth-AddRow
 BudgetValue
 	Model-PaycheckPlan-Balance
 	Model-PaycheckPlan-Types of categories, income

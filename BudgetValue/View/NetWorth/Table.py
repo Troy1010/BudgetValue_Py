@@ -26,7 +26,8 @@ class Table(TM.tk.TableFrame):
         for net_worth_row in self.vModel.NetWorth:
             assert isinstance(net_worth_row, BV.Model.NetWorthRow)
             self.MakeEntry((row, 0), text=net_worth_row.name)
-            self.MakeEntry((row, 0), text=net_worth_row.amount)
+            self.MakeEntry((row, 1), text=net_worth_row.amount)
+            row += 1
 
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
