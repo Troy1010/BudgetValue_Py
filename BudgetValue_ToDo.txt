@@ -3,9 +3,6 @@ BudgetValue
 	Import History
 		Security
 		Be able to import from blank table
-	SpendingsHistory table
-		Columns resizable
-		Why does it move right 1 pixel when expanded?
 	PaycheckPlan-DistributeBalance
 get TM_Log to work
 	1) set log in _Logger
