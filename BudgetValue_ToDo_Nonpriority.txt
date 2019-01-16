@@ -4,5 +4,6 @@ SpendingsHistory table
 	Why does it move right 1 pixel when expanded?
 NetWorth
 	MakeScrollable
+	Drag sometimes doesn't highlight blue
 ---------------------------------------------------------- Things I'm currently working on
 ---------------------------------------------------------- Things I've done

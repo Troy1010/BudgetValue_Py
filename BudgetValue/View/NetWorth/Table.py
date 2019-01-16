@@ -42,11 +42,11 @@ class Table(TM.tk.TableFrame):
         #
         self.CalcAndShowTotal()
 
-    def FocusIn_MakeObvious(self, cell):
+    def OnFocusIn_MakeObvious(self, cell):
         cell.config(justify=tk.LEFT)
         cell.select_text()
 
-    def FocusOut_MakeObvious(self, cell):
+    def OnFocusOut_MakeObvious(self, cell):
         cell.config(justify=tk.RIGHT)
 
     def CalcAndShowTotal(self):
@@ -80,11 +80,36 @@ class Table(TM.tk.TableFrame):
                         borderwidth=2, relief='ridge', background='SystemButtonFace')
         w.text = text
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ns")
-        w.bind("<FocusIn>", lambda event, w=w: self.FocusIn_MakeObvious(w))
+        w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
         w.bind("<FocusOut>", lambda event, w=w: self.SaveEntryInModel(w), add="+")
-        w.bind("<FocusOut>", lambda event, w=w: self.FocusOut_MakeObvious(w), add="+")
+        w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
         w.bind("<FocusOut>", lambda event: self.CalcAndShowTotal(), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
+        w.bind("<B1-Motion>", self.OnDrag)
+        w.bind("<ButtonRelease-1>", self.OnDrop)
+
+    def OnDrag(self, event):
+        x, y = event.widget.winfo_pointerxy()
+        target = event.widget.winfo_containing(x, y)
+        if target.row != event.widget.row:
+            # Grey out the From row
+            for cell in self.grid_slaves(row=event.widget.row):
+                cell.config(background="grey")
+            # Blue out the target
+            if not hasattr(self, "blueOutRow") or self.blueOutRow != target.row:
+                if hasattr(self, "blueOutRow"):
+                    for cell in self.grid_slaves(row=self.blueOutRow):
+                        cell.config(background="SystemButtonFace")
+                for cell in self.grid_slaves(row=target.row):
+                    cell.config(background="lightblue")
+                self.blueOutRow = target.row
+
+    def OnDrop(self, event):
+        x, y = event.widget.winfo_pointerxy()
+        target = event.widget.winfo_containing(x, y)
+        if target.row != event.widget.row:
+            self.vModel.NetWorth[target.row-1], self.vModel.NetWorth[event.widget.row-1] = self.vModel.NetWorth[event.widget.row-1], self.vModel.NetWorth[target.row-1]
+        self.Refresh()
 
     def SaveEntryInModel(self, cell):
         if cell.column == 0:

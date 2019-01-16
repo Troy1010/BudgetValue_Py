@@ -11,11 +11,9 @@ TM_Log
 		3) Open log in program the tests are testing
 		4) both opens write to same log
 ---------------------------------------------------------- Things I'm currently working on
-TM_CommonPy-FocusNextWritableCell
-NetWorth
-	input an example NetWorth
-		DragRow
 ---------------------------------------------------------- Things I've done
+NetWorth-input an example NetWorth-DragRow
+TM_CommonPy-FocusNextWritableCell
 NetWorth-input an example NetWorth-AddRow
 NetWorth-input an example NetWorth-Save on unfocus
 NetWorth-input an example NetWorth-RemoveRow button
