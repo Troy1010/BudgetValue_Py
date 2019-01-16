@@ -59,7 +59,7 @@ class Table(TM.tk.TableFrame):
         #
         self.excessDumpCell = self.GetCell(row-3, 3)
         self.DistributeBalance()
-        self.ShowBalance()
+        self.CalcAndShowBalance()
 
     def DistributeBalance(self, cellToKeep=None):
         if cellToKeep != self.excessDumpCell:
@@ -67,7 +67,7 @@ class Table(TM.tk.TableFrame):
             self.excessDumpCell.text = Decimal(self.excessDumpCell.text) + dBalance
             self.SaveToModel(self.excessDumpCell.row)
 
-    def ShowBalance(self):
+    def CalcAndShowBalance(self):
         dBalance = self.CalculateBalance()
         self.vBalanceNum.text = str(dBalance)
         # color
@@ -129,7 +129,7 @@ class Table(TM.tk.TableFrame):
             self.MakeRowValid(cell.row, cellToKeep=cell)
         self.SaveToModel(cell.row)
         self.DistributeBalance(cell)
-        self.ShowBalance()
+        self.CalcAndShowBalance()
 
     def Entry_Return(self, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
