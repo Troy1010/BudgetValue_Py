@@ -11,12 +11,16 @@ TM_Log
 		3) Open log in program the tests are testing
 		4) both opens write to same log
 ---------------------------------------------------------- Things I'm currently working on
+TM_CommonPy-FocusNextWritableCell
 NetWorth
-	Be able to input an example NetWorth
+	input an example NetWorth
 		RemoveRow
+			Bug when removing last row
 		Validation
+		DragRow
 ---------------------------------------------------------- Things I've done
-NetWorth-Be able to input an example NetWorth-AddRow
+NetWorth-input an example NetWorth-AddRow
+NetWorth-input an example NetWorth-Save on unfocus
 BudgetValue
 	Model-PaycheckPlan-Balance
 	Model-PaycheckPlan-Types of categories, income

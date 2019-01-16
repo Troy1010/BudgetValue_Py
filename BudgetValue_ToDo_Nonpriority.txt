@@ -2,5 +2,7 @@
 SpendingsHistory table
 	Columns resizable
 	Why does it move right 1 pixel when expanded?
+NetWorth
+	MakeScrollable
 ---------------------------------------------------------- Things I'm currently working on
 ---------------------------------------------------------- Things I've done

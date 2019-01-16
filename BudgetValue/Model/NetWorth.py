@@ -32,10 +32,27 @@ class NetWorth(list):
     def AddRow(self):
         self.append(NetWorthRow())
 
+    def RemoveRow(self, iRow):
+        del self[iRow]
+
 
 class NetWorthRow(dict):
     def __init__(self, name=None, amount=None):
-        self["name"] = name
         self.name = name
-        self["amount"] = amount
         self.amount = amount
+
+    @property
+    def amount(self):
+        return self["amount"]
+
+    @amount.setter
+    def amount(self, value):
+        self["amount"] = None if not value or value == 0 else BV.MakeValid_Money(value)
+
+    @property
+    def name(self):
+        return self["name"]
+
+    @name.setter
+    def name(self, value):
+        self["name"] = value
