@@ -14,13 +14,12 @@ TM_Log
 TM_CommonPy-FocusNextWritableCell
 NetWorth
 	input an example NetWorth
-		RemoveRow
-			Bug when removing last row
-		Validation
 		DragRow
 ---------------------------------------------------------- Things I've done
 NetWorth-input an example NetWorth-AddRow
 NetWorth-input an example NetWorth-Save on unfocus
+NetWorth-input an example NetWorth-RemoveRow button
+NetWorth-input an example NetWorth-Validation
 BudgetValue
 	Model-PaycheckPlan-Balance
 	Model-PaycheckPlan-Types of categories, income

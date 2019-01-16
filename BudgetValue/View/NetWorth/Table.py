@@ -52,11 +52,6 @@ class Table(TM.tk.TableFrame):
     def CalcAndShowTotal(self):
         dBalance = self.CalculateTotal()
         self.vTotalNum.text = str(dBalance)
-        # color
-        if dBalance < 0:
-            self.vTotalNum.config(readonlybackground="pink")
-        else:
-            self.vTotalNum.config(readonlybackground="lightgreen")
 
     def CalculateTotal(self):
         dBalance = 0
@@ -88,6 +83,7 @@ class Table(TM.tk.TableFrame):
         w.bind("<FocusIn>", lambda event, w=w: self.FocusIn_MakeObvious(w))
         w.bind("<FocusOut>", lambda event, w=w: self.SaveEntryInModel(w), add="+")
         w.bind("<FocusOut>", lambda event, w=w: self.FocusOut_MakeObvious(w), add="+")
+        w.bind("<FocusOut>", lambda event: self.CalcAndShowTotal(), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
 
     def SaveEntryInModel(self, cell):
