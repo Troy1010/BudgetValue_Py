@@ -1,6 +1,5 @@
 import os
 import logging
-import TM_CommonPy as TM
 # Settings
 bWriteLogFile = True
 sLogFile = os.path.join(__file__, '..', 'BVLog_LogTests.log')
