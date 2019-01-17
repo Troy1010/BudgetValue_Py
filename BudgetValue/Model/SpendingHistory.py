@@ -3,6 +3,7 @@ import TM_CommonPy as TM  # noqa
 import sqlite3
 import pandas as pd
 import os
+from decimal import Decimal
 
 
 class SpendingHistory():
@@ -30,6 +31,25 @@ class SpendingHistory():
             pass
         sheet.to_sql(name, self.vModel.connection, index=True)
         self.vModel.connection.commit()
+
+    def GetTotalOfAmountsOfCategory(self, category):
+        categoryCursor = self.vModel.connection.cursor()
+        try:
+            categoryCursor.execute("SELECT category FROM 'SpendingHistory'")
+        except sqlite3.OperationalError:  # SpendingHistory doesn't exist
+            pass
+        amountCursor = self.vModel.connection.cursor()
+        try:
+            amountCursor.execute("SELECT amount FROM 'SpendingHistory'")
+        except sqlite3.OperationalError:  # SpendingHistory doesn't exist
+            pass
+        cCategories = [x[0] for x in categoryCursor]
+        cAmounts = [x[0] for x in amountCursor]
+        dTotal = Decimal(0)
+        for category_, amount in zip(cCategories, cAmounts):
+            if str(category_) == str(category):
+                dTotal += Decimal(str(amount))
+        return dTotal
 
     def GetTable(self):
         cursor = self.vModel.connection.cursor()
