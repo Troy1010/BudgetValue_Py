@@ -109,7 +109,7 @@ class Table(TM.tk.TableFrame):
         target = event.widget.winfo_containing(x, y)
         if target.row != event.widget.row:
             self.vModel.NetWorth[target.row-1], self.vModel.NetWorth[event.widget.row-1] = self.vModel.NetWorth[event.widget.row-1], self.vModel.NetWorth[target.row-1]
-        self.Refresh()
+            self.Refresh()
 
     def SaveEntryInModel(self, cell):
         if cell.column == 0:

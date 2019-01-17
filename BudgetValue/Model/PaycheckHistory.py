@@ -1,5 +1,4 @@
 import os
-import TM_CommonPy as TM
 import pickle
 import BudgetValue as BV
 
@@ -11,12 +10,21 @@ class PaycheckHistory(list):
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckHistory.pickle")
         self.Load()
 
+    def Clear(self):
+        del self[:]
+
     def AddColumn(self):
         self.append(list())
-        self.AddEntry(-1)
 
-    def AddEntry(self, iColumn):
-        self[iColumn].append(PaycheckHistoryEntry(category=self.vModel.Categories["<Default Category>"], amount=0.00))
+    def AddEntry(self, iColumn, category=None, amount=0):
+        if category is None:
+            category = self.vModel.Categories["<Default Category>"]
+        self[iColumn].append(PaycheckHistoryEntry(category=category, amount=amount))
+
+    def AddPaycheckPlanColumn(self):
+        self.AddColumn()
+        for vCategoryPlan in self.vModel.PaycheckPlan.values():
+            self.AddEntry(-1, category=vCategoryPlan.category, amount=vCategoryPlan.amount)
 
     def Save(self):
         data = list()

@@ -22,6 +22,15 @@ class Spendables(tk.Frame):
         vButton_AddRow = ttk.Button(self.vButtonBar, text="AddPaycheckHistoryColumn",
                                     command=lambda self=self: self.AddPaycheckHistoryColumn())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
+        vButton_AddPaycheckPlan = ttk.Button(self.vButtonBar, text="AddPaycheckPlan",
+                                             command=lambda self=self: self.AddPaycheckPlan())
+        vButton_AddPaycheckPlan.pack(side=tk.LEFT, anchor='w')
+        vButton_Clear = ttk.Button(self.vButtonBar, text="Clear",
+                                   command=lambda self=self: self.Clear())
+        vButton_Clear.pack(side=tk.LEFT, anchor='w')
+        vButton_Print = ttk.Button(self.vButtonBar, text="Print",
+                                   command=lambda self=self: self.Print())
+        vButton_Print.pack(side=tk.LEFT, anchor='w')
         # Table
         self.vCanvas = tk.Canvas(self, highlightthickness=0)
         self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
@@ -29,8 +38,23 @@ class Spendables(tk.Frame):
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
 
+    def Print(self):
+        print("self.vModel.PaycheckHistory..")
+        for i, cColumn in enumerate(self.vModel.PaycheckHistory):
+            print(" Column "+str(i))
+            for vEntry in cColumn:
+                print("  "+vEntry.category.name+" - "+str(vEntry.amount))
+
+    def Clear(self):
+        self.vModel.PaycheckHistory.Clear()
+        self.vTable.Refresh()
+
     def _destroy(self):
         self.vModel.PaycheckHistory.Save()
+
+    def AddPaycheckPlan(self):
+        self.vModel.PaycheckHistory.AddPaycheckPlanColumn()
+        self.vTable.Refresh()
 
     def AddPaycheckHistoryColumn(self):
         self.vModel.PaycheckHistory.AddColumn()
