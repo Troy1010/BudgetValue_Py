@@ -2,6 +2,7 @@
 SpendingsHistory table
 	Columns resizable
 	Why does it move right 1 pixel when expanded?
+	Have category popup display near category
 NetWorth
 	MakeScrollable
 	Drag sometimes doesn't highlight blue
