@@ -1,5 +1,6 @@
 import TM_CommonPy as TM
 import tkinter as tk
+from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
 
@@ -21,8 +22,9 @@ class Table(TM.tk.TableFrame):
         # Data
         print("self.vModel.PaycheckHistory:"+TM.Narrate(self.vModel.PaycheckHistory))
         for paycheck_history_column in self.vModel.PaycheckHistory:
+            self.MakeAddEntryButton((0, column))
             for row, cCategoryAmountPair in enumerate(paycheck_history_column):
-                self.MakeEntry((row, column), text=cCategoryAmountPair[1])
+                self.MakeEntry((row+1, column), text=cCategoryAmountPair[1])
             column += 1
 
     def OnFocusIn_MakeObvious(self, cell):
@@ -66,6 +68,15 @@ class Table(TM.tk.TableFrame):
         w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
         w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
+
+    def MakeAddEntryButton(self, cRowColumnPair):
+        w = ttk.Button(self, text="Add Entry",
+                       command=lambda self=self, column=cRowColumnPair[1]: self.AddEntry(column))
+        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ew")
+
+    def AddEntry(self, column):
+        self.vModel.PaycheckHistory.AddEntry(column)
+        self.Refresh()
 
     def OnDrag(self, event):
         x, y = event.widget.winfo_pointerxy()
