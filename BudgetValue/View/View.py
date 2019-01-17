@@ -8,6 +8,7 @@ from BudgetValue.View import Fonts
 from BudgetValue.View import SpendingHistory
 from BudgetValue.View import PaycheckPlan
 from BudgetValue.View import NetWorth
+from BudgetValue.View import Spendables
 
 
 class View(tk.Tk):
@@ -18,7 +19,7 @@ class View(tk.Tk):
         self.geometry('700x800')
 
         cTabPages = (SpendingHistory.SpendingHistory, PaycheckPlan.PaycheckPlan, NetWorth.NetWorth,
-                     Spendables, Reports)
+                     Spendables.Spendables, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -35,7 +36,7 @@ class View(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(cTabPages[2])
+        vTabBar.ShowTab(cTabPages[3])
 
 
 class MenuBar(tk.Menu):
@@ -72,19 +73,6 @@ class TabBar(tk.Frame):
     def ShowTab(self, frame):
         self.HighlightButton(self.cTabButtons[frame])
         self.cTabPageFrames[frame].tkraise()
-
-
-class Spendables(tk.Frame):
-    name = "Spendables"
-
-    def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent)
-        vLabel = ttk.Label(self, text="Spendables",
-                           font=Fonts.FONT_MEDIUM)
-        vLabel.pack(pady=10, padx=10)
-
-        vButton1 = ttk.Button(self, text="Spending History",)
-        vButton1.pack()
 
 
 class Reports(tk.Frame):
