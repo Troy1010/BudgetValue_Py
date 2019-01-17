@@ -11,6 +11,8 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
+        #
+        self.Refresh()
 
     def Refresh(self):
         # remove old
@@ -20,11 +22,13 @@ class Table(TM.tk.TableFrame):
         # add new
         column = 0
         # Data
-        print("self.vModel.PaycheckHistory:"+TM.Narrate(self.vModel.PaycheckHistory))
         for paycheck_history_column in self.vModel.PaycheckHistory:
-            self.MakeAddEntryButton((0, column))
-            for row, cCategoryAmountPair in enumerate(paycheck_history_column):
-                self.MakeEntry((row+1, column), text=cCategoryAmountPair[1])
+            row = 0
+            self.MakeAddEntryButton((row, column))
+            row += 1
+            for vPaycheckHistoryEntry in paycheck_history_column:
+                self.MakeEntry((row, column), text=vPaycheckHistoryEntry.amount)
+                row += 1
             column += 1
 
     def OnFocusIn_MakeObvious(self, cell):

@@ -28,9 +28,6 @@ class Spendables(tk.Frame):
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
-        #
-        self.vModel.PaycheckHistory.Load()
-        self.vTable.Refresh()
 
     def _destroy(self):
         self.vModel.PaycheckHistory.Save()
