@@ -43,11 +43,11 @@ class SpendingHistory():
             amountCursor.execute("SELECT amount FROM 'SpendingHistory'")
         except sqlite3.OperationalError:  # SpendingHistory doesn't exist
             pass
-        cCategories = [x[0] for x in categoryCursor]
+        cCategoryNames = [x[0] for x in categoryCursor]
         cAmounts = [x[0] for x in amountCursor]
         dTotal = Decimal(0)
-        for category_, amount in zip(cCategories, cAmounts):
-            if str(category_) == str(category):
+        for categoryName, amount in zip(cCategoryNames, cAmounts):
+            if categoryName == str(category.name):
                 dTotal += Decimal(str(amount))
         return dTotal
 
