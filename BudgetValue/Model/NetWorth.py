@@ -1,6 +1,7 @@
 import BudgetValue as BV
 import os
 import pickle
+from decimal import Decimal
 
 
 class NetWorth(list):
@@ -27,6 +28,12 @@ class NetWorth(list):
             self.append(NetWorthRow())
             for k, v in net_worth_row.items():
                 self[-1][k] = v
+
+    def GetTotal(self):
+        dTotal = Decimal(0)
+        for net_worth_row in self:
+            dTotal += net_worth_row.amount
+        return dTotal
 
     def AddRow(self):
         self.append(NetWorthRow())

@@ -38,9 +38,8 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vTotalNum.grid(row=row, column=1, sticky="ewns")
+        self.vTotalNum.text = self.vModel.NetWorth.GetTotal()
         row += 1
-        #
-        self.CalcAndShowTotal()
 
     def OnFocusIn_MakeObvious(self, cell):
         cell.config(justify=tk.LEFT)
@@ -48,18 +47,6 @@ class Table(TM.tk.TableFrame):
 
     def OnFocusOut_MakeObvious(self, cell):
         cell.config(justify=tk.RIGHT)
-
-    def CalcAndShowTotal(self):
-        dBalance = self.CalculateTotal()
-        self.vTotalNum.text = str(dBalance)
-
-    def CalculateTotal(self):
-        dBalance = 0
-        for row in self.vModel.NetWorth:
-            if row.amount is None:
-                continue
-            dBalance += row.amount
-        return dBalance
 
     def MakeX(self, cRowColumnPair):
         w = tk.Button(self, text="X", font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=3, relief='ridge',
