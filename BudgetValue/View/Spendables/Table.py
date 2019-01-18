@@ -25,7 +25,8 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Column Header
         for iColumn, paycheck_history_column in enumerate(self.vModel.PaycheckHistory):
-            self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
+            vColumnHeader = self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
+            vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         iSpentColumn = len(self.vModel.PaycheckHistory)+1
         self.MakeHeader((row, iSpentColumn), text="Spent")
         self.iBudgetedColumn = len(self.vModel.PaycheckHistory)+2
@@ -105,10 +106,21 @@ class Table(TM.tk.TableFrame):
             self.vBalanceNum.config(readonlybackground="lightgreen")
         row += 1
 
+    def RemoveColumn(self, iColumn):
+        self.vModel.PaycheckHistory.RemoveColumn(iColumn)
+        self.Refresh()
+
+    def ShowHeaderMenu(self, event):
+        iColumn = event.widget.grid_info()['column'] - 1
+        vMenuBar = tk.Menu(tearoff=False)
+        vMenuBar.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
+        vMenuBar.post(event.x_root, event.y_root)
+
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
                      background='SystemButtonFace', text=text)
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
+        return w
 
     def MakeSeparationLable(self, row, text):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT,
@@ -202,3 +214,12 @@ class Table(TM.tk.TableFrame):
             self.vModel.NetWorth[cell.row-1].name = cell.text
         elif cell.column == 1:
             self.vModel.NetWorth[cell.row-1].amount = cell.text
+
+
+class HeaderMenuBar(tk.Menu):
+    def __init__(self, vModel, *args, **kwargs):
+        tk.Menu.__init__(self, *args, **kwargs)
+        self.add_command(label="Remove Column", command=self.hello)
+
+    def hello(self):
+        print("hello!")

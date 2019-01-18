@@ -23,6 +23,7 @@ Spendables History
 Spendables History
 	Remove a single column
 ---------------------------------------------------------- Things I've done
+Spendables History-Remove a single column
 NetWorth-input an example NetWorth-DragRow
 TM_CommonPy-FocusNextWritableCell
 NetWorth-input an example NetWorth-AddRow

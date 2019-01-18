@@ -11,6 +11,9 @@ class PaycheckHistory(list):
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckHistory.pickle")
         self.Load()
 
+    def RemoveColumn(self, iColumn):
+        del self[iColumn]
+
     def Clear(self):
         del self[:]
 
