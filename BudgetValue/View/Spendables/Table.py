@@ -112,9 +112,9 @@ class Table(TM.tk.TableFrame):
 
     def ShowHeaderMenu(self, event):
         iColumn = event.widget.grid_info()['column'] - 1
-        vMenuBar = tk.Menu(tearoff=False)
-        vMenuBar.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
-        vMenuBar.post(event.x_root, event.y_root)
+        vDropdown = tk.Menu(tearoff=False)
+        vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
+        vDropdown.post(event.x_root, event.y_root)
 
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
