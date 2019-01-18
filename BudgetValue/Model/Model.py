@@ -25,7 +25,7 @@ class Model():
         for paycheck_history_column in self.PaycheckHistory:
             for vPaycheckHistoryEntry in paycheck_history_column:
                 if vPaycheckHistoryEntry.category.name == category.name:
-                    dSpendableAmount += vPaycheckHistoryEntry.amount
+                    dSpendableAmount += 0 if vPaycheckHistoryEntry.amount is None else vPaycheckHistoryEntry.amount
         # Spent total for this category
         dSpendableAmount += self.SpendingHistory.GetTotalOfAmountsOfCategory(category)
         #
