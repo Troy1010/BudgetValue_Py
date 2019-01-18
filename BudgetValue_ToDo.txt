@@ -21,7 +21,7 @@ Spendables History
 		Add and view a PaycheckHistory column
 ---------------------------------------------------------- Things I'm currently working on
 Spendables History
-	Remove a single column
+	Add Catagory to column
 ---------------------------------------------------------- Things I've done
 Spendables History-Remove a single column
 NetWorth-input an example NetWorth-DragRow
