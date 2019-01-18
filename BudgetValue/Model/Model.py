@@ -3,6 +3,7 @@ import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import sqlite3
 import os
+from decimal import Decimal
 
 
 class Model():
@@ -17,3 +18,15 @@ class Model():
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.NetWorth = BV.Model.NetWorth(self)
         self.PaycheckHistory = BV.Model.PaycheckHistory(self)
+
+    def GetSpendableAmount(self, category):
+        dSpendableAmount = Decimal(0)
+        # PaycheckHistory total for this category
+        for paycheck_history_column in self.PaycheckHistory:
+            for vPaycheckHistoryEntry in paycheck_history_column:
+                if vPaycheckHistoryEntry.category.name == category.name:
+                    dSpendableAmount += vPaycheckHistoryEntry.amount
+        # Spent total for this category
+        dSpendableAmount += self.SpendingHistory.GetTotalOfAmountsOfCategory(category)
+        #
+        return dSpendableAmount
