@@ -10,7 +10,6 @@ TM_Log
 		2) Open log during tests
 		3) Open log in program the tests are testing
 		4) both opens write to same log
----------------------------------------------------------- Things I'm currently working on
 Spendables History
 	What should I name these things?
 		PaycheckHistory column
@@ -20,6 +19,9 @@ Spendables History
 		The PaycheckHistory columns must be saved
 	Test
 		Add and view a PaycheckHistory column
+---------------------------------------------------------- Things I'm currently working on
+Spendables History
+	Remove a single column
 ---------------------------------------------------------- Things I've done
 NetWorth-input an example NetWorth-DragRow
 TM_CommonPy-FocusNextWritableCell
