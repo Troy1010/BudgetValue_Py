@@ -38,8 +38,11 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vTotalNum.grid(row=row, column=1, sticky="ewns")
-        self.vTotalNum.text = self.vModel.NetWorth.GetTotal()
+        self.CalcAndShowTotal()
         row += 1
+
+    def CalcAndShowTotal(self):
+        self.vTotalNum.text = self.vModel.NetWorth.GetTotal()
 
     def OnFocusIn_MakeObvious(self, cell):
         cell.config(justify=tk.LEFT)

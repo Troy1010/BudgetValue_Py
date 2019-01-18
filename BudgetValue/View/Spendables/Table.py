@@ -21,15 +21,15 @@ class Table(TM.tk.TableFrame):
         for child in BV.GetAllChildren(self):
             child.grid_forget()
             child.destroy()
-        # add new
+        #
         row = 0
         # Column Header
         for iColumn, paycheck_history_column in enumerate(self.vModel.PaycheckHistory):
             self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
         iSpentColumn = len(self.vModel.PaycheckHistory)+1
         self.MakeHeader((row, iSpentColumn), text="Spent")
-        self.iSpendablesColumn = len(self.vModel.PaycheckHistory)+2
-        self.MakeHeader((row, self.iSpendablesColumn), text="Spendable")
+        self.iBudgetedColumn = len(self.vModel.PaycheckHistory)+2
+        self.MakeHeader((row, self.iBudgetedColumn), text="Budgeted")
         row += 1
         # Data
         prev_type = None
@@ -45,54 +45,58 @@ class Table(TM.tk.TableFrame):
             for iColumn, paycheck_history_column in enumerate(self.vModel.PaycheckHistory):
                 for vPaycheckHistoryEntry in paycheck_history_column:
                     if vPaycheckHistoryEntry.category.name == category.name:
-                        self.MakeEntry((row, iColumn+1), text=vPaycheckHistoryEntry.amount)
+                        bEditableState = True
+                        if category.name == "<Default Category>":
+                            bEditableState = False
+                        self.MakeEntry((row, iColumn+1), text=vPaycheckHistoryEntry.amount, bEditableState=bEditableState)
                         bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
             if dSpendingHistoryTotal:
                 self.MakeEntry_ReadOnly((row, iSpentColumn), text=str(dSpendingHistoryTotal))
                 bMadeEntry = True
-            # Spendables
-            dSpendable = self.vModel.GetSpendableAmount(category)
+            # Budgeted
+            dSpendable = self.vModel.GetBudgetedAmount(category)
             if (dSpendable != 0 or bMadeEntry) and category.type != BV.Model.CategoryType.income:
                 dTotalSpendableAmount += dSpendable
-                self.MakeEntry_ReadOnly((row, self.iSpendablesColumn), text=str(dSpendable))
+                self.MakeEntry_ReadOnly((row, self.iBudgetedColumn), text=str(dSpendable))
                 bMadeEntry = True
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):
-                self.MakeEntry_ReadOnly((row, 0), text=category.name, justify=tk.LEFT)
+                self.MakeEntry_ReadOnly((row, 0), text=category.name, justify=tk.LEFT, bBold=True)
             #
             row += 1
         # Total
-        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.iSpendablesColumn+1, sticky="ew")
+        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.iBudgetedColumn+1, sticky="ew")
         row += 1
         vTotal = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
                           relief='ridge', background='SystemButtonFace', text="Total")
-        vTotal.grid(row=row, column=0, columnspan=self.iSpendablesColumn, sticky="ewn")
+        vTotal.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vTotalNum.grid(row=row, column=self.iSpendablesColumn, sticky="ewns")
-        self.row = int(row)
-        self.vTotalNum.text = str(dTotalSpendableAmount)
+        self.vTotalNum.ValidationHandler = BV.MakeValid_Money
+        self.vTotalNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
+        self.vTotalNum.text = dTotalSpendableAmount
         row += 1
         # NetWorth (to compare)
         vNetWorth = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
                              relief='ridge', background='SystemButtonFace', text="Net Worth")
-        vNetWorth.grid(row=row, column=0, columnspan=self.iSpendablesColumn, sticky="ewn")
+        vNetWorth.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
         self.vNetWorthNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                         borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vNetWorthNum.grid(row=row, column=self.iSpendablesColumn, sticky="ewns")
+        self.vNetWorthNum.ValidationHandler = BV.MakeValid_Money
+        self.vNetWorthNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
         dNetWorth = self.vModel.NetWorth.GetTotal()
-        #dNetWorth = BV.View.NetWorth.Table.CalculateTotal(self)
-        self.vNetWorthNum.text = str(dNetWorth)
+        self.vNetWorthNum.text = dNetWorth
         row += 1
         # Balance
         vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
                             relief='ridge', background='SystemButtonFace', text="Balance")
-        vBalance.grid(row=row, column=0, columnspan=self.iSpendablesColumn, sticky="ewn")
+        vBalance.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
         self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vBalanceNum.grid(row=row, column=self.iSpendablesColumn, sticky="ewns")
+        self.vBalanceNum.ValidationHandler = BV.MakeValid_Money
+        self.vBalanceNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
         dBalance = dNetWorth - dTotalSpendableAmount
         self.vBalanceNum.text = str(dBalance)
         if dBalance != 0:
@@ -131,23 +135,35 @@ class Table(TM.tk.TableFrame):
         kwargs["bEditableState"] = False
         self.MakeEntry(*args, **kwargs)
 
-    def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT):
+    def SaveToModel(self, w):
+        iColumn = w.column - 1
+        columnName = self.GetCell(w.row, 0).text
+        amount = Decimal(w.text)
+        self.vModel.PaycheckHistory.SetEntryAndDirectOverflow(iColumn, columnName, amount)
+        self.Refresh()
+
+    def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):
         if bEditableState:
             state = "normal"
+            background = 'SystemButtonFace'
         else:
             state = "readonly"
-        w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=justify,
-                        borderwidth=2, relief='ridge', background='SystemButtonFace', state=state)
+            background = '#d8d8d8'
+        if bBold:
+            font = Fonts.FONT_SMALL_BOLD
+        else:
+            font = Fonts.FONT_SMALL
+        w = TM.tk.Entry(self, font=font, width=15, justify=justify,
+                        borderwidth=2, relief='ridge', background=background, disabledbackground=background,
+                        readonlybackground=background, state=state)
         w.text = text
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ns")
         w.bind('<Escape>', lambda event: self.FocusNothing())
         if bEditableState:
             w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
             w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
+            w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w), add="+")
             w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
-
-    def FocusNothing(self):
-        self.winfo_toplevel().focus_set()
 
     def MakeAddEntryButton(self, cRowColumnPair):
         w = ttk.Button(self, text="Add Entry",

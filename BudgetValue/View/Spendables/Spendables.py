@@ -37,6 +37,10 @@ class Spendables(tk.Frame):
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
+        # ButtonBar More
+        vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
+                                     command=lambda self=self: self.vTable.Refresh())
+        vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def Print(self):
         print("self.vModel.PaycheckHistory..")

@@ -1,6 +1,7 @@
 import os
 import pickle
 import BudgetValue as BV
+from decimal import Decimal
 
 
 class PaycheckHistory(list):
@@ -12,6 +13,23 @@ class PaycheckHistory(list):
 
     def Clear(self):
         del self[:]
+
+    def SetEntryAndDirectOverflow(self, iColumn, categoryName, amount):
+        # Set Entry amount
+        for vEntry in self[iColumn]:
+            if vEntry.category.name == categoryName:
+                vEntry.amount = amount
+        # Determine dBalance
+        dBalance = Decimal(0)
+        for vEntry in self[iColumn]:
+            dBalance += vEntry.amount
+        # Adjust Entry for Default Category by that amount
+        for vEntry in self[iColumn]:
+            if vEntry.category.name == "<Default Category>":
+                vEntry.amount = vEntry.amount - dBalance
+                break
+        else:
+            self.AddEntry(iColumn, category=self.vModel.Categories["<Default Category>"], amount=-dBalance)
 
     def AddColumn(self):
         self.append(list())

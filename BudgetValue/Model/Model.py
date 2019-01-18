@@ -19,7 +19,7 @@ class Model():
         self.NetWorth = BV.Model.NetWorth(self)
         self.PaycheckHistory = BV.Model.PaycheckHistory(self)
 
-    def GetSpendableAmount(self, category):
+    def GetBudgetedAmount(self, category):
         dSpendableAmount = Decimal(0)
         # PaycheckHistory total for this category
         for paycheck_history_column in self.PaycheckHistory:
