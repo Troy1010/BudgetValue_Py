@@ -156,10 +156,10 @@ class Table(TM.tk.TableFrame):
         kwargs["bEditableState"] = False
         self.MakeEntry(*args, **kwargs)
 
-    def SaveToModel(self, w):
-        iColumn = w.column - 1
-        columnName = self.GetCell(w.row, 0).text
-        amount = Decimal(w.text)
+    def SaveCellToModel(self, cell):
+        iColumn = cell.column - 1
+        columnName = self.GetCell(cell.row, 0).text
+        amount = Decimal(cell.text)
         self.vModel.PaycheckHistory.SetEntryAndDirectOverflow(iColumn, columnName, amount)
         self.Refresh()
 
@@ -183,7 +183,7 @@ class Table(TM.tk.TableFrame):
         if bEditableState:
             w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
             w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
-            w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w), add="+")
+            w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
             w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
 
     def MakeAddEntryButton(self, cRowColumnPair):
