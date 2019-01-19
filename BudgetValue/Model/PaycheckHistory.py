@@ -34,6 +34,15 @@ class PaycheckHistory(list):
         else:
             self.AddEntry(iColumn, category=self.vModel.Categories["<Default Category>"], amount=-dBalance)
 
+    def RemoveEntry(self, iColumn, categoryName):
+        iToRemove = None
+        for i, vEntry in enumerate(self[iColumn]):
+            if vEntry.category.name == categoryName:
+                iToRemove = i
+                break
+        if iToRemove is not None:
+            del self[iColumn][iToRemove]
+
     def AddColumn(self):
         self.append(list())
 

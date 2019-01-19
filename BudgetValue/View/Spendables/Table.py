@@ -49,7 +49,8 @@ class Table(TM.tk.TableFrame):
                         bEditableState = True
                         if category.name == "<Default Category>":
                             bEditableState = False
-                        self.MakeEntry((row, iColumn+1), text=vPaycheckHistoryEntry.amount, bEditableState=bEditableState)
+                        vPaycheckHistoryCell = self.MakeEntry((row, iColumn+1), text=vPaycheckHistoryEntry.amount, bEditableState=bEditableState)
+                        vPaycheckHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
                         bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
@@ -99,13 +100,26 @@ class Table(TM.tk.TableFrame):
         self.vBalanceNum.ValidationHandler = BV.MakeValid_Money
         self.vBalanceNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
         dBalance = dNetWorth - dTotalSpendableAmount
-        self.vBalanceNum.text = str(dBalance)
+        self.vBalanceNum.text = dBalance
         if dBalance != 0:
             self.vBalanceNum.config(readonlybackground="pink")
         else:
             self.vBalanceNum.config(readonlybackground="lightgreen")
         row += 1
         self.vModel.PaycheckHistory
+
+    def ShowCellMenu(self, event):
+        vDropdown = tk.Menu(tearoff=False)
+        vDropdown.add_command(label="Remove Entry", command=lambda cell=event.widget: self.RemoveCell(cell))
+        vDropdown.post(event.x_root, event.y_root)
+
+    def RemoveCell(self, cell):
+        iColumn = cell.grid_info()['column'] - 1
+        categoryName = self.GetCell(cell.row, 0).text
+        cell.text = 0
+        self.SaveCellToModel(cell)
+        self.vModel.PaycheckHistory.RemoveEntry(iColumn, categoryName)
+        self.Refresh()
 
     def RemoveColumn(self, iColumn):
         self.vModel.PaycheckHistory.RemoveColumn(iColumn)
@@ -158,9 +172,9 @@ class Table(TM.tk.TableFrame):
 
     def SaveCellToModel(self, cell):
         iColumn = cell.column - 1
-        columnName = self.GetCell(cell.row, 0).text
-        amount = Decimal(cell.text)
-        self.vModel.PaycheckHistory.SetEntryAndDirectOverflow(iColumn, columnName, amount)
+        categoryName = self.GetCell(cell.row, 0).text
+        amount = 0 if cell.text == "" else Decimal(cell.text)
+        self.vModel.PaycheckHistory.SetEntryAndDirectOverflow(iColumn, categoryName, amount)
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):
@@ -185,6 +199,7 @@ class Table(TM.tk.TableFrame):
             w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
             w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
             w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
+        return w
 
     def MakeAddEntryButton(self, cRowColumnPair):
         w = ttk.Button(self, text="Add Entry",

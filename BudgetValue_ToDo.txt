@@ -20,11 +20,16 @@ Spendables History
 	Test
 		Add and view a PaycheckHistory column
 ---------------------------------------------------------- Things I'm currently working on
-Spendables History
-	Remove Category from column
+Spendables
+	Simplify
+		Restructure PaycheckHistory
+	SpendablesPopup
+		only shows addable categories
+		Move to cursor or somewhere that makes sense
 ---------------------------------------------------------- Things I've done
-Spendables History-Add Catagory to column
-Spendables History-Remove a single column
+Spendables-Remove Category from column
+Spendables-Add Catagory to column
+Spendables-Remove a single column
 NetWorth-input an example NetWorth-DragRow
 TM_CommonPy-FocusNextWritableCell
 NetWorth-input an example NetWorth-AddRow
