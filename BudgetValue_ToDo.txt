@@ -26,6 +26,7 @@ Spendables
 	SpendablesPopup
 		only shows addable categories
 		Move to cursor or somewhere that makes sense
+		Escape to exit
 ---------------------------------------------------------- Things I've done
 Spendables-Remove Category from column
 Spendables-Add Catagory to column
