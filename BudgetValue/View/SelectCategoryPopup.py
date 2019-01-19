@@ -21,13 +21,16 @@ class SelectCategoryPopup(tk.Frame):
         y -= self.parent.winfo_rooty()
         self.place(in_=parent, x=x, y=y)
         self.tkraise()
-
+        # Show categories
         for vCategory in cCategories:
             b = tk.Button(self, text=vCategory.name,
                           command=lambda vCategory=vCategory: self.SelectCategory(vCategory))
             b.pack(fill=tk.BOTH, expand=True)
+        # Bind Escape to exit
+        self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy())
 
     def GetCurrentMousePosition(self):
+        """Legacy"""
         x, y = self.winfo_pointerxy()
         x -= self.parent.winfo_rootx()
         y -= self.parent.winfo_rooty()

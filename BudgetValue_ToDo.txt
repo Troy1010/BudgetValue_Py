@@ -22,19 +22,19 @@ Spendables History
 Spendables
 	SpendablesPopup
 		What to do when it's empty
----------------------------------------------------------- Things I'm currently working on
 BV redo tabs
 	Split Paycheck Into Categories
 	Spend From Categories
 	Net Worth
 	Budgeted Spendables
+---------------------------------------------------------- Things I'm currently working on
 Spendables
 	Simplify
 		Restructure PaycheckHistory
 	SelectCategoryPopup
-		Move to cursor or somewhere that makes sense
 		Escape to exit
 ---------------------------------------------------------- Things I've done
+Spendables-SelectCategoryPopup-Move to cursor or somewhere that makes sense
 Spendables-SelectCategoryPopup-only shows addable categories
 Spendables-Remove Category from column
 Spendables-Add Catagory to column
