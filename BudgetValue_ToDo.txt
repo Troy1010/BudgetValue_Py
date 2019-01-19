@@ -31,11 +31,9 @@ BV redo tabs
 Spendables
 	Simplify
 		Restructure PaycheckHistory
-	Add Active Category to column that doesn't have it, or somehow allow it to be edited
-	ActiveCategories
-		If you get the list of active categories from the columns, then it might be annoying to add an active category
-		If you get the list of active categories from the table, then it's annoying to remove an active category.
+		Make categories able to be compared without comparing names, or make that default
 ---------------------------------------------------------- Things I've done
+Spendables-Add Active Category to column that doesn't have it, or somehow allow it to be edited
 Spendables-SelectCategoryPopup-Escape to exit
 Spendables-SelectCategoryPopup-Move to cursor or somewhere that makes sense
 Spendables-SelectCategoryPopup-only shows addable categories

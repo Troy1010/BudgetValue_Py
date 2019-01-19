@@ -19,15 +19,12 @@ class Spendables(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-        vButton_AddRow = ttk.Button(self.vButtonBar, text="AddPaycheckHistoryColumn",
+        vButton_AddRow = ttk.Button(self.vButtonBar, text="Split NetWorth",
                                     command=lambda self=self: self.AddPaycheckHistoryColumn())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
-        vButton_AddPaycheckPlan = ttk.Button(self.vButtonBar, text="AddPaycheckPlan",
+        vButton_AddPaycheckPlan = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                              command=lambda self=self: self.AddPaycheckPlan())
         vButton_AddPaycheckPlan.pack(side=tk.LEFT, anchor='w')
-        vButton_Clear = ttk.Button(self.vButtonBar, text="Clear",
-                                   command=lambda self=self: self.Clear())
-        vButton_Clear.pack(side=tk.LEFT, anchor='w')
         vButton_Print = ttk.Button(self.vButtonBar, text="Print",
                                    command=lambda self=self: self.Print())
         vButton_Print.pack(side=tk.LEFT, anchor='w')
@@ -48,10 +45,6 @@ class Spendables(tk.Frame):
             print(" Column "+str(i))
             for vEntry in cColumn:
                 print("  "+vEntry.category.name+" - "+str(vEntry.amount))
-
-    def Clear(self):
-        self.vModel.PaycheckHistory.Clear()
-        self.vTable.Refresh()
 
     def _destroy(self):
         self.vModel.PaycheckHistory.Save()
