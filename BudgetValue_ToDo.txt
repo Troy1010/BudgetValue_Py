@@ -23,6 +23,11 @@ Spendables
 	SpendablesPopup
 		What to do when it's empty
 ---------------------------------------------------------- Things I'm currently working on
+BV redo tabs
+	Split Paycheck Into Categories
+	Spend From Categories
+	Net Worth
+	Budgeted Spendables
 Spendables
 	Simplify
 		Restructure PaycheckHistory
