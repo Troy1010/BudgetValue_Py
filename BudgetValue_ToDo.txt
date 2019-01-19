@@ -21,8 +21,9 @@ Spendables History
 		Add and view a PaycheckHistory column
 ---------------------------------------------------------- Things I'm currently working on
 Spendables History
-	Add Catagory to column
+	Remove Category from column
 ---------------------------------------------------------- Things I've done
+Spendables History-Add Catagory to column
 Spendables History-Remove a single column
 NetWorth-input an example NetWorth-DragRow
 TM_CommonPy-FocusNextWritableCell

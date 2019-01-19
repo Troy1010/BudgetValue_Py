@@ -105,15 +105,24 @@ class Table(TM.tk.TableFrame):
         else:
             self.vBalanceNum.config(readonlybackground="lightgreen")
         row += 1
+        self.vModel.PaycheckHistory
 
     def RemoveColumn(self, iColumn):
         self.vModel.PaycheckHistory.RemoveColumn(iColumn)
+        self.Refresh()
+
+    def SelectCategoryPopup(self, iColumn):
+        BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, iColumn)
+
+    def AddCategoryToColumn(self, category, iColumn):
+        self.vModel.PaycheckHistory.AddEntry(iColumn, category, 0)
         self.Refresh()
 
     def ShowHeaderMenu(self, event):
         iColumn = event.widget.grid_info()['column'] - 1
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
+        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn: self.SelectCategoryPopup(iColumn))
         vDropdown.post(event.x_root, event.y_root)
 
     def MakeHeader(self, cRowColumnPair, text=None):
