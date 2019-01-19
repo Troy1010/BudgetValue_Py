@@ -22,9 +22,9 @@ class Spendables(tk.Frame):
         vButton_AddRow = ttk.Button(self.vButtonBar, text="Split NetWorth",
                                     command=lambda self=self: self.AddPaycheckHistoryColumn())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
-        vButton_AddPaycheckPlan = ttk.Button(self.vButtonBar, text="Split Paycheck",
-                                             command=lambda self=self: self.AddPaycheckPlan())
-        vButton_AddPaycheckPlan.pack(side=tk.LEFT, anchor='w')
+        vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
+                                           command=lambda self=self: self.SplitPaycheck())
+        vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
         vButton_Print = ttk.Button(self.vButtonBar, text="Print",
                                    command=lambda self=self: self.Print())
         vButton_Print.pack(side=tk.LEFT, anchor='w')
@@ -49,7 +49,7 @@ class Spendables(tk.Frame):
     def _destroy(self):
         self.vModel.PaycheckHistory.Save()
 
-    def AddPaycheckPlan(self):
+    def SplitPaycheck(self):
         self.vModel.PaycheckHistory.AddPaycheckPlanColumn()
         self.vTable.Refresh()
 
