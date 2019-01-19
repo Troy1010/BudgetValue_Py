@@ -127,10 +127,16 @@ class Table(TM.tk.TableFrame):
         self.vModel.PaycheckHistory.RemoveColumn(iColumn)
         self.Refresh()
 
-    def GetAddableCategories(self):
+    def GetCategoriesOfColumn(self, iColumn):
+        cCategories = list()
+        for vEntry in self.vModel.PaycheckHistory[iColumn]:
+            cCategories.append(vEntry.category)
+        return cCategories
+
+    def GetAddableCategories(self, iColumn):
         cAddableCategories = list()
         for category in self.vModel.Categories.values():
-            if category not in self.cActiveCategories:
+            if category.name not in [x.name for x in self.GetCategoriesOfColumn(iColumn)]:
                 cAddableCategories.append(category)
         return cAddableCategories
 
@@ -143,7 +149,7 @@ class Table(TM.tk.TableFrame):
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
         vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root, y=event.y_root:
-                              BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, self.GetAddableCategories(), (x, y), iColumn))
+                              BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
 
     def SelectCategoryPopup(self, iColumn):
