@@ -19,15 +19,18 @@ Spendables History
 		The PaycheckHistory columns must be saved
 	Test
 		Add and view a PaycheckHistory column
+Spendables
+	SpendablesPopup
+		What to do when it's empty
 ---------------------------------------------------------- Things I'm currently working on
 Spendables
 	Simplify
 		Restructure PaycheckHistory
-	SpendablesPopup
-		only shows addable categories
+	SelectCategoryPopup
 		Move to cursor or somewhere that makes sense
 		Escape to exit
 ---------------------------------------------------------- Things I've done
+Spendables-SelectCategoryPopup-only shows addable categories
 Spendables-Remove Category from column
 Spendables-Add Catagory to column
 Spendables-Remove a single column

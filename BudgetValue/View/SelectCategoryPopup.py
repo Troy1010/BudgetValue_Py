@@ -5,23 +5,33 @@ import tkinter as tk
 class SelectCategoryPopup(tk.Frame):
     previous_popup = None
 
-    def __init__(self, parent, vModel, vClosingHandler, *args):
+    def __init__(self, parent, vModel, vClosingHandler, cCategories, cPos, *args):
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
         self.vModel = vModel
         self.vClosingHandler = vClosingHandler
         self.args = args
+        self.parent = parent
         # Delete old popup
         if self.__class__.previous_popup is not None:
             self.__class__.previous_popup.destroy()
         self.__class__.previous_popup = self
         # Position myself
-        self.place(x=0, y=0)
+        x, y = cPos[0], cPos[1]
+        x -= self.parent.winfo_rootx()
+        y -= self.parent.winfo_rooty()
+        self.place(in_=parent, x=x, y=y)
         self.tkraise()
 
-        for vCategory in vModel.Categories.values():
+        for vCategory in cCategories:
             b = tk.Button(self, text=vCategory.name,
                           command=lambda vCategory=vCategory: self.SelectCategory(vCategory))
             b.pack(fill=tk.BOTH, expand=True)
+
+    def GetCurrentMousePosition(self):
+        x, y = self.winfo_pointerxy()
+        x -= self.parent.winfo_rootx()
+        y -= self.parent.winfo_rooty()
+        return (x, y)
 
     def SelectCategory(self, vCategory):
         self.vClosingHandler(vCategory, *self.args)

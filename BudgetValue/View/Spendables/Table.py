@@ -35,6 +35,7 @@ class Table(TM.tk.TableFrame):
         # Data
         prev_type = None
         dTotalSpendableAmount = Decimal(0)
+        self.cActiveCategories = list()
         for category in self.vModel.Categories.Select():
             bMadeEntry = False
             # make separation label if needed
@@ -66,6 +67,7 @@ class Table(TM.tk.TableFrame):
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):
                 self.MakeEntry_ReadOnly((row, 0), text=category.name, justify=tk.LEFT, bBold=True)
+                self.cActiveCategories.append(category)
             #
             row += 1
         # Total
@@ -125,8 +127,12 @@ class Table(TM.tk.TableFrame):
         self.vModel.PaycheckHistory.RemoveColumn(iColumn)
         self.Refresh()
 
-    def SelectCategoryPopup(self, iColumn):
-        BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, iColumn)
+    def GetAddableCategories(self):
+        cAddableCategories = list()
+        for category in self.vModel.Categories.values():
+            if category not in self.cActiveCategories:
+                cAddableCategories.append(category)
+        return cAddableCategories
 
     def AddCategoryToColumn(self, category, iColumn):
         self.vModel.PaycheckHistory.AddEntry(iColumn, category, 0)
@@ -136,8 +142,12 @@ class Table(TM.tk.TableFrame):
         iColumn = event.widget.grid_info()['column'] - 1
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
-        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn: self.SelectCategoryPopup(iColumn))
+        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root, y=event.y_root:
+                              BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, self.GetAddableCategories(), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
+
+    def SelectCategoryPopup(self, iColumn):
+        BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, self.GetAddableCategories(), iColumn)
 
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
