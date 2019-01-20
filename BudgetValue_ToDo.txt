@@ -27,7 +27,6 @@ BV redo tabs
 	Spend From Categories
 	Net Worth
 	Budgeted Spendables
----------------------------------------------------------- Things I'm currently working on
 Spendables
 	NetWoth needs to update when you change it in the other tab
 		Retrieve NetWorth on switch to tab, not init
@@ -52,6 +51,9 @@ Spendables
 	Simplify
 		Restructure PaycheckHistory
 		Make categories able to be compared without comparing names, or make that default
+---------------------------------------------------------- Things I'm currently working on
+Tabs
+	Rename Spendables->SplitMoneyIntoCategories, SpendingHistory->SpendFromCategories
 ---------------------------------------------------------- Things I've done
 PaycheckPlan-Dumps into DefaultCategory
 Spendables-Add Active Category to column that doesn't have it, or somehow allow it to be edited
