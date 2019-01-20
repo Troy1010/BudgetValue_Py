@@ -32,7 +32,7 @@ class NetWorth(list):
     def GetTotal(self):
         dTotal = Decimal(0)
         for net_worth_row in self:
-            dTotal += net_worth_row.amount
+            dTotal += 0 if net_worth_row.amount is None else net_worth_row.amount
         return dTotal
 
     def AddRow(self):
