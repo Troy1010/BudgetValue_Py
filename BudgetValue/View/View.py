@@ -9,6 +9,8 @@ from BudgetValue.View.SpendFromCategories import SpendFromCategories
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.NetWorth import NetWorth
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
+import os
+import pickle
 
 
 class View(tk.Tk):
@@ -17,9 +19,12 @@ class View(tk.Tk):
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('700x800')
+        self.bind("<Destroy>", lambda event: self._destroy())
+        self.sSaveFile = os.path.join(vModel.sWorkspace, "View.pickle")
+        self.vLastShownTab = SplitMoneyIntoCategories
+        self.Load()
 
-        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, PaycheckPlan, NetWorth,
-                     Reports)
+        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, PaycheckPlan, NetWorth, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -36,7 +41,24 @@ class View(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(cTabPages[1])
+        vTabBar.ShowTab(self.vLastShownTab)
+
+    def _destroy(self):
+        self.Save()
+
+    def Save(self):
+        data = self.vLastShownTab
+        with open(self.sSaveFile, 'wb') as f:
+            pickle.dump(data, f)
+
+    def Load(self):
+        if not os.path.exists(self.sSaveFile):
+            return
+        with open(self.sSaveFile, 'rb') as f:
+            data = pickle.load(f)
+        if not data:
+            return
+        self.vLastShownTab = data
 
 
 class MenuBar(tk.Menu):
@@ -59,6 +81,7 @@ class TabBar(tk.Frame):
     def __init__(self, parent, vModel, cTabPages):
         tk.Frame.__init__(self, parent)
         self.cTabButtons = {}
+        self.parent = parent
         for i, page in enumerate(cTabPages):
             vButton = tk.Button(self, text=page.name, font=Fonts.FONT_MEDIUM,
                                 command=lambda page=page: self.ShowTab(page))
@@ -77,6 +100,7 @@ class TabBar(tk.Frame):
     def ShowTab(self, frame):
         self.HighlightButton(self.cTabButtons[frame])
         self.cTabPageFrames[frame].tkraise()
+        self.parent.vLastShownTab = frame
 
 
 class Reports(tk.Frame):
