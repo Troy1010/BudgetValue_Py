@@ -6,8 +6,8 @@ from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
 from BudgetValue.View.SpendFromCategories import SpendFromCategories
-from BudgetValue.View import PaycheckPlan
-from BudgetValue.View import NetWorth
+from BudgetValue.View.PaycheckPlan import PaycheckPlan
+from BudgetValue.View.NetWorth import NetWorth
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 
 
@@ -18,8 +18,8 @@ class View(tk.Tk):
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (SpendFromCategories, PaycheckPlan.PaycheckPlan, NetWorth.NetWorth,
-                     SplitMoneyIntoCategories, Reports)
+        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, PaycheckPlan, NetWorth,
+                     Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -60,9 +60,13 @@ class TabBar(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.cTabButtons = {}
         for i, page in enumerate(cTabPages):
-            vButton = tk.Button(self, text=page.name, width=15, font=Fonts.FONT_MEDIUM,
+            vButton = tk.Button(self, text=page.name, font=Fonts.FONT_MEDIUM,
                                 command=lambda page=page: self.ShowTab(page))
             self.cTabButtons[page] = vButton
+            # Make width at least 15
+            if len(vButton['text']) < 15:
+                vButton.configure(width=max(vButton.winfo_width(), 15))
+            #
             vButton.grid(row=0, column=i)
 
     def HighlightButton(self, vButtonToHighlight):
