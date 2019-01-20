@@ -9,6 +9,7 @@ class NetWorth(list):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
+        self.Load()
 
     def Save(self):
         data = list()

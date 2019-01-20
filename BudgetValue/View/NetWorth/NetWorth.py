@@ -24,7 +24,7 @@ class NetWorth(tk.Frame):
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
-        self.Load()
+        self.vTable.Refresh()
 
     def AddRow(self):
         self.vModel.NetWorth.AddRow()
@@ -32,7 +32,3 @@ class NetWorth(tk.Frame):
 
     def _destroy(self):
         self.vModel.NetWorth.Save()
-
-    def Load(self):
-        self.vModel.NetWorth.Load()
-        self.vTable.Refresh()

@@ -26,10 +26,11 @@ Spendables
 	Simplify
 		Restructure PaycheckHistory
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
----------------------------------------------------------- Things I'm currently working on
 SplitMoney
 	NetWorth needs to update when you change it in the other tab
 		Refresh on switch to tab, not init
+---------------------------------------------------------- Things I'm currently working on
+SplitMoney-Why is NetWorth not showing?
 ---------------------------------------------------------- Things I've done
 Tabs-Rename Spendables->SplitMoneyIntoCategories, SpendingHistory->SpendFromCategories
 PaycheckPlan-Dumps into DefaultCategory
