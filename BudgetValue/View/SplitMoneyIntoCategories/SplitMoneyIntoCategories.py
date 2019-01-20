@@ -8,8 +8,8 @@ from .Table import Table
 import BudgetValue as BV
 
 
-class Spendables(tk.Frame):
-    name = "Spendables"
+class SplitMoneyIntoCategories(tk.Frame):
+    name = "Split Money Into Categories"
 
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)

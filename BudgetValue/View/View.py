@@ -5,10 +5,10 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
-from BudgetValue.View import SpendingHistory
+from BudgetValue.View.SpendFromCategories import SpendFromCategories
 from BudgetValue.View import PaycheckPlan
 from BudgetValue.View import NetWorth
-from BudgetValue.View import Spendables
+from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 
 
 class View(tk.Tk):
@@ -18,8 +18,8 @@ class View(tk.Tk):
         self.title("Budget Value")
         self.geometry('700x800')
 
-        cTabPages = (SpendingHistory.SpendingHistory, PaycheckPlan.PaycheckPlan, NetWorth.NetWorth,
-                     Spendables.Spendables, Reports)
+        cTabPages = (SpendFromCategories, PaycheckPlan.PaycheckPlan, NetWorth.NetWorth,
+                     SplitMoneyIntoCategories, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -44,7 +44,7 @@ class MenuBar(tk.Menu):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
         vFileMenu.add_command(label="Import Spending History",
-                              command=lambda vModel=vModel: BV.View.SpendingHistory.ImportHistory(vModel))
+                              command=lambda vModel=vModel: BV.View.SpendFromCategories.ImportHistory(vModel))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)

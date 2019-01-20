@@ -9,8 +9,8 @@ import tkinter.messagebox  # noqa
 import rx
 
 
-class SpendingHistory(tk.Frame):
-    name = "Spending History"
+class SpendFromCategories(tk.Frame):
+    name = "Spend From Categories"
 
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
@@ -25,10 +25,10 @@ class SpendingHistory(tk.Frame):
         self.vTableFrame.grid_columnconfigure(0, weight=1)
         self.vTableFrame.parent = self
         #  Header
-        self.vHeader = BV.View.SpendingHistory.Header(self.vTableFrame, vModel)
+        self.vHeader = BV.View.SpendFromCategories.Header(self.vTableFrame, vModel)
         self.vHeader.grid(row=0, column=0, sticky="NSEW")
         #  Table
-        self.vTable = BV.View.SpendingHistory.Table(self.vTableFrame, vModel)
+        self.vTable = BV.View.SpendFromCategories.Table(self.vTableFrame, vModel)
         self.vTable.grid(row=1, column=0, sticky="NSEW")
         #  Scrollbars
         vScrollbar_Y = tk.Scrollbar(self.vTableFrame)

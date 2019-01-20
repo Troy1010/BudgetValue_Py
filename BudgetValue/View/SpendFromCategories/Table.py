@@ -36,7 +36,7 @@ class Table(tk.Canvas):
         # Popup - Select Category
         for cell in self.vTableWindow.children.values():
             if cell.grid_info()['column'] == 0:
-                cell.bind('<Button-1>', lambda event, cell=cell: BV.View.SpendingHistory.SelectCategoryPopup(cell, self.vModel))
+                cell.bind('<Button-1>', lambda event, cell=cell: BV.View.SpendFromCategories.SelectCategoryPopup(cell, self.vModel))
 
     def onFrameConfigure(self):
         '''Reset the scroll region to encompass the inner frame'''
