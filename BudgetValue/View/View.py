@@ -36,7 +36,7 @@ class View(tk.Tk):
             vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(cTabPages[3])
+        vTabBar.ShowTab(cTabPages[1])
 
 
 class MenuBar(tk.Menu):

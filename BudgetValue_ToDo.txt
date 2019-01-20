@@ -29,10 +29,31 @@ BV redo tabs
 	Budgeted Spendables
 ---------------------------------------------------------- Things I'm currently working on
 Spendables
+	NetWoth needs to update when you change it in the other tab
+		Retrieve NetWorth on switch to tab, not init
+Tabs
+	Split Money into categories
+	Spend from categories
+Simple Concept
+	Split Paycheck into categories
+	Split NetWorth into categories
+	Spend from those categories
+View
+	On init, open whatever tab was last open
+	MakeEntry and MakeHeader defaults
+		possible name: widget factory
+PaycheckPlan
+	Rename to Split Paycheck Plan or something
+		Split Paycheck Plan leads the understanding down the wrong path at first
+		Split Paycheck is not exactly correct, but might be good
+		Split Paycheck (Plan) is weird for a title
+		Paycheck Split Plan might be good, but sounds awkward
+Spendables
 	Simplify
 		Restructure PaycheckHistory
 		Make categories able to be compared without comparing names, or make that default
 ---------------------------------------------------------- Things I've done
+PaycheckPlan-Dumps into DefaultCategory
 Spendables-Add Active Category to column that doesn't have it, or somehow allow it to be edited
 Spendables-SelectCategoryPopup-Escape to exit
 Spendables-SelectCategoryPopup-Move to cursor or somewhere that makes sense

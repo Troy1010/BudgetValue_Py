@@ -27,7 +27,7 @@ class Table(TM.tk.TableFrame):
         row += 1
         # Data
         prev_type = None
-        for category in self.vModel.Categories.Select(types_exclude=[CategoryType.extra]):
+        for category in self.vModel.Categories.Select():
             # make separation label if needed
             if prev_type != category.type:
                 prev_type = category.type
@@ -46,46 +46,6 @@ class Table(TM.tk.TableFrame):
                 self.MakeText((row, 0), category, text=category.name, columnspan=3)
                 self.MakeEntry((row, 3), category, text=amount)
             row += 1
-        # Balance
-        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
-        row += 1
-        vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
-                            relief='ridge', background='SystemButtonFace', text="Balance")
-        vBalance.grid(row=row, column=0, columnspan=3, sticky="ewn")
-        self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
-                                       borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vBalanceNum.grid(row=row, column=3, sticky="ewns")
-        row += 1
-        #
-        self.excessDumpCell = self.GetCell(row-3, 3)
-        self.DistributeBalance()
-        self.CalcAndShowBalance()
-
-    def DistributeBalance(self, cellToKeep=None):
-        if cellToKeep != self.excessDumpCell:
-            dBalance = self.CalculateBalance()
-            self.excessDumpCell.text = Decimal(self.excessDumpCell.text) + dBalance
-            self.SaveToModel(self.excessDumpCell.row)
-
-    def CalcAndShowBalance(self):
-        dBalance = self.CalculateBalance()
-        self.vBalanceNum.text = str(dBalance)
-        # color
-        if dBalance != 0:
-            self.vBalanceNum.config(readonlybackground="pink")
-        else:
-            self.vBalanceNum.config(readonlybackground="lightgreen")
-
-    def CalculateBalance(self):
-        dBalance = 0
-        for category_plan in self.vModel.PaycheckPlan.values():
-            if category_plan.amount is None:
-                continue
-            if category_plan.category.type == CategoryType.income:
-                dBalance += category_plan.amount
-            else:
-                dBalance -= category_plan.amount
-        return dBalance
 
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
@@ -128,8 +88,8 @@ class Table(TM.tk.TableFrame):
             cell.MakeValid()
             self.MakeRowValid(cell.row, cellToKeep=cell)
         self.SaveToModel(cell.row)
-        self.DistributeBalance(cell)
-        self.CalcAndShowBalance()
+        self.vModel.PaycheckPlan.DistributeBalance()
+        self.Refresh()
 
     def Entry_Return(self, cell):
         list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
