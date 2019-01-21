@@ -21,7 +21,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
         vButton_AddRow = ttk.Button(self.vButtonBar, text="Split",
-                                    command=lambda self=self: self.AddPaycheckHistoryColumn())
+                                    command=lambda self=self: self.AddSplitMoneyHistoryColumn())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                            command=lambda self=self: self.SplitPaycheck())
@@ -53,32 +53,32 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def Print(self):
-        print("self.vModel.PaycheckHistory..")
-        for i, cColumn in enumerate(self.vModel.PaycheckHistory):
+        print("self.vModel.SplitMoneyHistory..")
+        for i, cColumn in enumerate(self.vModel.SplitMoneyHistory):
             print(" Column "+str(i))
             for vEntry in cColumn:
                 print("  "+vEntry.category.name+" - "+str(vEntry.amount))
 
     def _destroy(self):
-        self.vModel.PaycheckHistory.Save()
+        self.vModel.SplitMoneyHistory.Save()
 
     def SplitBalance(self):
         amount = -self.vTable.dBalance
-        self.vModel.PaycheckHistory.AddColumn()
-        self.vModel.PaycheckHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
+        self.vModel.SplitMoneyHistory.AddColumn()
+        self.vModel.SplitMoneyHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
         self.vTable.Refresh()
 
     def SplitPaycheck(self):
-        self.vModel.PaycheckHistory.AddColumn()
+        self.vModel.SplitMoneyHistory.AddColumn()
         for vCategoryPlan in self.vModel.PaycheckPlan.values():
-            self.vModel.PaycheckHistory.AddEntry(-1, category=vCategoryPlan.category, amount=vCategoryPlan.amount)
+            self.vModel.SplitMoneyHistory.AddEntry(-1, category=vCategoryPlan.category, amount=vCategoryPlan.amount)
         self.vTable.Refresh()
 
     def SplitNetWorth(self, amount):
-        self.vModel.PaycheckHistory.AddColumn()
-        self.vModel.PaycheckHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
+        self.vModel.SplitMoneyHistory.AddColumn()
+        self.vModel.SplitMoneyHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
         self.vTable.Refresh()
 
-    def AddPaycheckHistoryColumn(self):
-        self.vModel.PaycheckHistory.AddColumn()
+    def AddSplitMoneyHistoryColumn(self):
+        self.vModel.SplitMoneyHistory.AddColumn()
         self.vTable.Refresh()

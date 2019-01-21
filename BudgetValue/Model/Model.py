@@ -17,15 +17,15 @@ class Model():
         self.SpendingHistory = BV.Model.SpendingHistory(self)
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.NetWorth = BV.Model.NetWorth(self)
-        self.PaycheckHistory = BV.Model.PaycheckHistory(self)
+        self.SplitMoneyHistory = BV.Model.SplitMoneyHistory(self)
 
     def GetBudgetedAmount(self, category):
         dSpendableAmount = Decimal(0)
-        # PaycheckHistory total for this category
-        for paycheck_history_column in self.PaycheckHistory:
-            for vPaycheckHistoryEntry in paycheck_history_column:
-                if vPaycheckHistoryEntry.category.name == category.name:
-                    dSpendableAmount += 0 if vPaycheckHistoryEntry.amount is None else vPaycheckHistoryEntry.amount
+        # SplitMoneyHistory total for this category
+        for paycheck_history_column in self.SplitMoneyHistory:
+            for vSplitMoneyHistoryEntry in paycheck_history_column:
+                if vSplitMoneyHistoryEntry.category.name == category.name:
+                    dSpendableAmount += 0 if vSplitMoneyHistoryEntry.amount is None else vSplitMoneyHistoryEntry.amount
         # Spent total for this category
         dSpendableAmount += self.SpendingHistory.GetTotalOfAmountsOfCategory(category)
         #

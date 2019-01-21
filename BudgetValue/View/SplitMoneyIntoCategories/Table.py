@@ -32,12 +32,12 @@ class Table(TM.tk.TableFrame):
         #
         row = 0
         # Column Header
-        for iColumn, paycheck_history_column in enumerate(self.vModel.PaycheckHistory):
+        for iColumn, paycheck_history_column in enumerate(self.vModel.SplitMoneyHistory):
             vColumnHeader = self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
-        iSpentColumn = len(self.vModel.PaycheckHistory)+1
+        iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
         self.MakeHeader((row, iSpentColumn), text="Spent")
-        self.iBudgetedColumn = len(self.vModel.PaycheckHistory)+2
+        self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+2
         self.MakeHeader((row, self.iBudgetedColumn), text="Budgeted")
         row += 1
         # Data
@@ -52,14 +52,14 @@ class Table(TM.tk.TableFrame):
                 self.MakeSeparationLable(row, "  " + prev_type.name.capitalize())
                 row += 1
             # PaycheckHistories
-            for iColumn, paycheck_history_column in enumerate(self.vModel.PaycheckHistory):
-                for vPaycheckHistoryEntry in paycheck_history_column:
-                    if vPaycheckHistoryEntry.category.name == category.name:
+            for iColumn, paycheck_history_column in enumerate(self.vModel.SplitMoneyHistory):
+                for vSplitMoneyHistoryEntry in paycheck_history_column:
+                    if vSplitMoneyHistoryEntry.category.name == category.name:
                         bEditableState = True
                         if category.name == "<Default Category>":
                             bEditableState = False
-                        vPaycheckHistoryCell = self.MakeEntry((row, iColumn+1), text=vPaycheckHistoryEntry.amount, bEditableState=bEditableState)
-                        vPaycheckHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
+                        vSplitMoneyHistoryCell = self.MakeEntry((row, iColumn+1), text=vSplitMoneyHistoryEntry.amount, bEditableState=bEditableState)
+                        vSplitMoneyHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
                         bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
@@ -115,7 +115,6 @@ class Table(TM.tk.TableFrame):
         else:
             self.vBalanceNum.config(readonlybackground="lightgreen")
         row += 1
-        self.vModel.PaycheckHistory
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
@@ -127,16 +126,16 @@ class Table(TM.tk.TableFrame):
         categoryName = self.GetCell(cell.row, 0).text
         cell.text = 0
         self.SaveCellToModel(cell)
-        self.vModel.PaycheckHistory.RemoveEntry(iColumn, categoryName)
+        self.vModel.SplitMoneyHistory.RemoveEntry(iColumn, categoryName)
         self.Refresh()
 
     def RemoveColumn(self, iColumn):
-        self.vModel.PaycheckHistory.RemoveColumn(iColumn)
+        self.vModel.SplitMoneyHistory.RemoveColumn(iColumn)
         self.Refresh()
 
     def GetCategoriesOfColumn(self, iColumn):
         cCategories = list()
-        for vEntry in self.vModel.PaycheckHistory[iColumn]:
+        for vEntry in self.vModel.SplitMoneyHistory[iColumn]:
             cCategories.append(vEntry.category)
         return cCategories
 
@@ -148,7 +147,7 @@ class Table(TM.tk.TableFrame):
         return cAddableCategories
 
     def AddCategoryToColumn(self, category, iColumn):
-        self.vModel.PaycheckHistory.AddEntry(iColumn, category, 0)
+        self.vModel.SplitMoneyHistory.AddEntry(iColumn, category, 0)
         self.Refresh()
 
     def ShowHeaderMenu(self, event):
@@ -197,7 +196,7 @@ class Table(TM.tk.TableFrame):
         iColumn = cell.column - 1
         categoryName = self.GetCell(cell.row, 0).text
         amount = 0 if cell.text == "" else Decimal(cell.text)
-        self.vModel.PaycheckHistory.SetEntryAndDirectOverflow(iColumn, categoryName, amount)
+        self.vModel.SplitMoneyHistory.SetEntryAndDirectOverflow(iColumn, categoryName, amount)
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):
@@ -230,7 +229,7 @@ class Table(TM.tk.TableFrame):
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ew")
 
     def AddEntry(self, column):
-        self.vModel.PaycheckHistory.AddEntry(column)
+        self.vModel.SplitMoneyHistory.AddEntry(column)
         self.Refresh()
 
     def OnDrag(self, event):

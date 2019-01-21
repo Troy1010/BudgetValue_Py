@@ -4,11 +4,11 @@ import BudgetValue as BV
 from decimal import Decimal
 
 
-class PaycheckHistory(list):
+class SplitMoneyHistory(list):
 
     def __init__(self, vModel):
         self.vModel = vModel
-        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckHistory.pickle")
+        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SplitMoneyHistory.pickle")
         self.Load()
 
     def RemoveColumn(self, iColumn):
@@ -50,7 +50,7 @@ class PaycheckHistory(list):
     def AddEntry(self, iColumn, category=None, amount=0):
         if category is None:
             category = self.vModel.Categories["<Default Category>"]
-        self[iColumn].append(PaycheckHistoryEntry(category=category, amount=amount))
+        self[iColumn].append(SplitMoneyHistoryEntry(category=category, amount=amount))
 
     def Save(self):
         data = list()
@@ -71,10 +71,10 @@ class PaycheckHistory(list):
         for cColumn in data:
             self.append(list())
             for entry in cColumn:
-                self[-1].append(PaycheckHistoryEntry(category=entry["category"], amount=entry["amount"]))
+                self[-1].append(SplitMoneyHistoryEntry(category=entry["category"], amount=entry["amount"]))
 
 
-class PaycheckHistoryEntry(dict):
+class SplitMoneyHistoryEntry(dict):
     def __init__(self, category=None, amount=None):
         self.category = category
         self.amount = amount
