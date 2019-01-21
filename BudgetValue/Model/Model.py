@@ -22,10 +22,9 @@ class Model():
     def GetBudgetedAmount(self, category):
         dSpendableAmount = Decimal(0)
         # SplitMoneyHistory total for this category
-        for paycheck_history_column in self.SplitMoneyHistory:
-            for vSplitMoneyHistoryEntry in paycheck_history_column:
-                if vSplitMoneyHistoryEntry.category.name == category.name:
-                    dSpendableAmount += 0 if vSplitMoneyHistoryEntry.amount is None else vSplitMoneyHistoryEntry.amount
+        for split_money_history_column in self.SplitMoneyHistory:
+            if category.name in split_money_history_column:
+                dSpendableAmount += 0 if split_money_history_column[category.name].amount is None else split_money_history_column[category.name].amount
         # Spent total for this category
         dSpendableAmount += self.SpendingHistory.GetTotalOfAmountsOfCategory(category)
         #

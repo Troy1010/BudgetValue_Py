@@ -34,7 +34,7 @@ class Table(TM.tk.TableFrame):
         #
         row = 0
         # Column Header
-        for iColumn, paycheck_history_column in enumerate(self.vModel.SplitMoneyHistory):
+        for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
             vColumnHeader = self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         self.iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
@@ -54,16 +54,15 @@ class Table(TM.tk.TableFrame):
                 self.MakeSeparationLable(row, "  " + prev_type.name.capitalize())
                 row += 1
             # PaycheckHistories
-            for iColumn, paycheck_history_column in enumerate(self.vModel.SplitMoneyHistory):
-                for vSplitMoneyHistoryEntry in paycheck_history_column:
-                    if vSplitMoneyHistoryEntry.category.name == category.name:
-                        bEditableState = True
-                        if category.name == "<Default Category>":
-                            bEditableState = False
-                        vSplitMoneyHistoryCell = self.MakeEntry((row, iColumn+1), text=vSplitMoneyHistoryEntry.amount, bEditableState=bEditableState)
-                        vSplitMoneyHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
-                        vSplitMoneyHistoryCell.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
-                        bMadeEntry = True
+            for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
+                if category.name in split_money_history_column:
+                    bEditableState = True
+                    if category.name == "<Default Category>":
+                        bEditableState = False
+                    vSplitMoneyHistoryCell = self.MakeEntry((row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
+                    vSplitMoneyHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
+                    vSplitMoneyHistoryCell.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
+                    bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
             if dSpendingHistoryTotal:
@@ -138,7 +137,7 @@ class Table(TM.tk.TableFrame):
 
     def GetCategoriesOfColumn(self, iColumn):
         cCategories = list()
-        for vEntry in self.vModel.SplitMoneyHistory[iColumn]:
+        for vEntry in self.vModel.SplitMoneyHistory[iColumn].values():
             cCategories.append(vEntry.category)
         return cCategories
 
@@ -198,10 +197,7 @@ class Table(TM.tk.TableFrame):
     def SaveCellToModel(self, cell):
         iColumn = cell.column - 1
         categoryName = self.GetCell(cell.row, 0).text
-        amount = 0 if cell.text == "" else Decimal(cell.text)
-        for vEntry in self.vModel.SplitMoneyHistory[iColumn]:
-            if vEntry.category.name == categoryName:
-                vEntry.amount = amount
+        self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = 0 if cell.text == "" else cell.text
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):

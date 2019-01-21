@@ -25,9 +25,11 @@ Spendables
 	Simplify
 		Restructure SplitMoney
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
-		Use more observables
 ---------------------------------------------------------- Things I'm currently working on
-Use observables
+Restructure SplitMoney
+	List<List<Entry<Category,Amount>>>
+	
+	List<Dict<Category,Amount>
 ---------------------------------------------------------- Things I've done
 SplitMoney-DirectOverflow always happens
 SplitMoney-SplitNetWorth, SplitBalance

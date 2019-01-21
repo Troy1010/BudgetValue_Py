@@ -15,29 +15,25 @@ class SplitMoneyHistory(list):
         del self[iColumn]
 
     def RemoveEntry(self, iColumn, categoryName):
-        iToRemove = None
-        for i, vEntry in enumerate(self[iColumn]):
-            if vEntry.category.name == categoryName:
-                iToRemove = i
-                break
-        if iToRemove is not None:
-            del self[iColumn][iToRemove]
+        del self[iColumn][categoryName]
 
     def AddColumn(self):
-        self.append(list())
-        self[-1].append(BalanceEntry(self[-1], self.vModel.Categories["<Default Category>"]))
+        self.append(dict())
+        self._AddBalanceEntry(-1)
 
-    def AddEntry(self, iColumn, category=None, amount=0):
-        if category is None:
-            category = self.vModel.Categories["<Default Category>"]
-        self[iColumn].append(SplitMoneyHistoryEntry(category=category, amount=amount))
+    def _AddBalanceEntry(self, iColumn):
+        category = self.vModel.Categories["<Default Category>"]
+        self[-1][category.name] = BalanceEntry(self[-1], category)
+
+    def AddEntry(self, iColumn, category, amount=0):
+        self[iColumn][category.name] = SplitMoneyHistoryEntry(category=category, amount=amount)
 
     def Save(self):
         data = list()
         for cColumn in list(self):
-            data.append(list())
-            for entry in cColumn:
-                data[-1].append(dict(entry))
+            data.append(dict())
+            for k, v in cColumn.items():
+                data[-1][k] = dict(v)
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -49,12 +45,10 @@ class SplitMoneyHistory(list):
         if not data:
             return
         for cColumn in data:
-            self.append(list())
-            for entry in cColumn:
-                if "amount" not in entry:
-                    self[-1].append(BalanceEntry(self[-1], self.vModel.Categories["<Default Category>"]))
-                else:
-                    self[-1].append(SplitMoneyHistoryEntry(category=entry["category"], amount=entry["amount"]))
+            self.AddColumn()
+            for categoryName, entry in cColumn.items():
+                if "amount" in entry:
+                    self.AddEntry(-1, entry["category"], amount=entry["amount"])
 
 
 class BalanceEntry(dict):
@@ -65,7 +59,7 @@ class BalanceEntry(dict):
     @property
     def amount(self):
         dBalance = Decimal(0)
-        for item in self.parent:
+        for item in self.parent.values():
             if item is not None and "amount" in item:
                 dBalance += 0 if item.amount is None else item.amount
         return -dBalance
