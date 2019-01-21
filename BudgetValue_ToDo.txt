@@ -25,13 +25,6 @@ Spendables
 	Simplify
 		Restructure PaycheckHistory
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
-SplitMoney
-	NetWorth and SpendingHistory needs to update when you change it in the other tab
-		Refresh on switch to tab, not init
-NetWorth
-	Simplify
-		Make net_worth_rows have subjects
-		Have GetTotal just be an observable
 ---------------------------------------------------------- Things I'm currently working on
 ---------------------------------------------------------- Things I've done
 SplitMoney-DirectOverflow always happens
