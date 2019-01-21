@@ -23,9 +23,11 @@ View
 		possible name: widget factory
 Spendables
 	Simplify
-		Restructure PaycheckHistory
+		Restructure SplitMoney
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
+		Use more observables
 ---------------------------------------------------------- Things I'm currently working on
+Use observables
 ---------------------------------------------------------- Things I've done
 SplitMoney-DirectOverflow always happens
 SplitMoney-SplitNetWorth, SplitBalance
