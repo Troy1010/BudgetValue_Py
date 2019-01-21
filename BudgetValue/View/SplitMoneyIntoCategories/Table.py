@@ -155,7 +155,7 @@ class Table(TM.tk.TableFrame):
         iColumn = event.widget.grid_info()['column'] - 1
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
-        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root, y=event.y_root:
+        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty():
                               BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
 

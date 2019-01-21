@@ -5,8 +5,10 @@ import tkinter as tk
 class SelectCategoryPopup(tk.Frame):
     previous_popup = None
 
-    def __init__(self, parent, vClosingHandler, cCategories, cPos, *args):
+    def __init__(self, parent, vClosingHandler, cCategories, cPos, *args, vDestroyHandler=None):
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
+        if vDestroyHandler is not None:
+            self.destroy = self.DestoyDecorator(self.destroy, vDestroyHandler, *args)
         self.vClosingHandler = vClosingHandler
         self.args = args
         self.parent = parent
@@ -16,8 +18,6 @@ class SelectCategoryPopup(tk.Frame):
         self.__class__.previous_popup = self
         # Position myself
         x, y = cPos[0], cPos[1]
-        x -= self.parent.winfo_rootx()
-        y -= self.parent.winfo_rooty()
         self.place(in_=parent, x=x, y=y)
         self.tkraise()
         # Show categories
@@ -27,12 +27,20 @@ class SelectCategoryPopup(tk.Frame):
                               command=lambda vCategory=vCategory: self.SelectCategory(vCategory))
                 b.pack(fill=tk.BOTH, expand=True)
         else:
-            b = tk.Button(self, text="No Categories To Add",
-                          command=self.destroy)
+            b = tk.Button(self, text="No Categories To Add", command=self.destroy)
             b.pack(fill=tk.BOTH, expand=True)
-
         # Bind Escape to exit
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy())
+
+    class DestoyDecorator:
+        def __init__(self, method, vDestroyHandler, *args):
+            self.vDestroyHandler = vDestroyHandler
+            self.method = method
+            self.args = args
+
+        def __call__(self, *args, **kwargs):
+            self.vDestroyHandler(*self.args)
+            self.method(*args, **kwargs)
 
     def SelectCategory(self, vCategory):
         self.vClosingHandler(vCategory, *self.args)

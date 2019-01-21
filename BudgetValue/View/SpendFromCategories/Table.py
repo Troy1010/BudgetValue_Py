@@ -36,7 +36,18 @@ class Table(tk.Canvas):
         # Popup - Select Category
         for cell in self.vTableWindow.children.values():
             if cell.grid_info()['column'] == 0:
-                cell.bind('<Button-1>', lambda event, cell=cell: BV.View.SpendFromCategories.SelectCategoryPopup(cell, self.vModel))
+                cell.bind('<Button-1>', lambda event, cell=cell, x=cell.winfo_width(), y=0: (
+                          cell.config(background="grey"),
+                          BV.View.SelectCategoryPopup(self.parent, self.SelectCategory, self.vModel.Categories.values(), (x, y), cell, vDestroyHandler=self.DestroyHandler)))
+
+    def DestroyHandler(self, cell):
+        try:
+            cell.config(background="SystemButtonFace")
+        except tk.TclError:  # cell doesn't exist
+            pass
+
+    def SelectCategory(self, vCategory, cell):
+        self.Update((cell.grid_info()['row'], "Category"), vCategory.name)
 
     def onFrameConfigure(self):
         '''Reset the scroll region to encompass the inner frame'''
