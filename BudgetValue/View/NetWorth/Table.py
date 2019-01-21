@@ -10,6 +10,13 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
+        self.vTotal_ = 0
+        self.vModel.NetWorth.total.subscribe(lambda sum_: self.AssignTotal(sum_))
+
+    def AssignTotal(self, sum_):
+        self.vTotal_ = sum_
+        if hasattr(self, "vTotalNum"):
+            self.vTotalNum.text = sum_
 
     def Refresh(self):
         # remove old
@@ -38,11 +45,8 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vTotalNum.grid(row=row, column=1, sticky="ewns")
-        self.CalcAndShowTotal()
+        self.vTotalNum.text = self.vTotal_
         row += 1
-
-    def CalcAndShowTotal(self):
-        self.vTotalNum.text = self.vModel.NetWorth.GetTotal()
 
     def OnFocusIn_MakeObvious(self, cell):
         cell.config(justify=tk.LEFT)
@@ -73,7 +77,6 @@ class Table(TM.tk.TableFrame):
         w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
         w.bind("<FocusOut>", lambda event, w=w: self.SaveEntryInModel(w), add="+")
         w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
-        w.bind("<FocusOut>", lambda event: self.CalcAndShowTotal(), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
         w.bind("<B1-Motion>", self.OnDrag)
         w.bind("<ButtonRelease-1>", self.OnDrop)

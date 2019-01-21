@@ -14,7 +14,13 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         #
-        self.Refresh()
+        self.vNetWorthTotal = 0
+        self.vModel.NetWorth.total.subscribe(lambda sum_: self.AssignTotal(sum_))
+
+    def AssignTotal(self, sum_):
+        self.vNetWorthTotal = sum_
+        if hasattr(self, "vNetWorthNum"):
+            self.vNetWorthNum.text = sum_
 
     def Refresh(self):
         # remove old
@@ -90,8 +96,7 @@ class Table(TM.tk.TableFrame):
                                         borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vNetWorthNum.ValidationHandler = BV.MakeValid_Money
         self.vNetWorthNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        dNetWorth = self.vModel.NetWorth.GetTotal()
-        self.vNetWorthNum.text = dNetWorth
+        self.vNetWorthNum.text = self.vNetWorthTotal
         row += 1
         # Balance
         vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
@@ -101,7 +106,7 @@ class Table(TM.tk.TableFrame):
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vBalanceNum.ValidationHandler = BV.MakeValid_Money
         self.vBalanceNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        dBalance = dNetWorth - dTotalSpendableAmount
+        dBalance = self.vNetWorthTotal - dTotalSpendableAmount
         self.vBalanceNum.text = dBalance
         if dBalance != 0:
             self.vBalanceNum.config(readonlybackground="pink")

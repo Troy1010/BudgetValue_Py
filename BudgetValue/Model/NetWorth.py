@@ -2,6 +2,7 @@ import BudgetValue as BV
 import os
 import pickle
 from decimal import Decimal
+import rx
 
 
 class NetWorth(list):
@@ -9,7 +10,30 @@ class NetWorth(list):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
+        self.netWorthUpdated = rx.subjects.BehaviorSubject(None)
+        self.total = self.netWorthUpdated.select(
+            lambda unit: rx.Observable.combine_latest([x.stream for x in self], lambda *args: self.SumList(args))
+        ).select_many(
+            lambda sums: sums
+        ).replay(
+            1
+        ).ref_count()
         self.Load()
+
+    def AddRow(self):
+        self.append(NetWorthRow())
+        self.netWorthUpdated.on_next(None)
+
+    def RemoveRow(self, iRow):
+        del self[iRow]
+        self.netWorthUpdated.on_next(None)
+
+    def SumList(self, cList):
+        total = 0
+        for item in cList:
+            if item is not None:
+                total += item
+        return total
 
     def Save(self):
         data = list()
@@ -29,6 +53,7 @@ class NetWorth(list):
             self.append(NetWorthRow())
             for k, v in net_worth_row.items():
                 self[-1][k] = v
+        self.netWorthUpdated.on_next(None)
 
     def GetTotal(self):
         dTotal = Decimal(0)
@@ -36,17 +61,17 @@ class NetWorth(list):
             dTotal += 0 if net_worth_row.amount is None else net_worth_row.amount
         return dTotal
 
-    def AddRow(self):
-        self.append(NetWorthRow())
-
-    def RemoveRow(self, iRow):
-        del self[iRow]
-
 
 class NetWorthRow(dict):
     def __init__(self, name=None, amount=None):
         self.name = name
+        self.stream = rx.subjects.BehaviorSubject(amount)
         self.amount = amount
+
+    def __setitem__(self, key, value):
+        if key == "amount":
+            self.stream.on_next(value)
+        dict.__setitem__(self, key, value)
 
     @property
     def amount(self):
@@ -54,7 +79,9 @@ class NetWorthRow(dict):
 
     @amount.setter
     def amount(self, value):
-        self["amount"] = None if not value or value == 0 else BV.MakeValid_Money(value)
+        value = None if not value or value == 0 else BV.MakeValid_Money(value)
+        self["amount"] = value
+        self.stream.on_next(value)
 
     @property
     def name(self):
