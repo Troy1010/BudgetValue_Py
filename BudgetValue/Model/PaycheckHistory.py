@@ -52,11 +52,6 @@ class PaycheckHistory(list):
             category = self.vModel.Categories["<Default Category>"]
         self[iColumn].append(PaycheckHistoryEntry(category=category, amount=amount))
 
-    def AddPaycheckPlanColumn(self):
-        self.AddColumn()
-        for vCategoryPlan in self.vModel.PaycheckPlan.values():
-            self.AddEntry(-1, category=vCategoryPlan.category, amount=vCategoryPlan.amount)
-
     def Save(self):
         data = list()
         for cColumn in list(self):
