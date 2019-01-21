@@ -3,10 +3,11 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
-import BudgetValue as BV
 import itertools
 import tkinter.messagebox  # noqa
 import rx
+from .Table import Table
+from .Header import Header
 
 
 class SpendFromCategories(tk.Frame):
@@ -25,10 +26,10 @@ class SpendFromCategories(tk.Frame):
         self.vTableFrame.grid_columnconfigure(0, weight=1)
         self.vTableFrame.parent = self
         #  Header
-        self.vHeader = BV.View.SpendFromCategories.Header(self.vTableFrame, vModel)
+        self.vHeader = Header(self.vTableFrame, vModel)
         self.vHeader.grid(row=0, column=0, sticky="NSEW")
         #  Table
-        self.vTable = BV.View.SpendFromCategories.Table(self.vTableFrame, vModel)
+        self.vTable = Table(self.vTableFrame, vModel)
         self.vTable.grid(row=1, column=0, sticky="NSEW")
         #  Scrollbars
         vScrollbar_Y = tk.Scrollbar(self.vTableFrame)
