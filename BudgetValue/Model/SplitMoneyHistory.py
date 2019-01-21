@@ -42,7 +42,7 @@ class SplitMoneyHistory(list):
 
     def AddColumn(self):
         self.append(list())
-        self.AddEntry(-1, category=self.vModel.Categories["<Default Category>"], amount=0)
+        self[-1].append(BalanceEntry(self[-1], self.vModel.Categories["<Default Category>"]))
 
     def AddEntry(self, iColumn, category=None, amount=0):
         if category is None:
@@ -68,7 +68,32 @@ class SplitMoneyHistory(list):
         for cColumn in data:
             self.append(list())
             for entry in cColumn:
-                self[-1].append(SplitMoneyHistoryEntry(category=entry["category"], amount=entry["amount"]))
+                if "amount" not in entry:
+                    self[-1].append(BalanceEntry(self[-1], self.vModel.Categories["<Default Category>"]))
+                else:
+                    self[-1].append(SplitMoneyHistoryEntry(category=entry["category"], amount=entry["amount"]))
+
+
+class BalanceEntry(dict):
+    def __init__(self, parent, category):
+        self.parent = parent
+        self.category = category
+
+    @property
+    def amount(self):
+        dBalance = Decimal(0)
+        for item in self.parent:
+            if item is not None and "amount" in item:
+                dBalance += 0 if item.amount is None else item.amount
+        return dBalance
+
+    @property
+    def category(self):
+        return self["category"]
+
+    @category.setter
+    def category(self, value):
+        self["category"] = value
 
 
 class SplitMoneyHistoryEntry(dict):
