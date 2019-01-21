@@ -21,10 +21,16 @@ class SelectCategoryPopup(tk.Frame):
         self.place(in_=parent, x=x, y=y)
         self.tkraise()
         # Show categories
-        for vCategory in cCategories:
-            b = tk.Button(self, text=vCategory.name,
-                          command=lambda vCategory=vCategory: self.SelectCategory(vCategory))
+        if cCategories is not None and len(cCategories):
+            for vCategory in cCategories:
+                b = tk.Button(self, text=vCategory.name,
+                              command=lambda vCategory=vCategory: self.SelectCategory(vCategory))
+                b.pack(fill=tk.BOTH, expand=True)
+        else:
+            b = tk.Button(self, text="No Categories To Add",
+                          command=self.destroy)
             b.pack(fill=tk.BOTH, expand=True)
+
         # Bind Escape to exit
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy())
 

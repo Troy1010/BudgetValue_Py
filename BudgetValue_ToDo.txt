@@ -3,14 +3,6 @@ BudgetValue
 	Import History
 		Security
 		Be able to import from blank table
-Spendables
-	SpendablesPopup
-		What to do when it's empty
-BV redo tabs
-	Split Paycheck Into Categories
-	Spend From Categories
-	Net Worth
-	Budgeted Spendables
 View
 	MakeEntry and MakeHeader defaults
 		possible name: widget factory
@@ -19,6 +11,7 @@ Spendables
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
 ---------------------------------------------------------- Things I'm currently working on
 ---------------------------------------------------------- Things I've done
+SelectCategoryPopup-What to do when it's empty
 SplitMoney-Restructure
 SplitMoney-DirectOverflow always happens
 SplitMoney-SplitNetWorth, SplitBalance
