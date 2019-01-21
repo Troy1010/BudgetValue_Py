@@ -3,13 +3,13 @@ BudgetValue
 	Import History
 		Security
 		Be able to import from blank table
-View
-	MakeEntry and MakeHeader defaults
-		possible name: widget factory
 Spendables
 	Simplify
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
 ---------------------------------------------------------- Things I'm currently working on
+View
+	MakeEntry and MakeHeader defaults
+		possible name: widget factory
 ---------------------------------------------------------- Things I've done
 SelectCategoryPopup-What to do when it's empty
 SplitMoney-Restructure

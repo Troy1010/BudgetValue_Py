@@ -1,6 +1,5 @@
 import TM_CommonPy as TM
 import tkinter as tk
-from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
 from BudgetValue.Model import CategoryType  # noqa
@@ -160,9 +159,6 @@ class Table(TM.tk.TableFrame):
                               BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
 
-    def SelectCategoryPopup(self, iColumn):
-        BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(), iColumn)
-
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
                      background='SystemButtonFace', text=text)
@@ -223,15 +219,6 @@ class Table(TM.tk.TableFrame):
             w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
             w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
         return w
-
-    def MakeAddEntryButton(self, cRowColumnPair):
-        w = ttk.Button(self, text="Add Entry",
-                       command=lambda self=self, column=cRowColumnPair[1]: self.AddEntry(column))
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ew")
-
-    def AddEntry(self, column):
-        self.vModel.SplitMoneyHistory.AddEntry(column)
-        self.Refresh()
 
 
 class HeaderMenuBar(tk.Menu):
