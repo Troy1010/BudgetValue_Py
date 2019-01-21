@@ -34,12 +34,12 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Column Header
         for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
-            vColumnHeader = self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
+            vColumnHeader = BV.View.MakeHeader(self, (row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         self.iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
-        self.MakeHeader((row, self.iSpentColumn), text="Spent")
+        BV.View.MakeHeader(self, (row, self.iSpentColumn), text="Spent")
         self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+2
-        self.MakeHeader((row, self.iBudgetedColumn), text="Budgeted")
+        BV.View.MakeHeader(self, (row, self.iBudgetedColumn), text="Budgeted")
         row += 1
         # Data
         prev_type = None
@@ -50,7 +50,7 @@ class Table(TM.tk.TableFrame):
             # make separation label if needed
             if prev_type != category.type:
                 prev_type = category.type
-                self.MakeSeparationLable(row, "  " + prev_type.name.capitalize())
+                BV.View.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
             # PaycheckHistories
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
@@ -58,24 +58,24 @@ class Table(TM.tk.TableFrame):
                     bEditableState = True
                     if category.name == "<Default Category>":
                         bEditableState = False
-                    vSplitMoneyHistoryCell = self.MakeEntry((row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
+                    vSplitMoneyHistoryCell = BV.View.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
                     vSplitMoneyHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
                     vSplitMoneyHistoryCell.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                     bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
             if dSpendingHistoryTotal:
-                self.MakeEntry_ReadOnly((row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
+                BV.View.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
                 bMadeEntry = True
             # Budgeted
             dSpendable = self.vModel.GetBudgetedAmount(category)
             if (dSpendable != 0 or bMadeEntry) and category.type != BV.Model.CategoryType.income:
                 dTotalSpendableAmount += dSpendable
-                self.MakeEntry_ReadOnly((row, self.iBudgetedColumn), text=str(dSpendable))
+                BV.View.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=str(dSpendable))
                 bMadeEntry = True
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):
-                self.MakeEntry_ReadOnly((row, 0), text=category.name, justify=tk.LEFT, bBold=True)
+                BV.View.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
                 self.cActiveCategories.append(category)
             #
             row += 1
@@ -159,17 +159,6 @@ class Table(TM.tk.TableFrame):
                               BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
 
-    def MakeHeader(self, cRowColumnPair, text=None):
-        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
-                     background='SystemButtonFace', text=text)
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
-        return w
-
-    def MakeSeparationLable(self, row, text):
-        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT,
-                     background='lightblue', text=text, anchor="w")
-        w.grid(row=row, columnspan=1000, sticky="ew")  # columnspan?
-
     def OnFocusIn_MakeObvious(self, cell):
         cell.config(justify=tk.LEFT)
         cell.select_text()
@@ -186,45 +175,8 @@ class Table(TM.tk.TableFrame):
         self.vModel.NetWorth.RemoveRow(iRow-1)  # skip header
         self.Refresh()
 
-    def MakeEntry_ReadOnly(self, *args, **kwargs):
-        kwargs["bEditableState"] = False
-        self.MakeEntry(*args, **kwargs)
-
     def SaveCellToModel(self, cell):
         iColumn = cell.column - 1
         categoryName = self.GetCell(cell.row, 0).text
         self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = 0 if cell.text == "" else cell.text
         self.Refresh()
-
-    def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):
-        if bEditableState:
-            state = "normal"
-            background = 'SystemButtonFace'
-        else:
-            state = "readonly"
-            background = '#d8d8d8'
-        if bBold:
-            font = Fonts.FONT_SMALL_BOLD
-        else:
-            font = Fonts.FONT_SMALL
-        w = TM.tk.Entry(self, font=font, width=15, justify=justify,
-                        borderwidth=2, relief='ridge', background=background, disabledbackground=background,
-                        readonlybackground=background, state=state)
-        w.text = text
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ns")
-        w.bind('<Escape>', lambda event: self.FocusNothing())
-        if bEditableState:
-            w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
-            w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
-            w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
-            w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
-        return w
-
-
-class HeaderMenuBar(tk.Menu):
-    def __init__(self, vModel, *args, **kwargs):
-        tk.Menu.__init__(self, *args, **kwargs)
-        self.add_command(label="Remove Column", command=self.hello)
-
-    def hello(self):
-        print("hello!")
