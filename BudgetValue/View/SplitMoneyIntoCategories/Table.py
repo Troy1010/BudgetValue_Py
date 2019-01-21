@@ -60,6 +60,7 @@ class Table(TM.tk.TableFrame):
                             bEditableState = False
                         vSplitMoneyHistoryCell = self.MakeEntry((row, iColumn+1), text=vSplitMoneyHistoryEntry.amount, bEditableState=bEditableState)
                         vSplitMoneyHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
+                        vSplitMoneyHistoryCell.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                         bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
@@ -196,7 +197,9 @@ class Table(TM.tk.TableFrame):
         iColumn = cell.column - 1
         categoryName = self.GetCell(cell.row, 0).text
         amount = 0 if cell.text == "" else Decimal(cell.text)
-        self.vModel.SplitMoneyHistory.SetEntryAndDirectOverflow(iColumn, categoryName, amount)
+        for vEntry in self.vModel.SplitMoneyHistory[iColumn]:
+            if vEntry.category.name == categoryName:
+                vEntry.amount = amount
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):
@@ -231,35 +234,6 @@ class Table(TM.tk.TableFrame):
     def AddEntry(self, column):
         self.vModel.SplitMoneyHistory.AddEntry(column)
         self.Refresh()
-
-    def OnDrag(self, event):
-        x, y = event.widget.winfo_pointerxy()
-        target = event.widget.winfo_containing(x, y)
-        if target.row != event.widget.row:
-            # Grey out the From row
-            for cell in self.grid_slaves(row=event.widget.row):
-                cell.config(background="grey")
-            # Blue out the target
-            if not hasattr(self, "blueOutRow") or self.blueOutRow != target.row:
-                if hasattr(self, "blueOutRow"):
-                    for cell in self.grid_slaves(row=self.blueOutRow):
-                        cell.config(background="SystemButtonFace")
-                for cell in self.grid_slaves(row=target.row):
-                    cell.config(background="lightblue")
-                self.blueOutRow = target.row
-
-    def OnDrop(self, event):
-        x, y = event.widget.winfo_pointerxy()
-        target = event.widget.winfo_containing(x, y)
-        if target.row != event.widget.row:
-            self.vModel.NetWorth[target.row-1], self.vModel.NetWorth[event.widget.row-1] = self.vModel.NetWorth[event.widget.row-1], self.vModel.NetWorth[target.row-1]
-        self.Refresh()
-
-    def SaveEntryInModel(self, cell):
-        if cell.column == 0:
-            self.vModel.NetWorth[cell.row-1].name = cell.text
-        elif cell.column == 1:
-            self.vModel.NetWorth[cell.row-1].amount = cell.text
 
 
 class HeaderMenuBar(tk.Menu):

@@ -14,23 +14,6 @@ class SplitMoneyHistory(list):
     def RemoveColumn(self, iColumn):
         del self[iColumn]
 
-    def SetEntryAndDirectOverflow(self, iColumn, categoryName, amount):
-        # Set Entry amount
-        for vEntry in self[iColumn]:
-            if vEntry.category.name == categoryName:
-                vEntry.amount = amount
-        # Determine dBalance
-        dBalance = Decimal(0)
-        for vEntry in self[iColumn]:
-            dBalance += 0 if vEntry.amount is None else vEntry.amount
-        # Adjust Entry for Default Category by that amount
-        for vEntry in self[iColumn]:
-            if vEntry.category.name == "<Default Category>":
-                vEntry.amount = - dBalance + (0 if vEntry.amount is None else vEntry.amount)
-                break
-        else:
-            self.AddEntry(iColumn, category=self.vModel.Categories["<Default Category>"], amount=-dBalance)
-
     def RemoveEntry(self, iColumn, categoryName):
         iToRemove = None
         for i, vEntry in enumerate(self[iColumn]):
@@ -85,7 +68,7 @@ class BalanceEntry(dict):
         for item in self.parent:
             if item is not None and "amount" in item:
                 dBalance += 0 if item.amount is None else item.amount
-        return dBalance
+        return -dBalance
 
     @property
     def category(self):
