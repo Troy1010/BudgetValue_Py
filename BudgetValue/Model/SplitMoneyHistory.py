@@ -14,9 +14,6 @@ class SplitMoneyHistory(list):
     def RemoveColumn(self, iColumn):
         del self[iColumn]
 
-    def Clear(self):
-        del self[:]
-
     def SetEntryAndDirectOverflow(self, iColumn, categoryName, amount):
         # Set Entry amount
         for vEntry in self[iColumn]:
