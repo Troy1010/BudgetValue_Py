@@ -5,9 +5,8 @@ import tkinter as tk
 class SelectCategoryPopup(tk.Frame):
     previous_popup = None
 
-    def __init__(self, parent, vModel, vClosingHandler, cCategories, cPos, *args):
+    def __init__(self, parent, vClosingHandler, cCategories, cPos, *args):
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
-        self.vModel = vModel
         self.vClosingHandler = vClosingHandler
         self.args = args
         self.parent = parent
@@ -28,13 +27,6 @@ class SelectCategoryPopup(tk.Frame):
             b.pack(fill=tk.BOTH, expand=True)
         # Bind Escape to exit
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy())
-
-    def GetCurrentMousePosition(self):
-        """Legacy"""
-        x, y = self.winfo_pointerxy()
-        x -= self.parent.winfo_rootx()
-        y -= self.parent.winfo_rooty()
-        return (x, y)
 
     def SelectCategory(self, vCategory):
         self.vClosingHandler(vCategory, *self.args)

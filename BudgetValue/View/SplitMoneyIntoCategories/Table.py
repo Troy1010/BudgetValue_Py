@@ -157,11 +157,11 @@ class Table(TM.tk.TableFrame):
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
         vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root, y=event.y_root:
-                              BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
+                              BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
 
     def SelectCategoryPopup(self, iColumn):
-        BV.View.SelectCategoryPopup(self.parent, self.vModel, self.AddCategoryToColumn, self.GetAddableCategories(), iColumn)
+        BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(), iColumn)
 
     def MakeHeader(self, cRowColumnPair, text=None):
         w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',

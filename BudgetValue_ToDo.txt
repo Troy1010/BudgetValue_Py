@@ -3,13 +3,6 @@ BudgetValue
 	Import History
 		Security
 		Be able to import from blank table
-	PaycheckPlan-DistributeBalance
-TM_Log
-	Sometimes TM_Log has a permission error and nothing from the 2nd process writes to log.
-		1) set log in _Logger
-		2) Open log during tests
-		3) Open log in program the tests are testing
-		4) both opens write to same log
 Spendables
 	SpendablesPopup
 		What to do when it's empty
@@ -23,14 +16,10 @@ View
 		possible name: widget factory
 Spendables
 	Simplify
-		Restructure SplitMoney
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
 ---------------------------------------------------------- Things I'm currently working on
-Restructure SplitMoney
-	List<List<Entry<Category,Amount>>>
-	
-	List<Dict<Category,Amount>
 ---------------------------------------------------------- Things I've done
+SplitMoney-Restructure
 SplitMoney-DirectOverflow always happens
 SplitMoney-SplitNetWorth, SplitBalance
 NetWorth-Total is a subject
