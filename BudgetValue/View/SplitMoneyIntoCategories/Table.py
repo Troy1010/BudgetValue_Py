@@ -14,6 +14,8 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         #
+        self.vModel.SpendingHistory.ObserveUpdatedCategory.subscribe(lambda category: self.Refresh())
+        #
         self.dBalance = Decimal(0)
         #
         self.vNetWorthTotal = 0
@@ -35,8 +37,8 @@ class Table(TM.tk.TableFrame):
         for iColumn, paycheck_history_column in enumerate(self.vModel.SplitMoneyHistory):
             vColumnHeader = self.MakeHeader((row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
-        iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
-        self.MakeHeader((row, iSpentColumn), text="Spent")
+        self.iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
+        self.MakeHeader((row, self.iSpentColumn), text="Spent")
         self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+2
         self.MakeHeader((row, self.iBudgetedColumn), text="Budgeted")
         row += 1
@@ -65,7 +67,7 @@ class Table(TM.tk.TableFrame):
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
             if dSpendingHistoryTotal:
-                self.MakeEntry_ReadOnly((row, iSpentColumn), text=str(dSpendingHistoryTotal))
+                self.MakeEntry_ReadOnly((row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
                 bMadeEntry = True
             # Budgeted
             dSpendable = self.vModel.GetBudgetedAmount(category)

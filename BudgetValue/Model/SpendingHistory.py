@@ -4,11 +4,13 @@ import sqlite3
 import pandas as pd
 import os
 from decimal import Decimal
+import rx
 
 
 class SpendingHistory():
     def __init__(self, vModel):
         self.vModel = vModel
+        self.ObserveUpdatedCategory = rx.subjects.Subject()
 
     def Import(self, sFilePath):
         columns = ["Category", "Timestamp", "Title", "Amount", "Description"]
@@ -76,3 +78,5 @@ class SpendingHistory():
             [value, cRowColumnPair[0]]
         )
         self.vModel.connection.commit()
+        if str(cRowColumnPair[1]) == "Category":
+            self.ObserveUpdatedCategory.on_next(self.vModel.Categories[value])
