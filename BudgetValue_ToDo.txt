@@ -28,12 +28,14 @@ Spendables
 SplitMoney
 	NetWorth and SpendingHistory needs to update when you change it in the other tab
 		Refresh on switch to tab, not init
----------------------------------------------------------- Things I'm currently working on
 NetWorth
 	Simplify
 		Make net_worth_rows have subjects
 		Have GetTotal just be an observable
+---------------------------------------------------------- Things I'm currently working on
+Split 
 ---------------------------------------------------------- Things I've done
+NetWorth-Total is a subject
 View-On init, open whatever tab was last open
 SplitMoney-NetWorth loads on init
 Tabs-Rename Spendables->SplitMoneyIntoCategories, SpendingHistory->SpendFromCategories

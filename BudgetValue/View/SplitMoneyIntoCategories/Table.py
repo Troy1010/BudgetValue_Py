@@ -14,6 +14,8 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         #
+        self.dBalance = Decimal(0)
+        #
         self.vNetWorthTotal = 0
         self.vModel.NetWorth.total.subscribe(lambda sum_: self.AssignTotal(sum_))
 
@@ -106,9 +108,9 @@ class Table(TM.tk.TableFrame):
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vBalanceNum.ValidationHandler = BV.MakeValid_Money
         self.vBalanceNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        dBalance = self.vNetWorthTotal - dTotalSpendableAmount
-        self.vBalanceNum.text = dBalance
-        if dBalance != 0:
+        self.dBalance = self.vNetWorthTotal - dTotalSpendableAmount
+        self.vBalanceNum.text = self.dBalance
+        if self.dBalance != 0:
             self.vBalanceNum.config(readonlybackground="pink")
         else:
             self.vBalanceNum.config(readonlybackground="lightgreen")

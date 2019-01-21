@@ -28,6 +28,7 @@ class Categories(dict):
             Category("<Default Category>", CategoryType.extra),
             Category("Paycheck", CategoryType.income),
             Category("Bonus", CategoryType.income),
+            Category("Net Worth", CategoryType.income),
             Category("Rent", CategoryType.always),
             Category("Hair", CategoryType.always),
             Category("Commute", CategoryType.always),

@@ -45,6 +45,7 @@ class PaycheckHistory(list):
 
     def AddColumn(self):
         self.append(list())
+        self.AddEntry(-1, category=self.vModel.Categories["<Default Category>"], amount=0)
 
     def AddEntry(self, iColumn, category=None, amount=0):
         if category is None:

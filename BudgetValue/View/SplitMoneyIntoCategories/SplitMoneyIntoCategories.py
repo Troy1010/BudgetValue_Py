@@ -6,6 +6,7 @@ import TM_CommonPy as TM  # noqa
 import tkinter.messagebox  # noqa
 from .Table import Table
 import BudgetValue as BV
+import rx
 
 
 class SplitMoneyIntoCategories(tk.Frame):
@@ -19,12 +20,23 @@ class SplitMoneyIntoCategories(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-        vButton_AddRow = ttk.Button(self.vButtonBar, text="Split NetWorth",
+        vButton_AddRow = ttk.Button(self.vButtonBar, text="Split",
                                     command=lambda self=self: self.AddPaycheckHistoryColumn())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                            command=lambda self=self: self.SplitPaycheck())
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
+        vButton_SplitBalance = ttk.Button(self.vButtonBar, text="Split Balance",
+                                          command=lambda self=self: self.SplitBalance())
+        vButton_SplitBalance.pack(side=tk.LEFT, anchor='w')
+        vButton_SplitNetWorth = ttk.Button(self.vButtonBar, text="Split NetWorth",
+                                           command=lambda self=self: self.buttonPressed.on_next(None))
+        vButton_SplitNetWorth.pack(side=tk.LEFT, anchor='w')
+        self.buttonPressed = rx.subjects.Subject()
+        self.buttonPressed.with_latest_from(
+            self.vModel.NetWorth.total,
+            lambda pressEvent, total: total
+        ).subscribe(lambda x: self.SplitNetWorth(x))
         vButton_Print = ttk.Button(self.vButtonBar, text="Print",
                                    command=lambda self=self: self.Print())
         vButton_Print.pack(side=tk.LEFT, anchor='w')
@@ -50,8 +62,19 @@ class SplitMoneyIntoCategories(tk.Frame):
     def _destroy(self):
         self.vModel.PaycheckHistory.Save()
 
+    def SplitBalance(self):
+        amount = -self.vTable.dBalance
+        self.vModel.PaycheckHistory.AddColumn()
+        self.vModel.PaycheckHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
+        self.vTable.Refresh()
+
     def SplitPaycheck(self):
         self.vModel.PaycheckHistory.AddPaycheckPlanColumn()
+        self.vTable.Refresh()
+
+    def SplitNetWorth(self, amount):
+        self.vModel.PaycheckHistory.AddColumn()
+        self.vModel.PaycheckHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
         self.vTable.Refresh()
 
     def AddPaycheckHistoryColumn(self):
