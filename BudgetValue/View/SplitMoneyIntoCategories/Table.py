@@ -52,7 +52,7 @@ class Table(TM.tk.TableFrame):
                 prev_type = category.type
                 BV.View.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
-            # PaycheckHistories
+            # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
                 if category.name in split_money_history_column:
                     bEditableState = True
