@@ -43,14 +43,20 @@ class PaycheckPlan(dict):
         if not data:
             return
         for categoryName, categoryPlan in data.items():
-            self[categoryName] = CategoryPlan(category=self.vModel.Categories[categoryName], amount=categoryPlan["amount"], period=categoryPlan["period"])
+            self[categoryName] = CategoryPlan()
+            for k, v in categoryPlan.items():
+                if k == "category":
+                    self[categoryName][k] = self.vModel.Categories[categoryName]
+                else:
+                    self[categoryName][k] = v
 
 
 class CategoryPlan(dict):
     """inherits from dict to make pickling easier"""
 
-    def __init__(self, category, amount=None, period=None):
-        self.category = category
+    def __init__(self, category=None, amount=None, period=None):
+        if category is not None:
+            self.category = category
         self.amount = amount
         self.period = period
 
