@@ -26,12 +26,15 @@ class PaycheckPlan(dict):
     def GenerateTotalObservable(self, unit):
         cStreams = [x.amount_stream for x in self.values()]
         if cStreams:
-            return rx.Observable.combine_latest(cStreams, lambda *args: sum(args))
+            return rx.Observable.combine_latest(cStreams, lambda *args: self.CalcTotal(args))
         else:
             return rx.subjects.Subject()
 
+    def CalcTotal(self, args):
+        total = sum(args)
+        return None if not total or total == 0 else BV.MakeValid_Money(total)
+
     def _SetTotal(self, value):
-        value = None if not value or value == 0 else BV.MakeValid_Money(value)
         self.total.on_next(value)
 
     def __setitem__(self, key, val):
