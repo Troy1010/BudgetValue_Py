@@ -1,7 +1,7 @@
 import BudgetValue as BV
 import pickle
 import os
-from decimal import Decimal
+import rx
 
 
 class PaycheckPlan(dict):
@@ -10,8 +10,28 @@ class PaycheckPlan(dict):
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
+        self.total = rx.subjects.BehaviorSubject(0)
+        self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
+        self.total_Observable = self.paycheckPlanUpdated.select(
+            lambda unit: self.GenerateTotalObservable(unit)
+        ).select_many(
+            lambda sums: sums
+        ).replay(
+            1
+        ).ref_count()
+        self.total_Observable.subscribe(on_next=lambda value: self._SetTotal(value))
         self.Load()
         self["<Default Category>"] = BalanceEntry(self, self.vModel.Categories["<Default Category>"])
+
+    def GenerateTotalObservable(self, unit):
+        cStreams = [x.amount_stream for x in self.values()]
+        if cStreams:
+            return rx.Observable.combine_latest(cStreams, lambda *args: sum(args))
+        else:
+            return rx.subjects.Subject()
+
+    def _SetTotal(self, value):
+        self.total.on_next(value)
 
     def __setitem__(self, key, val):
         # Keys must be a BV.Model.Category
@@ -19,6 +39,11 @@ class PaycheckPlan(dict):
             raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(str) + " object")
         #
         dict.__setitem__(self, key, val)
+        self.paycheckPlanUpdated.on_next(None)
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
+        self.paycheckPlanUpdated.on_next(None)
 
     def Narrate(self):
         cReturning = ["PaycheckPlan.."]
@@ -47,6 +72,8 @@ class PaycheckPlan(dict):
             for k, v in categoryPlan.items():
                 if k == "category":
                     self[categoryName][k] = self.vModel.Categories[categoryName]
+                elif k == "amount":
+                    self[categoryName].amount = v
                 else:
                     self[categoryName][k] = v
 
@@ -57,6 +84,7 @@ class CategoryPlan(dict):
     def __init__(self, category=None, amount=None, period=None):
         if category is not None:
             self.category = category
+        self.amount_stream = rx.subjects.BehaviorSubject(amount)
         self.amount = amount
         self.period = period
 
@@ -78,7 +106,10 @@ class CategoryPlan(dict):
 
     @amount.setter
     def amount(self, value):
-        self["amount"] = None if not value or value == 0 else BV.MakeValid_Money(value)
+        value = None if not value or value == 0 else BV.MakeValid_Money(value)
+        self["amount"] = value
+        value = 0 if value is None else value
+        self.amount_stream.on_next(value)
 
     @property
     def period(self):
@@ -106,14 +137,11 @@ class BalanceEntry(dict):
         self.parent = parent
         self.category = category
         self.period = None
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
 
     @property
     def amount(self):
-        dBalance = Decimal(0)
-        for item in self.parent.values():
-            if item is not None and "amount" in item:
-                dBalance += 0 if item.amount is None else item.amount
-        return -dBalance
+        return self.parent.total.value
 
     @property
     def category(self):

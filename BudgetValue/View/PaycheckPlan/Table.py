@@ -13,6 +13,12 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
+        self.vTotalCell = None
+        self.vModel.PaycheckPlan.total.subscribe(on_next=lambda value: self.ShowTotal())
+
+    def ShowTotal(self):
+        if self.vTotalCell is not None:
+            self.vTotalCell.text = self.vModel.PaycheckPlan.total.value
 
     def Refresh(self):
         # remove old
@@ -49,6 +55,8 @@ class Table(TM.tk.TableFrame):
                 BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
                 w = BV.View.MakeEntry(self, (row, 3), text=amount)
                 w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
+                if self.GetCategoryOfRow(w.row).name == "<Default Category>":
+                    self.vTotalCell = w
             row += 1
 
     def MakeEntry(self, cRowColumnPair, category, text=None, columnspan=1):
