@@ -1,7 +1,6 @@
 import BudgetValue as BV
 import os
 import pickle
-from decimal import Decimal
 import rx
 
 
@@ -12,7 +11,7 @@ class NetWorth(list):
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
         self.netWorthUpdated = rx.subjects.BehaviorSubject(None)
         self.total = self.netWorthUpdated.select(
-            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self], lambda *args: self.SumList(args))
+            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self], lambda *args: sum(args))
         ).select_many(
             lambda sums: sums
         ).replay(
@@ -34,13 +33,6 @@ class NetWorth(list):
     def RemoveRow(self, iRow):
         del self[iRow]
 
-    def SumList(self, cList):
-        total = 0
-        for item in cList:
-            if item is not None:
-                total += item
-        return total
-
     def Save(self):
         data = list()
         for net_worth_row in list(self):
@@ -59,12 +51,6 @@ class NetWorth(list):
             self.append(NetWorthRow())
             for k, v in net_worth_row.items():
                 self[-1][k] = v
-
-    def GetTotal(self):
-        dTotal = Decimal(0)
-        for net_worth_row in self:
-            dTotal += 0 if net_worth_row.amount is None else net_worth_row.amount
-        return dTotal
 
 
 class NetWorthRow(dict):
