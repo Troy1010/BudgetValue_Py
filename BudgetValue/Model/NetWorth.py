@@ -20,13 +20,19 @@ class NetWorth(list):
         ).ref_count()
         self.Load()
 
+    def __setitem__(self, key, val):
+        list.__setitem__(self, key, val)
+        self.netWorthUpdated.on_next(None)
+
+    def __delitem__(self, key):
+        list.__delitem__(self, key)
+        self.netWorthUpdated.on_next(None)
+
     def AddRow(self):
         self.append(NetWorthRow())
-        self.netWorthUpdated.on_next(None)
 
     def RemoveRow(self, iRow):
         del self[iRow]
-        self.netWorthUpdated.on_next(None)
 
     def SumList(self, cList):
         total = 0
@@ -53,7 +59,6 @@ class NetWorth(list):
             self.append(NetWorthRow())
             for k, v in net_worth_row.items():
                 self[-1][k] = v
-        self.netWorthUpdated.on_next(None)
 
     def GetTotal(self):
         dTotal = Decimal(0)
