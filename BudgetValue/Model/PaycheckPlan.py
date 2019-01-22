@@ -31,6 +31,7 @@ class PaycheckPlan(dict):
             return rx.subjects.Subject()
 
     def _SetTotal(self, value):
+        value = None if not value or value == 0 else BV.MakeValid_Money(value)
         self.total.on_next(value)
 
     def __setitem__(self, key, val):
