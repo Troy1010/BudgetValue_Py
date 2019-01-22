@@ -1,6 +1,5 @@
 from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
-from BudgetValue.View import Fonts
 import TM_CommonPy as TM
 import BudgetValue as BV
 from decimal import Decimal
@@ -58,42 +57,6 @@ class Table(TM.tk.TableFrame):
                 if self.GetCategoryOfRow(w.row).name == "<Default Category>":
                     self.vTotalCell = w
             row += 1
-
-    def MakeEntry(self, cRowColumnPair, category, text=None, columnspan=1):
-        w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
-                        borderwidth=2, relief='ridge', background='SystemButtonFace')
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan)
-        w.bind("<FocusIn>", lambda event, w=w: self.Entry_FocusIn(w))
-        w.bind("<FocusOut>", lambda event, w=w: self.Entry_FocusOut(w))
-        w.bind("<Return>", lambda event, w=w: self.Entry_Return(w))
-        w.category = category
-        w.ValidationHandler = BV.MakeValid_Money
-        w.text = text
-
-    def Entry_FocusIn(self, cell):
-        cell.config(justify=tk.LEFT)
-        cell.select_text()
-        cell.text_at_focus_in = cell.text
-
-    def Entry_FocusOut(self, cell):
-        cell.config(justify=tk.RIGHT)
-        if cell.text_at_focus_in != cell.text:
-            cell.MakeValid()
-            self.MakeRowValid(cell.row, cellToKeep=cell)
-        self.SaveToModel(cell.row)
-        self.vModel.PaycheckPlan.DistributeBalance()
-        self.Refresh()
-
-    def Entry_Return(self, cell):
-        list_of_cell_to_the_right = self.grid_slaves(cell.grid_info()['row'], cell.grid_info()['column'] + 1)
-        if list_of_cell_to_the_right:
-            list_of_cell_to_the_right[0].focus_set()
-            return
-        list_of_first_entry_in_next_row = self.grid_slaves(cell.grid_info()['row'] + 1, 1)
-        if list_of_first_entry_in_next_row:
-            list_of_first_entry_in_next_row[0].focus_set()
-            return
-        cell.winfo_toplevel().focus_set()
 
     def MakeRowValid(self, row, cellToKeep=None):
         columnToKeep = -1 if cellToKeep is None else cellToKeep.column
