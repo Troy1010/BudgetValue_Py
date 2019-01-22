@@ -12,7 +12,7 @@ class NetWorth(list):
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
         self.netWorthUpdated = rx.subjects.BehaviorSubject(None)
         self.total = self.netWorthUpdated.select(
-            lambda unit: rx.Observable.combine_latest([x.stream for x in self], lambda *args: self.SumList(args))
+            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self], lambda *args: self.SumList(args))
         ).select_many(
             lambda sums: sums
         ).replay(
@@ -65,12 +65,12 @@ class NetWorth(list):
 class NetWorthRow(dict):
     def __init__(self, name=None, amount=None):
         self.name = name
-        self.stream = rx.subjects.BehaviorSubject(amount)
+        self.amount_stream = rx.subjects.BehaviorSubject(amount)
         self.amount = amount
 
     def __setitem__(self, key, value):
         if key == "amount":
-            self.stream.on_next(value)
+            self.amount_stream.on_next(value)
         dict.__setitem__(self, key, value)
 
     @property
@@ -81,7 +81,7 @@ class NetWorthRow(dict):
     def amount(self, value):
         value = None if not value or value == 0 else BV.MakeValid_Money(value)
         self["amount"] = value
-        self.stream.on_next(value)
+        self.amount_stream.on_next(value)
 
     @property
     def name(self):
