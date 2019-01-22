@@ -15,13 +15,18 @@ def MakeEntry_ReadOnly(*args, **kwargs):
     return MakeEntry(*args, **kwargs)
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False):
+def MakeRowHeader(*args, **kwargs):
+    kwargs["bEditableState"] = False
+    kwargs["justify"] = tk.LEFT
+    kwargs["bBold"] = True
+    return MakeEntry(*args, **kwargs)
+
+
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background='SystemButtonFace'):
     if bEditableState:
         state = "normal"
-        background = 'SystemButtonFace'
     else:
         state = "readonly"
-        background = '#d8d8d8'
     if bBold:
         font = Fonts.FONT_SMALL_BOLD
     else:
@@ -30,12 +35,11 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
     w.text = text
-    w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ns")
+    w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
     w.bind('<Escape>', lambda event: self.FocusNothing())
     if bEditableState:
-        w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
-        w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
-        w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
+        w.bind("<FocusIn>", lambda event, w=w: OnFocusIn_MakeObvious(w))
+        w.bind("<FocusOut>", lambda event, w=w: OnFocusOut_MakeObvious(w), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
     return w
 
@@ -45,3 +49,12 @@ def MakeSeparationLable(parent, row, text):
                  background='lightblue', text=text, anchor="w")
     w.grid(row=row, columnspan=1000, sticky="ew")  # columnspan?
     return w
+
+
+def OnFocusIn_MakeObvious(cell):
+    cell.config(justify=tk.LEFT)
+    cell.select_text()
+
+
+def OnFocusOut_MakeObvious(cell):
+    cell.config(justify=tk.RIGHT)

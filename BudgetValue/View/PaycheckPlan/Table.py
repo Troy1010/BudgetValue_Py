@@ -23,7 +23,7 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Header
         for j, header_name in enumerate(['Category', 'Amount', 'Period', 'Plan']):
-            self.MakeHeader((row, j), text=header_name)
+            BV.View.MakeHeader(self, (row, j), text=header_name)
         row += 1
         # Data
         prev_type = None
@@ -31,40 +31,25 @@ class Table(TM.tk.TableFrame):
             # make separation label if needed
             if prev_type != category.type:
                 prev_type = category.type
-                self.MakeSeparationLable(row, "  " + prev_type.name.capitalize())
+                BV.View.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
             # generate row
-            amount = None if category not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category].amount
-            period = None if category not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category].period
+            amount = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount
+            period = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].period
             if category.IsSpendable():
-                self.MakeText((row, 0), category, text=category.name)
-                self.MakeEntry((row, 1), category)
-                self.MakeEntry((row, 2), category, text=period)
-                self.MakeEntry((row, 3), category, text=amount)
+                BV.View.MakeRowHeader(self, (row, 0), text=category.name)
+                w = BV.View.MakeEntry(self, (row, 1))
+                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
+                w = BV.View.MakeEntry(self, (row, 2), text=period)
+                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
+                w = BV.View.MakeEntry(self, (row, 3), text=amount)
+                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
                 self.MakeRowValid(row)
             else:
-                self.MakeText((row, 0), category, text=category.name, columnspan=3)
-                self.MakeEntry((row, 3), category, text=amount)
+                BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
+                w = BV.View.MakeEntry(self, (row, 3), text=amount)
+                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
             row += 1
-
-    def MakeHeader(self, cRowColumnPair, text=None):
-        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
-                     background='SystemButtonFace', text=text)
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
-
-    def MakeSeparationLable(self, row, text):
-        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT,
-                     background='lightblue', text=text, anchor="w")
-        w.grid(row=row, columnspan=4, sticky="ew")
-
-    def MakeText(self, cRowColumnPair, category, text=None, columnspan=1):
-        w = tk.Text(self, font=Fonts.FONT_SMALL, width=15, height=1,
-                    borderwidth=2, relief='ridge', background='SystemButtonFace')
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ew")
-        w.category = category
-        if text:
-            w.insert(1.0, text)
-        w.configure(state="disabled")
 
     def MakeEntry(self, cRowColumnPair, category, text=None, columnspan=1):
         w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
@@ -121,7 +106,7 @@ class Table(TM.tk.TableFrame):
         # Get category
         category = self.GetCategoryOfRow(row)
         # Make a category_plan out of the view's data
-        category_plan = self.vModel.PaycheckPlan.CategoryPlan(category)
+        category_plan = BV.Model.CategoryPlan(category)
         if category.IsSpendable():
             category_plan.amount = self.GetCell(row, 3).text
             category_plan.period = self.GetCell(row, 2).text
@@ -129,10 +114,11 @@ class Table(TM.tk.TableFrame):
             category_plan.amount = self.GetCell(row, 3).text
         # Add category_plan to model
         if category_plan.IsEmpty():
-            if category in self.vModel.PaycheckPlan:
-                del self.vModel.PaycheckPlan[category]
+            if category.name in self.vModel.PaycheckPlan:
+                del self.vModel.PaycheckPlan[category.name]
         else:
-            self.vModel.PaycheckPlan[category] = category_plan
+            self.vModel.PaycheckPlan[category.name] = category_plan
 
     def GetCategoryOfRow(self, row):
-        return self.GetCell(row, 0).category
+        categoryName = self.GetCell(row, 0).text
+        return self.vModel.Categories[categoryName]

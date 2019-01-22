@@ -58,9 +58,10 @@ class Table(TM.tk.TableFrame):
                     bEditableState = True
                     if category.name == "<Default Category>":
                         bEditableState = False
-                    vSplitMoneyHistoryCell = BV.View.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
-                    vSplitMoneyHistoryCell.bind("<Button-3>", lambda event: self.ShowCellMenu(event))
-                    vSplitMoneyHistoryCell.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
+                    w = BV.View.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
+                    w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
+                    w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+                    w.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                     bMadeEntry = True
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
@@ -158,13 +159,6 @@ class Table(TM.tk.TableFrame):
         vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty():
                               BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
-
-    def OnFocusIn_MakeObvious(self, cell):
-        cell.config(justify=tk.LEFT)
-        cell.select_text()
-
-    def OnFocusOut_MakeObvious(self, cell):
-        cell.config(justify=tk.RIGHT)
 
     def MakeX(self, cRowColumnPair):
         w = tk.Button(self, text="X", font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=3, relief='ridge',

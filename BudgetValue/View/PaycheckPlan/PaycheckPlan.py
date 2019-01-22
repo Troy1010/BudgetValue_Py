@@ -33,6 +33,10 @@ class PaycheckPlan(tk.Frame):
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
         self.Load()
+        # ButtonBar More
+        vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
+                                     command=lambda self=self: self.vTable.Refresh())
+        vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def _destroy(self, event):
         self.vModel.PaycheckPlan.Save()

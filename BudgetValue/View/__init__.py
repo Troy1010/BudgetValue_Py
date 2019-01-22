@@ -8,8 +8,9 @@ from .WidgetFactories import MakeEntry
 from .WidgetFactories import MakeEntry_ReadOnly
 from .WidgetFactories import MakeHeader
 from .WidgetFactories import MakeSeparationLable
+from .WidgetFactories import MakeRowHeader
 
 
 __all__ = ['View', 'SpendFromCategories', 'Fonts', 'PaycheckPlan', 'NetWorth', 'SelectCategoryPopup',
-           'MakeEntry', 'MakeEntry_ReadOnly', 'MakeHeader', 'MakeSeparationLable'
+           'MakeEntry', 'MakeEntry_ReadOnly', 'MakeHeader', 'MakeSeparationLable', 'MakeRowHeader'
            ]
