@@ -43,8 +43,6 @@ class PaycheckPlan(dict):
         if not data:
             return
         for categoryName, categoryPlan in data.items():
-            if hasattr(categoryName, "name"):
-                categoryName = categoryName.name
             self[categoryName] = CategoryPlan(category=self.vModel.Categories[categoryName], amount=categoryPlan["amount"], period=categoryPlan["period"])
 
 
