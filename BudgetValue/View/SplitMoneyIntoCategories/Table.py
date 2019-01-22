@@ -33,6 +33,7 @@ class Table(TM.tk.TableFrame):
         #
         row = 0
         # Column Header
+        BV.View.MakeHeader(self, (row, 0), text="Category")
         for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
             vColumnHeader = BV.View.MakeHeader(self, (row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
