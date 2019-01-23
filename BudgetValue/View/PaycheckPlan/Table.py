@@ -39,16 +39,15 @@ class Table(TM.tk.TableFrame):
                 period = self.vModel.PaycheckPlan[category.name].period
             except (AttributeError, KeyError):
                 period = None
+            BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
             if category.IsSpendable():
-                BV.View.MakeRowHeader(self, (row, 0), text=category.name)
                 self.MakeEntry_Money((row, 1))
                 self.MakeEntry((row, 2), text=period)
                 self.MakeEntry_Money((row, 3), text=amount)
                 self.MakeRowValid(row)
             else:
-                BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
                 if category.name == "<Default Category>":
-                    w = BV.View.MakeEntry_ReadOnly(self, (row, 3), text=amount)
+                    w = BV.View.MakeEntry_ReadOnly(self, (row, 3), text=amount, background='#d6d6d6')
                 else:
                     w = self.MakeEntry_Money((row, 3), text=amount)
                 if self.GetCategoryOfRow(w.row).name == "<Default Category>":
