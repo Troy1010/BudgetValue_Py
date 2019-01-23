@@ -12,11 +12,7 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
-        self.vModel.PaycheckPlan.total_Observable.subscribe(on_next=lambda value: self.ShowTotal(value))
-
-    def ShowTotal(self, value):
-        if hasattr(self, "vTotalCell"):
-            self.vTotalCell.text = value
+        self.vModel.PaycheckPlan.total_Observable.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
 
     def Refresh(self):
         # remove old
@@ -42,20 +38,22 @@ class Table(TM.tk.TableFrame):
             period = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].period
             if category.IsSpendable():
                 BV.View.MakeRowHeader(self, (row, 0), text=category.name)
-                w = BV.View.MakeEntry(self, (row, 1))
-                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
-                w = BV.View.MakeEntry(self, (row, 2), text=period)
-                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
-                w = BV.View.MakeEntry(self, (row, 3), text=amount)
-                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
+                w = self.MakeEntry((row, 1))
+                w = self.MakeEntry((row, 2), text=period)
+                w = self.MakeEntry((row, 3), text=amount)
                 self.MakeRowValid(row)
             else:
                 BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
-                w = BV.View.MakeEntry(self, (row, 3), text=amount)
-                w.bind("<FocusOut>", lambda event, row=row: self.SaveToModel(row), add="+")
+                w = self.MakeEntry((row, 3), text=amount)
                 if self.GetCategoryOfRow(w.row).name == "<Default Category>":
-                    self.vTotalCell = w
+                    self.vTotalNum = w
             row += 1
+
+    def MakeEntry(self, cRowColumnPair, text=None):
+        w = BV.View.MakeEntry(self, cRowColumnPair, text=text)
+        w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
+        w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
+        return w
 
     def MakeRowValid(self, row, cellToKeep=None):
         columnToKeep = -1 if cellToKeep is None else cellToKeep.column
@@ -73,21 +71,18 @@ class Table(TM.tk.TableFrame):
                 self.GetCell(row, 1).text = plan * period
 
     def SaveToModel(self, row):
-        # Get category
+        # Determine category
         category = self.GetCategoryOfRow(row)
-        # Make a category_plan out of the view's data
-        category_plan = BV.Model.CategoryPlan(category)
-        if category.IsSpendable():
-            category_plan.amount = self.GetCell(row, 3).text
-            category_plan.period = self.GetCell(row, 2).text
-        else:
-            category_plan.amount = self.GetCell(row, 3).text
-        # Add category_plan to model
-        if category_plan.IsEmpty():
-            if category.name in self.vModel.PaycheckPlan:
-                del self.vModel.PaycheckPlan[category.name]
-        else:
-            self.vModel.PaycheckPlan[category.name] = category_plan
+        #
+        if category.name not in self.vModel.PaycheckPlan:
+            self.vModel.PaycheckPlan[category.name] = BV.Model.CategoryPlan(category=self.vModel.Categories[category.name])
+        #
+        if self.GetCell(row, 2):
+            self.vModel.PaycheckPlan[category.name].period = self.GetCell(row, 2).text
+        self.vModel.PaycheckPlan[category.name].amount = self.GetCell(row, 3).text
+        #
+        if self.vModel.PaycheckPlan[category.name].IsEmpty():
+            del self.vModel.PaycheckPlan[category.name]
 
     def GetCategoryOfRow(self, row):
         categoryName = self.GetCell(row, 0).text

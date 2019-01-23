@@ -2,34 +2,27 @@ import BudgetValue as BV
 import pickle
 import os
 import rx
-import TM_CommonPy as TM  # noqa
 
 
 class PaycheckPlan(dict):
-    """inherits from dict to make pickling easier"""
-
     def __init__(self, vModel):
+        assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
         self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
-        self.total_Observable = self.paycheckPlanUpdated.select(
-            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: self.CalcTotal(args))
-        ).select_many(
-            lambda sums: sums
-        ).replay(
-            1
-        ).ref_count()
+        self.total_Observable = rx.Observable.switch_map(
+            self.paycheckPlanUpdated,
+            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: sum(args))
+        ).replay(1).ref_count()
         self.Load()
         self["<Default Category>"] = BalanceEntry(self, self.vModel.Categories["<Default Category>"])
 
-    def CalcTotal(self, args):
-        total = sum(args)
-        return None if not total or total == 0 else BV.MakeValid_Money(total)
-
     def __setitem__(self, key, val):
-        # Keys must be a BV.Model.Category
+        # Keys must be a category name
         if not isinstance(key, str):
             raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(str) + " object")
+        elif key not in self.vModel.Categories.keys():
+            raise TypeError("Keys of " + __class__.__name__ + " must be the name of a category")
         #
         bUpdate = key not in self
         dict.__setitem__(self, key, val)
@@ -79,9 +72,14 @@ class CategoryPlan(dict):
     def __init__(self, category=None, amount=None, period=None):
         if category is not None:
             self.category = category
-        self.amount_stream = rx.subjects.BehaviorSubject(amount)
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
         self.amount = amount
         self.period = period
+
+    def __setitem__(self, key, value):
+        if key == "amount":
+            self.amount_stream.on_next(value)
+        dict.__setitem__(self, key, value)
 
     def IsEmpty(self):
         return not (self.amount or self.period)
@@ -101,10 +99,7 @@ class CategoryPlan(dict):
 
     @amount.setter
     def amount(self, value):
-        value = None if not value or value == 0 else BV.MakeValid_Money(value)
-        self["amount"] = value
-        value = 0 if value is None else value
-        self.amount_stream.on_next(value)
+        self["amount"] = BV.MakeValid_Money(value)
 
     @property
     def period(self):
@@ -136,7 +131,7 @@ class BalanceEntry(dict):
 
     @property
     def amount(self):
-        return BV.MakeValid_Money_ZeroIsNone(BV.GetLatest(self.parent.total_Observable))
+        return BV.MakeValid_Money(BV.GetLatest(self.parent.total_Observable))
 
     @property
     def category(self):

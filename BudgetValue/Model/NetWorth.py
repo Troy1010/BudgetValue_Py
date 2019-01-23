@@ -13,9 +13,7 @@ class NetWorth(list):
         self.total_Observable = rx.Observable.switch_map(
             self.netWorthUpdated,
             lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self], lambda *args: sum(args))
-        ).replay(
-            1
-        ).ref_count()
+        ).replay(1).ref_count()
         self.Load()
 
     def __setitem__(self, key, val):
@@ -71,8 +69,7 @@ class NetWorthRow(dict):
 
     @amount.setter
     def amount(self, value):
-        value = BV.MakeValid_Money(value)
-        self["amount"] = value
+        self["amount"] = BV.MakeValid_Money(value)
 
     @property
     def name(self):
