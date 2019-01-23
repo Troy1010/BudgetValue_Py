@@ -11,12 +11,16 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         self.vTotal_ = 0
-        self.vModel.NetWorth.total.subscribe(lambda sum_: self.AssignTotal(sum_))
+        self.vModel.NetWorth.total_Observable.subscribe(lambda total: self.ShowTotal(total))
 
-    def AssignTotal(self, sum_):
-        self.vTotal_ = sum_
+    # def ShowTotal(self, value):
+    #     if self.vTotalNum is not None:
+    #         self.vTotalNum.text = value
+
+    def ShowTotal(self, total):
+        self.vTotal_ = total
         if hasattr(self, "vTotalNum"):
-            self.vTotalNum.text = sum_
+            self.vTotalNum.text = total
 
     def Refresh(self):
         # remove old

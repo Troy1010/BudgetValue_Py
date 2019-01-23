@@ -18,7 +18,7 @@ class Table(TM.tk.TableFrame):
         self.dBalance = Decimal(0)
         #
         self.vNetWorthTotal = 0
-        self.vModel.NetWorth.total.subscribe(lambda sum_: self.AssignTotal(sum_))
+        self.vModel.NetWorth.total_Observable.subscribe(lambda sum_: self.AssignTotal(sum_))
 
     def AssignTotal(self, sum_):
         self.vNetWorthTotal = sum_

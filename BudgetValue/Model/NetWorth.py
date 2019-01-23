@@ -10,7 +10,7 @@ class NetWorth(list):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
         self.netWorthUpdated = rx.subjects.BehaviorSubject(None)
-        self.total = self.netWorthUpdated.select(
+        self.total_Observable = self.netWorthUpdated.select(
             lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self], lambda *args: sum(args))
         ).select_many(
             lambda sums: sums

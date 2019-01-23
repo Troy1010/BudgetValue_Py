@@ -12,11 +12,10 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
-        self.vTotalCell = None
         self.vModel.PaycheckPlan.total_Observable.subscribe(on_next=lambda value: self.ShowTotal(value))
 
     def ShowTotal(self, value):
-        if self.vTotalCell is not None:
+        if hasattr(self, "vTotalCell"):
             self.vTotalCell.text = value
 
     def Refresh(self):
