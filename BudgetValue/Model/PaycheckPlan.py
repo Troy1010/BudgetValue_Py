@@ -145,10 +145,7 @@ class BalanceEntry(dict):
 
     @property
     def amount(self):
-        if not hasattr(self, "total"):
-            self.total = rx.subjects.BehaviorSubject(0)
-            self.parent.total_Observable.subscribe(self.total)
-        return BV.MakeValid_Money_ZeroIsNone(self.total.value)
+        return BV.MakeValid_Money_ZeroIsNone(BV.GetLatest(self.parent.total_Observable))
 
     @property
     def category(self):
