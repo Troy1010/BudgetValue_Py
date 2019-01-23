@@ -38,7 +38,7 @@ class Table(TM.tk.TableFrame):
             assert isinstance(net_worth_row, BV.Model.NetWorthRow)
             self.MakeEntry((row, 0), text=net_worth_row.name)
             self.MakeEntry((row, 1), text=net_worth_row.amount)
-            self.MakeX((row, 2))
+            BV.View.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
         # Total
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
@@ -58,11 +58,6 @@ class Table(TM.tk.TableFrame):
 
     def OnFocusOut_MakeObvious(self, cell):
         cell.config(justify=tk.RIGHT)
-
-    def MakeX(self, cRowColumnPair):
-        w = tk.Button(self, text="X", font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=3, relief='ridge',
-                      command=lambda self=self: self.RemoveRow(cRowColumnPair[0]))
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
 
     def RemoveRow(self, iRow):
         self.vModel.NetWorth.RemoveRow(iRow-1)  # skip header

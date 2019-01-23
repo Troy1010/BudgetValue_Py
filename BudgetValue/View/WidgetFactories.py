@@ -3,6 +3,12 @@ import tkinter as tk
 from . import Fonts
 
 
+def MakeX(self, cRowColumnPair, command):
+    w = tk.Button(self, text="X", font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=3, relief='ridge',
+                  command=command)
+    w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
+
+
 def MakeHeader(self, cRowColumnPair, text=None):
     w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
                  background='SystemButtonFace', text=text)
