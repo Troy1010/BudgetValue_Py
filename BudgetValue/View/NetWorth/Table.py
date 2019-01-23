@@ -10,7 +10,6 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
-        self.vTotal_ = 0
         self.vModel.NetWorth.total_Observable.subscribe(lambda total: self.ShowTotal(total))
 
     # def ShowTotal(self, value):
@@ -18,7 +17,6 @@ class Table(TM.tk.TableFrame):
     #         self.vTotalNum.text = value
 
     def ShowTotal(self, total):
-        self.vTotal_ = total
         if hasattr(self, "vTotalNum"):
             self.vTotalNum.text = total
 
@@ -50,7 +48,7 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vTotalNum.grid(row=row, column=1, sticky="ewns")
-        self.vTotalNum.text = self.vTotal_
+        self.vTotalNum.text = BV.GetLatest(self.vModel.NetWorth.total_Observable)
         row += 1
 
     def RemoveRow(self, iRow):
