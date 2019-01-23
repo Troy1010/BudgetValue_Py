@@ -10,15 +10,7 @@ class Table(TM.tk.TableFrame):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.parent = parent
-        self.vModel.NetWorth.total_Observable.subscribe(lambda total: self.ShowTotal(total))
-
-    # def ShowTotal(self, value):
-    #     if self.vTotalNum is not None:
-    #         self.vTotalNum.text = value
-
-    def ShowTotal(self, total):
-        if hasattr(self, "vTotalNum"):
-            self.vTotalNum.text = total
+        self.vModel.NetWorth.total_Observable.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
 
     def Refresh(self):
         # remove old
