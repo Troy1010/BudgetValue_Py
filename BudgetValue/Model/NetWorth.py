@@ -66,4 +66,5 @@ class NetWorthRow():
 
     @amount.setter
     def amount(self, value):
-        self.amount_stream.on_next(BV.MakeValid_Money(value))
+        if value and value != self.amount_stream.value:
+            self.amount_stream.on_next(BV.MakeValid_Money(value))
