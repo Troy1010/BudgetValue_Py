@@ -45,6 +45,7 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
     w.bind('<Escape>', lambda event: self.FocusNothing())
     if bEditableState:
         w.bind("<FocusIn>", lambda event, w=w: OnFocusIn_MakeObvious(w))
+        w.bind("<FocusOut>", lambda event, w=w: w.MakeValid(), add="+")
         w.bind("<FocusOut>", lambda event, w=w: OnFocusOut_MakeObvious(w), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
     return w
