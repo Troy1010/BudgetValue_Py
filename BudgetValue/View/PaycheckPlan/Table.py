@@ -13,7 +13,7 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         self.vTotalCell = None
-        self.vModel.PaycheckPlan.total_Observable.subscribe(on_next=lambda value: self.ShowTotal(value))
+        self.vModel.PaycheckPlan.total.subscribe(on_next=lambda value: self.ShowTotal(value))
 
     def ShowTotal(self, value):
         if self.vTotalCell is not None:

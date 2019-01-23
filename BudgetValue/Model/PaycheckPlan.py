@@ -2,6 +2,7 @@ import BudgetValue as BV
 import pickle
 import os
 import rx
+import TM_CommonPy as TM  # noqa
 
 
 class PaycheckPlan(dict):
@@ -11,13 +12,14 @@ class PaycheckPlan(dict):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
         self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
-        self.total_Observable = self.paycheckPlanUpdated.select(
+        self.total = rx.subjects.BehaviorSubject(0)
+        self.paycheckPlanUpdated.select(
             lambda unit: self.GenerateTotalObservable(unit)
         ).select_many(
             lambda sums: sums
         ).replay(
             1
-        ).ref_count()
+        ).ref_count().subscribe(self.total)
         self.Load()
         self["<Default Category>"] = BalanceEntry(self, self.vModel.Categories["<Default Category>"])
 
@@ -26,7 +28,7 @@ class PaycheckPlan(dict):
         if cStreams:
             return rx.Observable.combine_latest(cStreams, lambda *args: self.CalcTotal(args))
         else:
-            return rx.subjects.Subject()
+            return rx.Observable.from_list([0])
 
     def CalcTotal(self, args):
         total = sum(args)
@@ -37,8 +39,12 @@ class PaycheckPlan(dict):
         if not isinstance(key, str):
             raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(str) + " object")
         #
+        bUpdated = False
+        if key not in self:
+            bUpdated = True
         dict.__setitem__(self, key, val)
-        self.paycheckPlanUpdated.on_next(None)
+        if bUpdated:
+            self.paycheckPlanUpdated.on_next(None)
 
     def __delitem__(self, key):
         dict.__delitem__(self, key)
@@ -140,8 +146,7 @@ class BalanceEntry(dict):
 
     @property
     def amount(self):
-        value = sum([x.amount_stream.value for x in self.parent.values()])
-        return None if not value or value == 0 else BV.MakeValid_Money(value)
+        return None if not self.parent.total.value or self.parent.total.value == 0 else BV.MakeValid_Money(self.parent.total.value)
 
     @property
     def category(self):
