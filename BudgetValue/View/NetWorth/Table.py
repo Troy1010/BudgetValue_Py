@@ -31,7 +31,7 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Header
         for j, header_name in enumerate(['Account', 'Amount']):
-            self.MakeHeader((row, j), text=header_name)
+            BV.View.MakeHeader(self, (row, j), text=header_name)
         row += 1
         # Data
         for net_worth_row in self.vModel.NetWorth:
@@ -53,21 +53,9 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum.text = self.vTotal_
         row += 1
 
-    def OnFocusIn_MakeObvious(self, cell):
-        cell.config(justify=tk.LEFT)
-        cell.select_text()
-
-    def OnFocusOut_MakeObvious(self, cell):
-        cell.config(justify=tk.RIGHT)
-
     def RemoveRow(self, iRow):
         self.vModel.NetWorth.RemoveRow(iRow-1)  # skip header
         self.Refresh()
-
-    def MakeHeader(self, cRowColumnPair, text=None):
-        w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
-                     background='SystemButtonFace', text=text)
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
 
     def MakeEntry(self, cRowColumnPair, text=None):
         w = BV.View.MakeEntry(self, cRowColumnPair, text=text)
