@@ -2,6 +2,7 @@ import BudgetValue as BV
 import pickle
 import os
 import rx
+from . import Misc
 
 
 class PaycheckPlan(dict):
@@ -15,7 +16,7 @@ class PaycheckPlan(dict):
             lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: BV.MakeValid_Money(sum(args)))
         ).replay(1).ref_count()
         self.Load()
-        self["<Default Category>"] = BalanceEntry(self.total_Observable, self.vModel.Categories["<Default Category>"])
+        self["<Default Category>"] = Misc.BalanceEntry(self.total_Observable, self.vModel.Categories["<Default Category>"])
 
     def __setitem__(self, key, value):
         # Keys must be a category name
@@ -110,23 +111,3 @@ class CategoryPlan():
     @amountOverPeriod.setter
     def amountOverPeriod(self, value):
         self.amount = value*self._period
-
-
-class BalanceEntry():
-    def __init__(self, total_stream, category):
-        self.total_stream = total_stream
-        self._category = category
-        self.amount_stream = rx.subjects.BehaviorSubject(0)  # remove later
-
-    @property
-    def amount(self):
-        return BV.MakeValid_Money(BV.GetLatest(self.total_stream))
-
-    @property
-    def category(self):
-        return self._category
-
-    @category.setter
-    def category(self, value):
-        assert isinstance(value, BV.Model.Category)
-        self._category = value
