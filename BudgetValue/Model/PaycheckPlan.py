@@ -31,9 +31,9 @@ class PaycheckPlan(dict):
         if not isinstance(key, str):
             raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(str) + " object")
         #
-        bUpdated = key not in self
+        bUpdate = key not in self
         dict.__setitem__(self, key, val)
-        if bUpdated:
+        if bUpdate:
             self.paycheckPlanUpdated.on_next(None)
 
     def __delitem__(self, key):
