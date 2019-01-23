@@ -29,10 +29,9 @@ class PaycheckPlan(dict):
         elif key not in self.vModel.Categories.keys():
             raise TypeError("Keys of " + __class__.__name__ + " must be the name of a category")
         #
-        bUpdate = key not in self
+        bUpdate = value.amount_stream not in [x.amount_stream for x in self.values()]
         dict.__setitem__(self, key, value)
         if bUpdate:
-            print("paycheckPlanUpdated.")
             self.paycheckPlanUpdated.on_next(None)
 
     def __delitem__(self, key):
@@ -69,7 +68,8 @@ class PaycheckPlan(dict):
             for k, v in categoryPlan.items():
                 if k == 'categoryName':
                     self[categoryName].category = self.vModel.Categories[categoryName]
-                setattr(self[categoryName], k, v)
+                else:
+                    setattr(self[categoryName], k, v)
 
 
 class CategoryPlan():
