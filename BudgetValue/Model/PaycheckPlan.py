@@ -70,9 +70,9 @@ class PaycheckPlan(dict):
 
 class CategoryPlan():
     def __init__(self, category=None, amount=0, period=None):
-        self._category = category
+        self.category = category
         self.amount_stream = rx.subjects.BehaviorSubject(amount)
-        self._period = period
+        self.period = period
 
     @property
     def category(self):
