@@ -35,7 +35,10 @@ class NetWorth(list):
     def Save(self):
         data = list()
         for net_worth_row in list(self):
-            data.append(dict(net_worth_row))
+            net_worth_row_storable = dict()
+            net_worth_row_storable['name'] = net_worth_row.name
+            net_worth_row_storable['amount'] = net_worth_row.amount
+            data.append(net_worth_row_storable)
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -49,32 +52,18 @@ class NetWorth(list):
         for net_worth_row in data:
             self.append(NetWorthRow())
             for k, v in net_worth_row.items():
-                self[-1][k] = v
+                setattr(self[-1], k, v)
 
 
-class NetWorthRow(dict):
-    def __init__(self, name=None, amount=None):
+class NetWorthRow():
+    def __init__(self, name=None, amount=0):
         self.name = name
-        self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.amount = amount
-
-    def __setitem__(self, key, value):
-        if key == "amount":
-            self.amount_stream.on_next(value)
-        dict.__setitem__(self, key, value)
+        self.amount_stream = rx.subjects.BehaviorSubject(amount)
 
     @property
     def amount(self):
-        return self["amount"]
+        return self.amount_stream.value
 
     @amount.setter
     def amount(self, value):
-        self["amount"] = BV.MakeValid_Money(value)
-
-    @property
-    def name(self):
-        return self["name"]
-
-    @name.setter
-    def name(self, value):
-        self["name"] = value
+        self.amount_stream.on_next(BV.MakeValid_Money(value))
