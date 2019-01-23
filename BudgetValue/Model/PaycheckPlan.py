@@ -12,14 +12,13 @@ class PaycheckPlan(dict):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
         self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
-        self.total = rx.subjects.BehaviorSubject(0)
-        self.paycheckPlanUpdated.select(
+        self.total_Observable = self.paycheckPlanUpdated.select(
             lambda unit: self.GenerateTotalObservable(unit)
         ).select_many(
             lambda sums: sums
         ).replay(
             1
-        ).ref_count().subscribe(self.total)
+        ).ref_count()
         self.Load()
         self["<Default Category>"] = BalanceEntry(self, self.vModel.Categories["<Default Category>"])
 
@@ -146,7 +145,10 @@ class BalanceEntry(dict):
 
     @property
     def amount(self):
-        return None if not self.parent.total.value or self.parent.total.value == 0 else BV.MakeValid_Money(self.parent.total.value)
+        if not hasattr(self, "total"):
+            self.total = rx.subjects.BehaviorSubject(0)
+            self.parent.total_Observable.subscribe(self.total)
+        return BV.MakeValid_Money_ZeroIsNone(self.total.value)
 
     @property
     def category(self):
