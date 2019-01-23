@@ -32,3 +32,7 @@ def MakeValid_Money(value):
     if returning % 1 == 0:
         returning = returning.quantize(Decimal('1.'))
     return returning
+
+
+def MakeValid_Money_ZeroIsNone(value):
+    return None if not value or value == 0 else MakeValid_Money(value)
