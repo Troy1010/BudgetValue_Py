@@ -20,8 +20,10 @@ class NetWorth(list):
         self.Load()
 
     def __setitem__(self, key, val):
+        bUpdated = key not in self
         list.__setitem__(self, key, val)
-        self.netWorthUpdated.on_next(None)
+        if bUpdated:
+            self.netWorthUpdated.on_next(None)
 
     def __delitem__(self, key):
         list.__delitem__(self, key)

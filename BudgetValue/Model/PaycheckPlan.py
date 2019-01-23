@@ -13,7 +13,7 @@ class PaycheckPlan(dict):
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
         self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
         self.total_Observable = self.paycheckPlanUpdated.select(
-            lambda unit: self.GenerateTotalObservable(unit)
+            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: self.CalcTotal(args))
         ).select_many(
             lambda sums: sums
         ).replay(
@@ -21,13 +21,6 @@ class PaycheckPlan(dict):
         ).ref_count()
         self.Load()
         self["<Default Category>"] = BalanceEntry(self, self.vModel.Categories["<Default Category>"])
-
-    def GenerateTotalObservable(self, unit):
-        cStreams = [x.amount_stream for x in self.values()]
-        if cStreams:
-            return rx.Observable.combine_latest(cStreams, lambda *args: self.CalcTotal(args))
-        else:
-            return rx.Observable.from_list([0])
 
     def CalcTotal(self, args):
         total = sum(args)
@@ -38,9 +31,7 @@ class PaycheckPlan(dict):
         if not isinstance(key, str):
             raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(str) + " object")
         #
-        bUpdated = False
-        if key not in self:
-            bUpdated = True
+        bUpdated = key not in self
         dict.__setitem__(self, key, val)
         if bUpdated:
             self.paycheckPlanUpdated.on_next(None)
