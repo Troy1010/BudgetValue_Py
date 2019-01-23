@@ -39,11 +39,15 @@ class GetAllChildren_Helper():
 def MakeValid_Money(value):
     if value is None:
         value = 0
-    returning = Decimal(str(value)).quantize(Decimal('0.01'), rounding=decimal.ROUND_UP)
-    if returning % 1 == 0:
-        returning = returning.quantize(Decimal('1.'))
+    try:
+        returning = Decimal(str(value)).quantize(Decimal('0.01'), rounding=decimal.ROUND_UP)
+        if returning % 1 == 0:
+            returning = returning.quantize(Decimal('1.'))
+    except decimal.InvalidOperation:
+        returning = Decimal(0)
     return returning
 
 
 def MakeValid_Money_ZeroIsNone(value):
-    return None if not value or value == 0 else MakeValid_Money(value)
+    value = MakeValid_Money(value)
+    return None if not value or value == 0 else value
