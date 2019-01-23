@@ -4,12 +4,14 @@ import TM_CommonPy as TM
 import BudgetValue as BV
 from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
+from BudgetValue.View.Skin import vSkin
+from BudgetValue.View import WidgetFactories as WF
 
 
 class Table(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent)
         assert isinstance(vModel, BV.Model.Model)
+        tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
         self.vModel.PaycheckPlan.total_Observable.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
@@ -23,7 +25,7 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Header
         for j, header_name in enumerate(['Category', 'Amount', 'Period', 'Plan']):
-            BV.View.MakeHeader(self, (row, j), text=header_name)
+            WF.MakeHeader(self, (row, j), text=header_name)
         row += 1
         # Data
         prev_type = None
@@ -31,7 +33,7 @@ class Table(TM.tk.TableFrame):
             # make separation label if needed
             if prev_type != category.type:
                 prev_type = category.type
-                BV.View.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
+                WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
             # generate row
             amount = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount
@@ -39,7 +41,7 @@ class Table(TM.tk.TableFrame):
                 period = self.vModel.PaycheckPlan[category.name].period
             except (AttributeError, KeyError):
                 period = None
-            BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
+            WF.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
             if category.IsSpendable():
                 self.MakeEntry_Money((row, 1))
                 self.MakeEntry((row, 2), text=period)
@@ -47,7 +49,7 @@ class Table(TM.tk.TableFrame):
                 self.MakeRowValid(row)
             else:
                 if category.name == "<Default Category>":
-                    w = BV.View.MakeEntry_ReadOnly(self, (row, 3), text=amount, background='#d6d6d6')
+                    w = WF.MakeEntry_ReadOnly(self, (row, 3), text=amount, background=vSkin.READ_ONLY)
                 else:
                     w = self.MakeEntry_Money((row, 3), text=amount)
                 if self.GetCategoryOfRow(w.row).name == "<Default Category>":
@@ -55,7 +57,7 @@ class Table(TM.tk.TableFrame):
             row += 1
 
     def MakeEntry(self, cRowColumnPair, text=None):
-        w = BV.View.MakeEntry(self, cRowColumnPair, text=text)
+        w = WF.MakeEntry(self, cRowColumnPair, text=text)
         w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
         w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
         return w

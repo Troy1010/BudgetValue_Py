@@ -2,8 +2,8 @@ import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
-from BudgetValue.Model import CategoryType  # noqa
 from decimal import Decimal
+from BudgetValue.View import WidgetFactories as WF
 
 
 class Table(TM.tk.TableFrame):
@@ -33,14 +33,14 @@ class Table(TM.tk.TableFrame):
         #
         row = 0
         # Column Header
-        BV.View.MakeHeader(self, (row, 0), text="Category")
+        WF.MakeHeader(self, (row, 0), text="Category")
         for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
-            vColumnHeader = BV.View.MakeHeader(self, (row, iColumn+1), text="Column "+str(iColumn+1))
+            vColumnHeader = WF.MakeHeader(self, (row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         self.iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
-        BV.View.MakeHeader(self, (row, self.iSpentColumn), text="Spent")
+        WF.MakeHeader(self, (row, self.iSpentColumn), text="Spent")
         self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+2
-        BV.View.MakeHeader(self, (row, self.iBudgetedColumn), text="Budgeted")
+        WF.MakeHeader(self, (row, self.iBudgetedColumn), text="Budgeted")
         row += 1
         # Data
         prev_type = None
@@ -51,7 +51,7 @@ class Table(TM.tk.TableFrame):
             # make separation label if needed
             if prev_type != category.type:
                 prev_type = category.type
-                BV.View.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
+                WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
             # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
@@ -59,7 +59,7 @@ class Table(TM.tk.TableFrame):
                     bEditableState = True
                     if category.name == "<Default Category>":
                         bEditableState = False
-                    w = BV.View.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
+                    w = WF.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
                     w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                     w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
                     w.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
@@ -67,17 +67,17 @@ class Table(TM.tk.TableFrame):
             # Spent
             dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
             if dSpendingHistoryTotal:
-                BV.View.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
+                WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
                 bMadeEntry = True
             # Budgeted
             dSpendable = self.vModel.GetBudgetedAmount(category)
             if (dSpendable != 0 or bMadeEntry) and category.type != BV.Model.CategoryType.income:
                 dTotalSpendableAmount += dSpendable
-                BV.View.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=str(dSpendable))
+                WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=str(dSpendable))
                 bMadeEntry = True
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):
-                BV.View.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
+                WF.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
                 self.cActiveCategories.append(category)
             #
             row += 1

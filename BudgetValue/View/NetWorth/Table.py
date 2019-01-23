@@ -2,12 +2,13 @@ import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
+from BudgetValue.View import WidgetFactories as WF
 
 
 class Table(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent)
         assert isinstance(vModel, BV.Model.Model)
+        tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
         self.vModel.NetWorth.total_Observable.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
@@ -21,7 +22,7 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Header
         for j, header_name in enumerate(['Account', 'Amount']):
-            BV.View.MakeHeader(self, (row, j), text=header_name)
+            WF.MakeHeader(self, (row, j), text=header_name)
         row += 1
         # Data
         for net_worth_row in self.vModel.NetWorth:
@@ -29,7 +30,7 @@ class Table(TM.tk.TableFrame):
             self.MakeEntry((row, 0), text=net_worth_row.name)
             w = self.MakeEntry((row, 1), text=net_worth_row.amount)
             w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
-            BV.View.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
+            WF.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
         # Total
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
@@ -48,7 +49,7 @@ class Table(TM.tk.TableFrame):
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None):
-        w = BV.View.MakeEntry(self, cRowColumnPair, text=text)
+        w = WF.MakeEntry(self, cRowColumnPair, text=text)
         w.bind("<FocusOut>", lambda event, w=w: self.SaveEntryInModel(w), add="+")
         w.bind("<B1-Motion>", self.OnDrag, add="+")
         w.bind("<ButtonRelease-1>", self.OnDrop, add="+")
