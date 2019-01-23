@@ -37,6 +37,8 @@ class GetAllChildren_Helper():
 
 
 def MakeValid_Money(value):
+    if value is None:
+        value = 0
     returning = Decimal(str(value)).quantize(Decimal('0.01'), rounding=decimal.ROUND_UP)
     if returning % 1 == 0:
         returning = returning.quantize(Decimal('1.'))
