@@ -4,11 +4,6 @@ import os
 import rx
 
 
-def sum2(args):
-    print("total_Observable. value:"+str(sum(args)))
-    return sum(args)
-
-
 class PaycheckPlan(dict):
     def __init__(self, vModel):
         assert isinstance(vModel, BV.Model.Model)
@@ -17,7 +12,7 @@ class PaycheckPlan(dict):
         self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
         self.total_Observable = rx.Observable.switch_map(
             self.paycheckPlanUpdated,
-            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: BV.MakeValid_Money(sum2(args)))
+            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: BV.MakeValid_Money(sum(args)))
         ).replay(1).ref_count()
         self.Load()
         self["<Default Category>"] = BalanceEntry(self.total_Observable, self.vModel.Categories["<Default Category>"])
@@ -94,7 +89,6 @@ class CategoryPlan():
     @amount.setter
     def amount(self, value):
         if BV.MakeValid_Money(value) != self.amount_stream.value:
-            print("amount_stream emitting. value:"+str(value))
             self.amount_stream.on_next(BV.MakeValid_Money(value))
 
     @property
