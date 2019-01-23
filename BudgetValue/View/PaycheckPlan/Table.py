@@ -35,16 +35,22 @@ class Table(TM.tk.TableFrame):
                 row += 1
             # generate row
             amount = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount
-            period = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].period
+            try:
+                period = self.vModel.PaycheckPlan[category.name].period
+            except (AttributeError, KeyError):
+                period = None
             if category.IsSpendable():
                 BV.View.MakeRowHeader(self, (row, 0), text=category.name)
-                w = self.MakeEntry((row, 1))
-                w = self.MakeEntry((row, 2), text=period)
-                w = self.MakeEntry((row, 3), text=amount)
+                self.MakeEntry_Money((row, 1))
+                self.MakeEntry((row, 2), text=period)
+                self.MakeEntry_Money((row, 3), text=amount)
                 self.MakeRowValid(row)
             else:
                 BV.View.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
-                w = self.MakeEntry((row, 3), text=amount)
+                if category.name == "<Default Category>":
+                    w = BV.View.MakeEntry_ReadOnly(self, (row, 3), text=amount)
+                else:
+                    w = self.MakeEntry_Money((row, 3), text=amount)
                 if self.GetCategoryOfRow(w.row).name == "<Default Category>":
                     self.vTotalNum = w
             row += 1
@@ -53,6 +59,11 @@ class Table(TM.tk.TableFrame):
         w = BV.View.MakeEntry(self, cRowColumnPair, text=text)
         w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
         w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
+        return w
+
+    def MakeEntry_Money(self, cRowColumnPair, text=None):
+        w = self.MakeEntry(cRowColumnPair, text)
+        w.ValidationHandler = BV.MakeValid_Money
         return w
 
     def MakeRowValid(self, row, cellToKeep=None):
@@ -73,16 +84,21 @@ class Table(TM.tk.TableFrame):
     def SaveToModel(self, row):
         # Determine category
         category = self.GetCategoryOfRow(row)
-        #
-        if category.name not in self.vModel.PaycheckPlan:
-            self.vModel.PaycheckPlan[category.name] = BV.Model.CategoryPlan(category=self.vModel.Categories[category.name])
-        #
+        # Retrieve text
         if self.GetCell(row, 2):
-            self.vModel.PaycheckPlan[category.name].period = self.GetCell(row, 2).text
-        self.vModel.PaycheckPlan[category.name].amount = self.GetCell(row, 3).text
-        #
-        if self.vModel.PaycheckPlan[category.name].IsEmpty():
-            del self.vModel.PaycheckPlan[category.name]
+            periodText = self.GetCell(row, 2).text
+        amountText = self.GetCell(row, 3).text
+        # Remove or add CategoryPlan
+        if not (periodText or amountText):
+            if category.name in self.vModel.PaycheckPlan:
+                del self.vModel.PaycheckPlan[category.name]
+            return
+        elif category.name not in self.vModel.PaycheckPlan:
+            self.vModel.PaycheckPlan[category.name] = BV.Model.CategoryPlan(category=self.vModel.Categories[category.name])
+        # Set values
+        if self.GetCell(row, 2):
+            self.vModel.PaycheckPlan[category.name].period = periodText
+        self.vModel.PaycheckPlan[category.name].amount = amountText
 
     def GetCategoryOfRow(self, row):
         categoryName = self.GetCell(row, 0).text
