@@ -58,7 +58,7 @@ class NetWorth(list):
 class NetWorthRow(dict):
     def __init__(self, name=None, amount=None):
         self.name = name
-        self.amount_stream = rx.subjects.BehaviorSubject(amount)
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
         self.amount = amount
 
     def __setitem__(self, key, value):
@@ -72,7 +72,7 @@ class NetWorthRow(dict):
 
     @amount.setter
     def amount(self, value):
-        value = None if not value or value == 0 else BV.MakeValid_Money(value)
+        value = BV.MakeValid_Money(value)
         self["amount"] = value
         self.amount_stream.on_next(value)
 
