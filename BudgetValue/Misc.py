@@ -1,6 +1,15 @@
 import decimal
 from decimal import Decimal
 from ._Logger import BVLog
+import rx
+
+
+def GetLatest(vObservable):
+    vBehaviorSubject = rx.subjects.BehaviorSubject(0)
+    vDisposable = vObservable.subscribe(vBehaviorSubject)
+    vReturning = vBehaviorSubject.value
+    vDisposable.dispose()
+    return vReturning
 
 
 def Hello():
