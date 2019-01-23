@@ -37,7 +37,8 @@ class Table(TM.tk.TableFrame):
         for net_worth_row in self.vModel.NetWorth:
             assert isinstance(net_worth_row, BV.Model.NetWorthRow)
             self.MakeEntry((row, 0), text=net_worth_row.name)
-            self.MakeEntry((row, 1), text=net_worth_row.amount)
+            w = self.MakeEntry((row, 1), text=net_worth_row.amount)
+            w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
             BV.View.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
         # Total
@@ -68,17 +69,12 @@ class Table(TM.tk.TableFrame):
                      background='SystemButtonFace', text=text)
         w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1])
 
-    def MakeEntry(self, cRowColumnPair, text=None, columnspan=1):
-        w = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15, justify=tk.RIGHT,
-                        borderwidth=2, relief='ridge', background='SystemButtonFace')
-        w.text = text
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ns")
-        w.bind("<FocusIn>", lambda event, w=w: self.OnFocusIn_MakeObvious(w))
+    def MakeEntry(self, cRowColumnPair, text=None):
+        w = BV.View.MakeEntry(self, cRowColumnPair, text=text)
         w.bind("<FocusOut>", lambda event, w=w: self.SaveEntryInModel(w), add="+")
-        w.bind("<FocusOut>", lambda event, w=w: self.OnFocusOut_MakeObvious(w), add="+")
-        w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
-        w.bind("<B1-Motion>", self.OnDrag)
-        w.bind("<ButtonRelease-1>", self.OnDrop)
+        w.bind("<B1-Motion>", self.OnDrag, add="+")
+        w.bind("<ButtonRelease-1>", self.OnDrop, add="+")
+        return w
 
     def OnDrag(self, event):
         x, y = event.widget.winfo_pointerxy()
