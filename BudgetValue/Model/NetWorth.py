@@ -4,27 +4,50 @@ import pickle
 import rx
 
 
+def GetTotalStream(cStreams):
+    if not cStreams:  # all streams are empty
+        return rx.Observable.of(0)
+    else:
+        cDistinctUntilChangedStreams = list(map(lambda x: x.distinct_until_changed(), cStreams))
+        return rx.Observable.combine_latest(cDistinctUntilChangedStreams, lambda *args: sum(args))
+
+
 class NetWorth(list):
     def __init__(self, vModel):
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
-        self.netWorthUpdated = rx.subjects.BehaviorSubject(None)
+        # Structure total stream
+        self.cStreams_stream = rx.subjects.Subject()
         self.total_Observable = rx.Observable.switch_map(
-            self.netWorthUpdated,
-            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self], lambda *args: sum(args))
+            self.cStreams_stream,
+            GetTotalStream
         ).replay(1).ref_count()
+        # Load
         self.Load()
+        # Begin total stream
+        self.total_Observable.subscribe()
+        self.cStreams_stream.on_next(self.GetStreams())
 
-    def __setitem__(self, key, val):
-        bUpdate = key not in self
-        list.__setitem__(self, key, val)
-        if bUpdate:
-            self.netWorthUpdated.on_next(None)
+    def GetStreams(self):
+        return [x._amount_stream for x in filter(lambda x: hasattr(x, '_amount_stream'), self)]
+
+    def __setitem__(self, key, value):
+        bStreamsChange = value._amount_stream not in self.GetStreams()
+        list.__setitem__(self, key, value)
+        if bStreamsChange:
+            print("cStreams_stream emission")
+            self.cStreams_stream.on_next(self.GetStreams())
+
+    def append(self, value):
+        super(NetWorth, self).append(value)
+        print("cStreams_stream emission")
+        self.cStreams_stream.on_next(self.GetStreams())
 
     def __delitem__(self, key):
         list.__delitem__(self, key)
-        self.netWorthUpdated.on_next(None)
+        print("cStreams_stream emission")
+        self.cStreams_stream.on_next(self.GetStreams())
 
     def AddRow(self):
         self.append(NetWorthRow())
@@ -53,18 +76,20 @@ class NetWorth(list):
             self.append(NetWorthRow())
             for k, v in net_worth_row.items():
                 setattr(self[-1], k, v)
+        print("Load`Close")
 
 
 class NetWorthRow():
     def __init__(self, name=None, amount=0):
         self.name = name
-        self.amount_stream = rx.subjects.BehaviorSubject(amount)
+        print("_amount_stream emission (init)")
+        self._amount_stream = rx.subjects.BehaviorSubject(amount)
 
     @property
     def amount(self):
-        return self.amount_stream.value
+        return self._amount_stream.value
 
     @amount.setter
     def amount(self, value):
-        if value and value != self.amount_stream.value:
-            self.amount_stream.on_next(BV.MakeValid_Money(value))
+        print("_amount_stream emission (set)")
+        self._amount_stream.on_next(BV.MakeValid_Money(value))
