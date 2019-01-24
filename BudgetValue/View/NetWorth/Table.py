@@ -11,7 +11,7 @@ class Table(TM.tk.TableFrame):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        self.vModel.NetWorth.total_Observable.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
+        self.vModel.NetWorth.total_stream.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
 
     def Refresh(self):
         # remove old
@@ -41,7 +41,7 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vTotalNum.grid(row=row, column=1, sticky="ewns")
-        self.vTotalNum.text = BV.GetLatest(self.vModel.NetWorth.total_Observable)
+        self.vTotalNum.text = BV.GetLatest(self.vModel.NetWorth.total_stream)
         row += 1
 
     def RemoveRow(self, iRow):

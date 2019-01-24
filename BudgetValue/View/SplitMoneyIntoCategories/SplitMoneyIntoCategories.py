@@ -34,7 +34,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_SplitNetWorth.pack(side=tk.LEFT, anchor='w')
         self.buttonPressed = rx.subjects.Subject()
         self.buttonPressed.with_latest_from(
-            self.vModel.NetWorth.total_Observable,
+            self.vModel.NetWorth.total_stream,
             lambda pressEvent, total: total
         ).subscribe(lambda x: self.SplitNetWorth(x))
         vButton_Print = ttk.Button(self.vButtonBar, text="Print",
