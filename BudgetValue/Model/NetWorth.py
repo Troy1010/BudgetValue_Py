@@ -18,12 +18,11 @@ class NetWorth(list):
             return returning
 
         def Scan_Collect2(accumulator, value):
-            print("value:"+str(value))
             print("Scan_Collect2")
             if value.bAdd:
-                accumulator.add(value.stream)
+                accumulator[value.stream] = value.stream.pairwise().map(GetDifference)
             else:
-                accumulator.remove(value.stream)
+                del accumulator[value.stream]
             return accumulator
 
         def Scan_CalcTotal(accumulator, value):  # Gets cStreams
@@ -49,9 +48,9 @@ class NetWorth(list):
         self.new_stream = rx.subjects.Subject()
         self.total_stream2 = self.new_stream.scan(  # getting AddStreamPair
             Scan_Collect2,
-            set()
-        ).map(  # getting collection of amount streams
-            ConvertAmountStreamsToDifferenceStreams
+            dict()
+        ).map(  # getting dict of amount streams to diff streams
+            lambda cDictOfAmountStreamToDiffStream: list(cDictOfAmountStreamToDiffStream.values())
         ).switch_map(  # getting collection of difference streams
             MergeStreams
         ).scan(  # getting merged difference stream
@@ -65,17 +64,16 @@ class NetWorth(list):
             def __init__(self, bAdd, stream):
                 self.bAdd = bAdd
                 self.stream = stream
-        self.s1 = rx.subjects.ReplaySubject()
+        self.s1 = rx.subjects.BehaviorSubject(0)
         self.s1.subscribe(lambda x: print("s1:"+str(x)))
         self.new_stream.on_next(StreamAddPair(True, self.s1))
         self.s1.on_next(0)
         self.s1.on_next(4)
         self.s1.on_next(7)
-        self.s2 = rx.subjects.ReplaySubject()
+        self.s2 = rx.subjects.BehaviorSubject(0)
         self.s2.subscribe(lambda x: print("s2:"+str(x)))
         self.new_stream.on_next(StreamAddPair(True, self.s2))
         self.s2.on_next(0)
-        self.s2.on_next(6)
         self.s2.on_next(12)
         self.s2.on_next(10)
         self.s1.on_next(10)
