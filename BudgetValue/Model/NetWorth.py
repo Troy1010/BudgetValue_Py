@@ -17,14 +17,6 @@ class NetWorth(list):
             print("GetDifference. old:"+str(cOldNewPair[0])+" new:"+str(cOldNewPair[1]) + " diff:"+str(returning))
             return returning
 
-        def Scan_Collect2(accumulator, value):
-            print("Scan_Collect2")
-            if value.bAdd:
-                accumulator[value.stream] = value.stream.pairwise().map(GetDifference)
-            else:
-                del accumulator[value.stream]
-            return accumulator
-
         def Scan_CalcTotal(accumulator, value):  # Gets cStreams
             print("Scan_CalcTotal. oldtotal:"+str(accumulator)+" diff:"+str(value)+" total:"+str(accumulator + value))
             return accumulator + value
@@ -39,6 +31,15 @@ class NetWorth(list):
         def ConvertAmountStreamsToDifferenceStreams(cStreams):
             return [x.pairwise().map(GetDifference) for x in cStreams]
 
+        def AccumulateDiffStreams(accumulator, value):
+            print("Scan_Collect2")
+            if value.bAdd:
+                accumulator[value.stream] = value.stream.pairwise().map(lambda cOldNewpair: cOldNewpair[1]-cOldNewpair[0])
+            else:
+                value.stream.on_next(0)
+                del accumulator[value.stream]
+            return accumulator
+
         def MergeStreams(cStreams):
             if not cStreams:  # all amount streams are empty
                 return rx.Observable.of(0)
@@ -47,14 +48,14 @@ class NetWorth(list):
 
         self.new_stream = rx.subjects.Subject()
         self.total_stream2 = self.new_stream.scan(  # getting AddStreamPair
-            Scan_Collect2,
+            AccumulateDiffStreams,
             dict()
         ).map(  # getting dict of amount streams to diff streams
             lambda cDictOfAmountStreamToDiffStream: list(cDictOfAmountStreamToDiffStream.values())
         ).switch_map(  # getting collection of difference streams
             MergeStreams
         ).scan(  # getting merged difference stream
-            Scan_CalcTotal,
+            lambda accumulator, value: accumulator + value,
             0
         )
         self.new_stream.subscribe(lambda x: print("new_stream:"+str(x)))
@@ -77,6 +78,7 @@ class NetWorth(list):
         self.s2.on_next(12)
         self.s2.on_next(10)
         self.s1.on_next(10)
+        self.new_stream.on_next(StreamAddPair(False, self.s1))
         print("FIRST PART DONE")
         self.cStreams_stream = rx.subjects.Subject()
 
