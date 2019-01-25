@@ -12,14 +12,14 @@ class NetWorth(list):
         # Structure total stream
         self.cStreams_stream = rx.subjects.Subject()
 
-        def GenerateTotalStream(cStreams):
+        def pseudo_lambda(cStreams):
             if not cStreams:  # all amount streams are empty
                 return rx.Observable.of(0)
             else:
                 return rx.Observable.combine_latest(cStreams, lambda *args: sum(args))
         self.total_stream = rx.Observable.switch_map(
             self.cStreams_stream,
-            GenerateTotalStream
+            pseudo_lambda
         ).replay(1).ref_count()
         # Load
         self.Load()
