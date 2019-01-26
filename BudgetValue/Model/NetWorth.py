@@ -19,24 +19,21 @@ class NetWorth(list):
         # Structure total stream
 
         def TryMerge(cStreams):
-            if not cStreams:  # all amount streams are empty
+            if not cStreams:  # all streams are empty
                 return rx.Observable.of(0)
             else:
                 return rx.Observable.merge(cStreams)
 
         def AccumulateDiffStreams(accumulator, value):
-            if value is None:
-                return accumulator
             if value.bAdd:
-                accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewpair: cOldNewpair[1]-cOldNewpair[0])
+                accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0])
             else:
                 value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
 
-        self.stream_stream = rx.subjects.Subject()
-        self.stream_stream.subscribe()
-        self.total_stream = self.stream_stream.scan(  # getting AddStreamPair
+        self.amountStream_stream = rx.subjects.Subject()
+        self.total_stream = self.amountStream_stream.scan(  # getting AddStreamPair
             AccumulateDiffStreams,
             dict()
         ).map(  # getting dict of amountStreams:diffStreams
@@ -52,26 +49,21 @@ class NetWorth(list):
         self.Load()
         # Debug
         self.total_stream.subscribe(lambda x: print("total_stream:"+str(x)))
-        self.stream_stream.subscribe(lambda x: print("stream_stream:"+str(x)))
-        # Begin total stream
-        self.total_stream.subscribe()
-        self.stream_stream.on_next(None)
+        self.amountStream_stream.subscribe(lambda x: print("amountStream_stream:"+str(x)))
 
     def __setitem__(self, key, value):
-        raise Exception("Set item")
-        bStreamsChange = value._amount_stream not in self.GetStreams()
+        if self[key] != value:
+            self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+            self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         list.__setitem__(self, key, value)
-        if bStreamsChange:
-            self.stream_stream.on_next(self.GetStreams())
 
     def append(self, value):
+        self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super(NetWorth, self).append(value)
-        self.stream_stream.on_next(AddStreamPair(True, value._amount_stream))
 
     def __delitem__(self, key):
-        value = self[key]
+        self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
         list.__delitem__(self, key)
-        self.stream_stream.on_next(AddStreamPair(False, value._amount_stream))
 
     def AddRow(self):
         self.append(NetWorthRow())
@@ -105,7 +97,8 @@ class NetWorth(list):
 class NetWorthRow():
     def __init__(self, name=None, amount=0):
         self.name = name
-        self._amount_stream = rx.subjects.BehaviorSubject(amount)
+        self._amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount = amount
         self._amount_stream.subscribe(lambda x: print(str(x)))
 
     @property
