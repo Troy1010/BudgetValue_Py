@@ -32,7 +32,6 @@ class NetWorth(list):
             return [x.pairwise().map(GetDifference) for x in cStreams]
 
         def AccumulateDiffStreams(accumulator, value):
-            print("Scan_Collect2")
             if value.bAdd:
                 accumulator[value.stream] = value.stream.pairwise().map(lambda cOldNewpair: cOldNewpair[1]-cOldNewpair[0])
             else:
@@ -40,56 +39,50 @@ class NetWorth(list):
                 del accumulator[value.stream]
             return accumulator
 
-        def MergeStreams(cStreams):
+        def TryMerge(cStreams):
             if not cStreams:  # all amount streams are empty
                 return rx.Observable.of(0)
             else:
                 return rx.Observable.merge(cStreams)
 
-        self.new_stream = rx.subjects.Subject()
-        self.total_stream2 = self.new_stream.scan(  # getting AddStreamPair
+        self.accumulateStreams_stream = rx.subjects.Subject()
+        self.total_stream2 = self.accumulateStreams_stream.scan(  # getting AddStreamPair
             AccumulateDiffStreams,
             dict()
-        ).map(  # getting dict of amount streams to diff streams
-            lambda cDictOfAmountStreamToDiffStream: list(cDictOfAmountStreamToDiffStream.values())
+        ).map(  # getting dict of amountStreams:diffStreams
+            lambda cAmountToDiffStreams: list(cAmountToDiffStreams.values())
         ).switch_map(  # getting collection of difference streams
-            MergeStreams
+            TryMerge
         ).scan(  # getting merged difference stream
             lambda accumulator, value: accumulator + value,
             0
         )
-        self.new_stream.subscribe(lambda x: print("new_stream:"+str(x)))
+        self.accumulateStreams_stream.subscribe(lambda x: print("new_stream:"+str(x)))
         self.total_stream2.subscribe(lambda x: print("total_stream2:"+str(x)))
-
-        class StreamAddPair():
-            def __init__(self, bAdd, stream):
-                self.bAdd = bAdd
-                self.stream = stream
         self.s1 = rx.subjects.BehaviorSubject(0)
         self.s1.subscribe(lambda x: print("s1:"+str(x)))
-        self.new_stream.on_next(StreamAddPair(True, self.s1))
-        self.s1.on_next(0)
-        self.s1.on_next(4)
-        self.s1.on_next(7)
-        self.s2 = rx.subjects.BehaviorSubject(0)
-        self.s2.subscribe(lambda x: print("s2:"+str(x)))
-        self.new_stream.on_next(StreamAddPair(True, self.s2))
-        self.s2.on_next(0)
-        self.s2.on_next(12)
-        self.s2.on_next(10)
-        self.s1.on_next(10)
-        self.new_stream.on_next(StreamAddPair(False, self.s1))
+        # self.accumulateStreams_stream.on_next(AddStreamPair(True, self.s1))
+        # self.s1.on_next(0)
+        # self.s1.on_next(4)
+        # self.s1.on_next(7)
+        # self.s2 = rx.subjects.BehaviorSubject(0)
+        # self.s2.subscribe(lambda x: print("s2:"+str(x)))
+        # self.accumulateStreams_stream.on_next(AddStreamPair(True, self.s2))
+        # self.s2.on_next(0)
+        # self.s2.on_next(12)
+        # self.s2.on_next(10)
+        # self.s1.on_next(10)
+        # self.accumulateStreams_stream.on_next(AddStreamPair(False, self.s1))
         print("FIRST PART DONE")
         self.cStreams_stream = rx.subjects.Subject()
 
-        def pseudo_lambda(cStreams):
-            if not cStreams:  # all amount streams are empty
-                return rx.Observable.of(0)
-            else:
-                return rx.Observable.combine_latest(cStreams, lambda *args: sum(args))
+        class AddStreamPair():
+            def __init__(self, bAdd, stream):
+                self.bAdd = bAdd
+                self.stream = stream
         self.total_stream = rx.Observable.switch_map(
             self.cStreams_stream,
-            pseudo_lambda
+            TryMerge
         ).replay(1).ref_count()
         # Load
         self.Load()
