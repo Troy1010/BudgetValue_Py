@@ -28,17 +28,14 @@ class NetWorth(list):
             if value is None:
                 return accumulator
             if value.bAdd:
-                accumulator[value.stream] = value.stream.pairwise().map(lambda cOldNewpair: cOldNewpair[1]-cOldNewpair[0])
+                accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewpair: cOldNewpair[1]-cOldNewpair[0])
             else:
                 value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
 
-        def Scan_CalcTotal(accumulator, value):
-            print("Scan_CalcTotal. oldtotal:"+str(accumulator)+" diff:"+str(value)+" total:"+str(accumulator + value))
-            return accumulator + value
-
         self.stream_stream = rx.subjects.Subject()
+        self.stream_stream.subscribe()
         self.total_stream = self.stream_stream.scan(  # getting AddStreamPair
             AccumulateDiffStreams,
             dict()
@@ -47,12 +44,13 @@ class NetWorth(list):
         ).switch_map(  # getting collection of difference streams
             TryMerge
         ).scan(  # getting merged difference stream
-            Scan_CalcTotal,
+            lambda accumulator, value: accumulator + value,
             0
-        )
+        ).replay(1).ref_count()
+        self.total_stream.subscribe()
         # Load
         self.Load()
-        #
+        # Debug
         self.total_stream.subscribe(lambda x: print("total_stream:"+str(x)))
         self.stream_stream.subscribe(lambda x: print("stream_stream:"+str(x)))
         # Begin total stream
@@ -68,12 +66,12 @@ class NetWorth(list):
 
     def append(self, value):
         super(NetWorth, self).append(value)
-        self.stream_stream.on_next(AddStreamPair(True, value.amount))
+        self.stream_stream.on_next(AddStreamPair(True, value._amount_stream))
 
     def __delitem__(self, key):
         value = self[key]
         list.__delitem__(self, key)
-        self.stream_stream.on_next(AddStreamPair(False, value.amount))
+        self.stream_stream.on_next(AddStreamPair(False, value._amount_stream))
 
     def AddRow(self):
         self.append(NetWorthRow())
@@ -108,6 +106,7 @@ class NetWorthRow():
     def __init__(self, name=None, amount=0):
         self.name = name
         self._amount_stream = rx.subjects.BehaviorSubject(amount)
+        self._amount_stream.subscribe(lambda x: print(str(x)))
 
     @property
     def amount(self):
