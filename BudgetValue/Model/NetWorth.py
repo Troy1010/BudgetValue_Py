@@ -52,15 +52,15 @@ class NetWorth(list):
         if self[key] != value:
             self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
             self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
-        list.__setitem__(self, key, value)
+        super().__setitem__(key, value)
 
     def append(self, value):
         self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
-        super(NetWorth, self).append(value)
+        super().append(value)
 
     def __delitem__(self, key):
         self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-        list.__delitem__(self, key)
+        super().__delitem__(key)
 
     def AddRow(self):
         self.append(NetWorthRow())
