@@ -2,6 +2,13 @@ import BudgetValue as BV
 import os
 import pickle
 import rx
+import TM_CommonPy as TM  # noqa
+
+
+class AddStreamPair():
+    def __init__(self, bAdd, stream):
+        self.bAdd = bAdd
+        self.stream = stream
 
 
 class NetWorth(list):
@@ -10,40 +17,53 @@ class NetWorth(list):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
         # Structure total stream
-        self.cStreams_stream = rx.subjects.Subject()
 
-        def pseudo_lambda(cStreams):
-            if not cStreams:  # all amount streams are empty
+        def TryMerge(cStreams):
+            if not cStreams:  # all streams are empty
                 return rx.Observable.of(0)
             else:
-                return rx.Observable.combine_latest(cStreams, lambda *args: sum(args))
-        self.total_stream = rx.Observable.switch_map(
-            self.cStreams_stream,
-            pseudo_lambda
+                return rx.Observable.merge(cStreams)
+
+        def AccumulateDiffStreams(accumulator, value):
+            if value.bAdd:
+                accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0])
+            else:
+                value.stream.on_next(0)
+                del accumulator[value.stream]
+            return accumulator
+
+        self.amountStream_stream = rx.subjects.Subject()
+        self.total_stream = self.amountStream_stream.scan(  # getting AddStreamPair
+            AccumulateDiffStreams,
+            dict()
+        ).map(  # getting dict of amountStreams:diffStreams
+            lambda cAmountToDiffStreams: list(cAmountToDiffStreams.values())
+        ).switch_map(  # getting collection of difference streams
+            TryMerge
+        ).scan(  # getting merged difference stream
+            lambda accumulator, value: accumulator + value,
+            0
         ).replay(1).ref_count()
+        self.total_stream.subscribe()
         # Load
         self.Load()
-        # Begin total stream
-        self.total_stream.subscribe()
-        self.cStreams_stream.on_next(self.GetStreams())
-
-    def GetStreams(self):
-        cActiveStreamSources = filter(lambda x: hasattr(x, '_amount_stream'), self)
-        return [x._amount_stream.distinct_until_changed() for x in cActiveStreamSources]
+        # Debug
+        self.total_stream.subscribe(lambda x: print("total_stream:"+str(x)))
+        self.amountStream_stream.subscribe(lambda x: print("amountStream_stream:"+str(x)))
 
     def __setitem__(self, key, value):
-        bStreamsChange = value._amount_stream not in self.GetStreams()
+        if self[key] != value:
+            self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+            self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         list.__setitem__(self, key, value)
-        if bStreamsChange:
-            self.cStreams_stream.on_next(self.GetStreams())
 
     def append(self, value):
+        self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super(NetWorth, self).append(value)
-        self.cStreams_stream.on_next(self.GetStreams())
 
     def __delitem__(self, key):
+        self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
         list.__delitem__(self, key)
-        self.cStreams_stream.on_next(self.GetStreams())
 
     def AddRow(self):
         self.append(NetWorthRow())
@@ -77,7 +97,9 @@ class NetWorth(list):
 class NetWorthRow():
     def __init__(self, name=None, amount=0):
         self.name = name
-        self._amount_stream = rx.subjects.BehaviorSubject(amount)
+        self._amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount = amount
+        self._amount_stream.subscribe(lambda x: print(str(x)))
 
     @property
     def amount(self):
