@@ -47,9 +47,6 @@ class NetWorth(list):
         self.total_stream.subscribe()
         # Load
         self.Load()
-        # Debug
-        self.total_stream.subscribe(lambda x: print("total_stream:"+str(x)))
-        self.amountStream_stream.subscribe(lambda x: print("amountStream_stream:"+str(x)))
 
     def __setitem__(self, key, value):
         if self[key] != value:
@@ -99,7 +96,6 @@ class NetWorthRow():
         self.name = name
         self._amount_stream = rx.subjects.BehaviorSubject(0)
         self.amount = amount
-        self._amount_stream.subscribe(lambda x: print(str(x)))
 
     @property
     def amount(self):
