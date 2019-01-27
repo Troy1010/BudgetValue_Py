@@ -14,16 +14,17 @@ class Dict_AmountStreamStream(dict):
         self._amountStream_stream = rx.subjects.Subject()
 
     def __setitem__(self, key, value):
-        # if we have an old value and value isn't old, remove old value
-        if key in self and self[key] != value:
+        # if we have an old value and it isn't the new value, remove old value
+        if key in self and hasattr(self[key], '_amount_stream') and self[key] != value:
             self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-        # if value has _amount_stream and value isn't old, add that value
-        if hasattr(value, '_amount_stream') and not (key in self and self[key] == value):
+        # if new value isn't the old value, add that new value
+        if hasattr(value, '_amount_stream') and (key not in self or self[key] != value):
             self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().__setitem__(key, value)
 
     def __delitem__(self, key):
-        self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        if key in self and hasattr(self[key], '_amount_stream'):
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
         super().__delitem__(key)
 
 
@@ -34,17 +35,21 @@ class List_AmountStreamStream(list):
 
     def __setitem__(self, key, value):
         # if value has _amount_stream and value isn't old, remove the old and add the new
-        if hasattr(value, '_amount_stream') and self[key] != value:
-            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-            self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        if key in self and self[key] != value:
+            if hasattr(self[key], '_amount_stream'):
+                self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+            if hasattr(value, '_amount_stream'):
+                self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().__setitem__(key, value)
 
     def append(self, value):
-        self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        if hasattr(value, '_amount_stream'):
+            self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().append(value)
 
     def __delitem__(self, key):
-        self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        if key in self and hasattr(self[key], '_amount_stream'):
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
         super().__delitem__(key)
 
 
