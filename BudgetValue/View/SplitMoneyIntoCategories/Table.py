@@ -136,21 +136,15 @@ class Table(TM.tk.TableFrame):
         self.vModel.SplitMoneyHistory.RemoveColumn(iColumn)
         self.Refresh()
 
-    def GetCategoriesOfColumn(self, iColumn):
-        cCategories = list()
-        for vEntry in self.vModel.SplitMoneyHistory[iColumn].values():
-            cCategories.append(vEntry.category)
-        return cCategories
-
     def GetAddableCategories(self, iColumn):
         cAddableCategories = list()
         for category in self.vModel.Categories.values():
-            if category.name not in [x.name for x in self.GetCategoriesOfColumn(iColumn)]:
+            if category.name not in self.vModel.SplitMoneyHistory[iColumn].keys():
                 cAddableCategories.append(category)
         return cAddableCategories
 
     def AddCategoryToColumn(self, category, iColumn):
-        self.vModel.SplitMoneyHistory.AddEntry(iColumn, category, 0)
+        self.vModel.SplitMoneyHistory.AddEntry(iColumn, category.name, 0)
         self.Refresh()
 
     def ShowHeaderMenu(self, event):

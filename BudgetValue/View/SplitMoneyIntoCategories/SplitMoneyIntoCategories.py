@@ -65,18 +65,18 @@ class SplitMoneyIntoCategories(tk.Frame):
     def SplitBalance(self):
         amount = -self.vTable.dBalance
         self.vModel.SplitMoneyHistory.AddColumn()
-        self.vModel.SplitMoneyHistory.AddEntry(-1, category=self.vModel.Categories["Income"], amount=amount)
+        self.vModel.SplitMoneyHistory.AddEntry(-1, "Income", amount=amount)
         self.vTable.Refresh()
 
     def SplitPaycheck(self):
         self.vModel.SplitMoneyHistory.AddColumn()
-        for vCategoryPlan in self.vModel.PaycheckPlan.values():
-            self.vModel.SplitMoneyHistory.AddEntry(-1, category=vCategoryPlan.category, amount=vCategoryPlan.amount)
+        for categoryName, vCategoryPlan in self.vModel.PaycheckPlan.items():
+            self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=vCategoryPlan.amount)
         self.vTable.Refresh()
 
     def SplitNetWorth(self, amount):
         self.vModel.SplitMoneyHistory.AddColumn()
-        self.vModel.SplitMoneyHistory.AddEntry(-1, category=self.vModel.Categories["Net Worth"], amount=amount)
+        self.vModel.SplitMoneyHistory.AddEntry(-1, "Net Worth", amount=amount)
         self.vTable.Refresh()
 
     def AddSplitMoneyHistoryColumn(self):
