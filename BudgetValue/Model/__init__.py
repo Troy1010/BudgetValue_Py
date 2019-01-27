@@ -7,6 +7,6 @@ from .PaycheckPlan import PaycheckPlan
 from .NetWorth import NetWorth
 from .NetWorth import NetWorthRow
 from .SplitMoneyHistory import SplitMoneyHistory
-from .PaycheckPlan import CategoryPlan
+from .PaycheckPlan import PaycheckPlanRow
 
-__all__ = ['Categories', 'Category', 'Model', 'SpendingHistory', 'PaycheckPlan', 'CategoryType', 'NetWorth', 'NetWorthRow', 'SplitMoneyHistory', 'CategoryPlan']
+__all__ = ['Categories', 'Category', 'Model', 'SpendingHistory', 'PaycheckPlan', 'CategoryType', 'NetWorth', 'NetWorthRow', 'SplitMoneyHistory', 'PaycheckPlanRow']
