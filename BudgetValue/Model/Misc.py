@@ -86,7 +86,7 @@ class TotalStream_Inheritable():
         self.total = 0
 
         def SetTotal(self, total):
-            self.total = total
+            self.total = BV.MakeValid_Money(total)
         self.total_stream.subscribe(lambda total: SetTotal(self, total))
 
 

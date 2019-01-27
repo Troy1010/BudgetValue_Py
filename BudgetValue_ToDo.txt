@@ -6,10 +6,9 @@ BudgetValue
 Spendables
 	Simplify
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
+SpendingHistory-Dispose removed column subscriptions
 ---------------------------------------------------------- Things I'm currently working on
-View
-	MakeEntry and MakeHeader defaults
-		possible name: widget factory
+SpendingHistory-make totals observable
 ---------------------------------------------------------- Things I've done
 SelectCategoryPopup-What to do when it's empty
 SplitMoney-Restructure
