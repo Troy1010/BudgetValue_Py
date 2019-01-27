@@ -14,7 +14,11 @@ class Table(TM.tk.TableFrame):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        self.vModel.PaycheckPlan.total_Observable.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
+
+        def ShowNewTotal(self):
+            if hasattr(self, 'vTotalNum'):
+                self.vTotalNum.text = self.vModel.PaycheckPlan["<Default Category>"].amount
+        self.vModel.PaycheckPlan.total_stream.subscribe(lambda total: ShowNewTotal(self))
 
     def Refresh(self):
         # remove old

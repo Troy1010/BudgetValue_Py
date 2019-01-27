@@ -5,34 +5,23 @@ import rx
 from . import Misc
 
 
-class PaycheckPlan(dict):
+class PaycheckPlan(Misc.Dict_TotalStream):
     def __init__(self, vModel):
         assert isinstance(vModel, BV.Model.Model)
+        super().__init__()
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
-        self.paycheckPlanUpdated = rx.subjects.BehaviorSubject(None)
-        self.total_Observable = rx.Observable.switch_map(
-            self.paycheckPlanUpdated,
-            lambda unit: rx.Observable.combine_latest([x.amount_stream for x in self.values()], lambda *args: BV.MakeValid_Money(sum(args)))
-        ).replay(1).ref_count()
         self.Load()
-        self["<Default Category>"] = Misc.BalanceEntry(self.total_Observable, self.vModel.Categories["<Default Category>"])
+        self["<Default Category>"] = Misc.BalanceEntry(self)
 
     def __setitem__(self, key, value):
         # Keys must be a category name
         if not isinstance(key, str):
             raise TypeError("Keys of " + __class__.__name__ + " must be a " + str(str) + " object")
         elif key not in self.vModel.Categories.keys():
-            raise TypeError("Keys of " + __class__.__name__ + " must be the name of a category")
+            raise ValueError("Keys of " + __class__.__name__ + " must be the name of a category")
         #
-        bUpdate = value.amount_stream not in [x.amount_stream for x in self.values()]
-        dict.__setitem__(self, key, value)
-        if bUpdate:
-            self.paycheckPlanUpdated.on_next(None)
-
-    def __delitem__(self, key):
-        dict.__delitem__(self, key)
-        self.paycheckPlanUpdated.on_next(None)
+        super().__setitem__(key, value)
 
     def Narrate(self):
         cReturning = ["PaycheckPlan.."]
@@ -71,7 +60,7 @@ class PaycheckPlan(dict):
 class CategoryPlan():
     def __init__(self, category=None, amount=0, period=None):
         self.category = category
-        self.amount_stream = rx.subjects.BehaviorSubject(amount)
+        self._amount_stream = rx.subjects.BehaviorSubject(amount)
         self.period = period
 
     @property
@@ -85,12 +74,12 @@ class CategoryPlan():
 
     @property
     def amount(self):
-        return self.amount_stream.value
+        return self._amount_stream.value
 
     @amount.setter
     def amount(self, value):
-        if BV.MakeValid_Money(value) != self.amount_stream.value:
-            self.amount_stream.on_next(BV.MakeValid_Money(value))
+        if BV.MakeValid_Money(value) != self._amount_stream.value:
+            self._amount_stream.on_next(BV.MakeValid_Money(value))
 
     @property
     def period(self):
