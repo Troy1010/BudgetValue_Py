@@ -8,8 +8,48 @@ class AddStreamPair():
         self.stream = stream
 
 
-class List_TotalStream(list):
+class Dict_AmountStreamStream(dict):
     def __init__(self):
+        self._amountStream_stream = rx.subjects.Subject()
+
+    def __setitem__(self, key, value):
+        # if we have an old value and value isn't old, remove old value
+        if key in self and self[key] != value:
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        # if value isn't old, add that value
+        if not (key in self and self[key] == value):
+            self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        super().__delitem__(key)
+
+
+class List_AmountStreamStream(list):
+    def __init__(self):
+        self._amountStream_stream = rx.subjects.Subject()
+
+    def __setitem__(self, key, value):
+        # if value isn't old, remove the old and add the new
+        if self[key] != value:
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+            self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        super().__setitem__(key, value)
+
+    def append(self, value):
+        self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        super().append(value)
+
+    def __delitem__(self, key):
+        self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        super().__delitem__(key)
+
+
+class TotalStream_Inheritable():
+    def __init__(self):
+        super().__init__()
+
         def __TryMerge(cStreams):
             if not cStreams:  # all streams are empty
                 return rx.Observable.of(0)
@@ -23,8 +63,7 @@ class List_TotalStream(list):
                 value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
-        self.__amountStream_stream = rx.subjects.Subject()
-        self.total_stream = self.__amountStream_stream.scan(  # getting AddStreamPair
+        self.total_stream = self._amountStream_stream.scan(  # getting AddStreamPair
             __AccumulateDiffStreams,
             dict()
         ).map(  # getting dict of amountStreams:diffStreams
@@ -37,19 +76,13 @@ class List_TotalStream(list):
         ).replay(1).ref_count()
         self.total_stream.subscribe()
 
-    def __setitem__(self, key, value):
-        if self[key] != value:
-            self.__amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-            self.__amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
-        super().__setitem__(key, value)
 
-    def append(self, value):
-        self.__amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
-        super().append(value)
+class List_TotalStream(TotalStream_Inheritable, List_AmountStreamStream):
+    pass
 
-    def __delitem__(self, key):
-        self.__amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-        super().__delitem__(key)
+
+class Dict_TotalStream(TotalStream_Inheritable, Dict_AmountStreamStream):
+    pass
 
 
 class BalanceEntry():
