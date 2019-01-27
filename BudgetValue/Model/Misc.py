@@ -10,14 +10,15 @@ class AddStreamPair():
 
 class Dict_AmountStreamStream(dict):
     def __init__(self):
+        super().__init__()
         self._amountStream_stream = rx.subjects.Subject()
 
     def __setitem__(self, key, value):
         # if we have an old value and value isn't old, remove old value
         if key in self and self[key] != value:
             self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-        # if value isn't old, add that value
-        if not (key in self and self[key] == value):
+        # if value has _amount_stream and value isn't old, add that value
+        if hasattr(value, '_amount_stream') and not (key in self and self[key] == value):
             self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().__setitem__(key, value)
 
@@ -28,11 +29,12 @@ class Dict_AmountStreamStream(dict):
 
 class List_AmountStreamStream(list):
     def __init__(self):
+        super().__init__()
         self._amountStream_stream = rx.subjects.Subject()
 
     def __setitem__(self, key, value):
-        # if value isn't old, remove the old and add the new
-        if self[key] != value:
+        # if value has _amount_stream and value isn't old, remove the old and add the new
+        if hasattr(value, '_amount_stream') and self[key] != value:
             self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
             self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().__setitem__(key, value)
@@ -57,6 +59,7 @@ class TotalStream_Inheritable():
                 return rx.Observable.merge(cStreams)
 
         def __AccumulateDiffStreams(accumulator, value):
+            assert(isinstance(value, AddStreamPair))
             if value.bAdd:
                 accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0])
             else:
@@ -75,6 +78,11 @@ class TotalStream_Inheritable():
             0
         ).replay(1).ref_count()
         self.total_stream.subscribe()
+        self.total = 0
+
+        def SetTotal(self, total):
+            self.total = total
+        self.total_stream.subscribe(lambda total: SetTotal(self, total))
 
 
 class List_TotalStream(TotalStream_Inheritable, List_AmountStreamStream):
@@ -86,14 +94,13 @@ class Dict_TotalStream(TotalStream_Inheritable, Dict_AmountStreamStream):
 
 
 class BalanceEntry():
-    def __init__(self, total_stream, category):
-        self.total_stream = total_stream
-        self._category = category
-        self.amount_stream = rx.subjects.BehaviorSubject(0)  # remove later
+    def __init__(self, parent):
+        self.parent = parent
+        self._category = self.parent.vModel.Categories["<Default Category>"]
 
     @property
     def amount(self):
-        return BV.GetLatest(self.total_stream)
+        return -self.parent.total
 
     @property
     def category(self):
