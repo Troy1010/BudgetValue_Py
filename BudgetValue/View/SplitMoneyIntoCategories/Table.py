@@ -58,8 +58,9 @@ class Table(TM.tk.TableFrame):
                     if category.name == "<Default Category>":
                         bEditableState = False
                     w = WF.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
-                    w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
-                    w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+                    if bEditableState:
+                        w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
+                        w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
                     w.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                     bMadeEntry = True
             # Spent
