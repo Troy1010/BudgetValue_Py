@@ -81,7 +81,7 @@ class TotalStream_Inheritable():
         ).scan(  # getting merged difference stream
             lambda accumulator, value: accumulator + value,
             0
-        ).replay(1).ref_count()
+        ).publish().ref_count()
         self.total_stream.subscribe()
         self.total = 0
 

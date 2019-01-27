@@ -41,7 +41,7 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
                                      borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vTotalNum.grid(row=row, column=1, sticky="ewns")
-        self.vTotalNum.text = BV.GetLatest(self.vModel.NetWorth.total_stream)
+        self.vTotalNum.text = self.vModel.NetWorth.total
         row += 1
 
     def RemoveRow(self, iRow):
