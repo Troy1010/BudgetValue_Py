@@ -10,30 +10,27 @@ class AddStreamPair():
 
 class List_TotalStream(list):
     def __init__(self):
-        # Structure total stream
-
-        def TryMerge(cStreams):
+        def __TryMerge(cStreams):
             if not cStreams:  # all streams are empty
                 return rx.Observable.of(0)
             else:
                 return rx.Observable.merge(cStreams)
 
-        def AccumulateDiffStreams(accumulator, value):
+        def __AccumulateDiffStreams(accumulator, value):
             if value.bAdd:
                 accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0])
             else:
                 value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
-
-        self.amountStream_stream = rx.subjects.Subject()
-        self.total_stream = self.amountStream_stream.scan(  # getting AddStreamPair
-            AccumulateDiffStreams,
+        self.__amountStream_stream = rx.subjects.Subject()
+        self.total_stream = self.__amountStream_stream.scan(  # getting AddStreamPair
+            __AccumulateDiffStreams,
             dict()
         ).map(  # getting dict of amountStreams:diffStreams
             lambda cAmountToDiffStreams: list(cAmountToDiffStreams.values())
         ).switch_map(  # getting collection of difference streams
-            TryMerge
+            __TryMerge
         ).scan(  # getting merged difference stream
             lambda accumulator, value: accumulator + value,
             0
@@ -42,16 +39,16 @@ class List_TotalStream(list):
 
     def __setitem__(self, key, value):
         if self[key] != value:
-            self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-            self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+            self.__amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+            self.__amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().__setitem__(key, value)
 
     def append(self, value):
-        self.amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        self.__amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
         super().append(value)
 
     def __delitem__(self, key):
-        self.amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        self.__amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
         super().__delitem__(key)
 
 
