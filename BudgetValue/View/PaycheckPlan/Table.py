@@ -99,7 +99,7 @@ class Table(TM.tk.TableFrame):
                 del self.vModel.PaycheckPlan[category.name]
             return
         elif category.name not in self.vModel.PaycheckPlan:
-            self.vModel.PaycheckPlan[category.name] = BV.Model.PaycheckPlanRow(category=self.vModel.Categories[category.name])
+            self.vModel.PaycheckPlan[category.name] = BV.Model.PaycheckPlanRow()
         # Set values
         if self.GetCell(row, 2):
             self.vModel.PaycheckPlan[category.name].period = periodText

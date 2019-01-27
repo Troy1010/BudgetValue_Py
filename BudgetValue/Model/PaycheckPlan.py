@@ -51,26 +51,14 @@ class PaycheckPlan(Misc.Dict_TotalStream):
         for categoryName, categoryPlan in data.items():
             self[categoryName] = PaycheckPlanRow()
             for k, v in categoryPlan.items():
-                if k == 'categoryName':
-                    self[categoryName].category = self.vModel.Categories[categoryName]
-                else:
-                    setattr(self[categoryName], k, v)
+                setattr(self[categoryName], k, v)
 
 
 class PaycheckPlanRow():
-    def __init__(self, category=None, amount=0, period=None):
-        self.category = category
-        self._amount_stream = rx.subjects.BehaviorSubject(amount)
+    def __init__(self, amount=0, period=None):
+        self._amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount = amount
         self.period = period
-
-    @property
-    def category(self):
-        return self._category
-
-    @category.setter
-    def category(self, value):
-        assert isinstance(value, BV.Model.Category) or value is None
-        self._category = value
 
     @property
     def amount(self):
