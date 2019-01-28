@@ -1,5 +1,6 @@
 import BudgetValue as BV
 import rx
+import TM_CommonPy as TM  # noqa
 
 
 class AddStreamPair():
@@ -71,7 +72,10 @@ class TotalStream_Inheritable():
                 value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
-        self.total_stream = self._amountStream_stream.scan(  # getting AddStreamPair
+        self.total_stream = rx.subjects.BehaviorSubject(0)  # can probably make it a regular stream when there is no Refresh()
+        self._amountStream_stream.filter(  # filter out BalanceEntry
+            lambda cAddStreamPair: cAddStreamPair.stream != self.total_stream
+        ).scan(  # getting AddStreamPair
             __AccumulateDiffStreams,
             dict()
         ).map(  # getting dict of amountStreams:diffStreams
@@ -79,14 +83,14 @@ class TotalStream_Inheritable():
         ).switch_map(  # getting collection of difference streams
             __TryMerge
         ).scan(  # getting merged difference stream
-            lambda accumulator, value: accumulator + value,
+            lambda accumulator, value: BV.MakeValid_Money(accumulator + value),
             0
-        ).publish().ref_count()
+        ).publish().ref_count().subscribe(self.total_stream)
         self.total_stream.subscribe()
         self.total = 0
 
         def SetTotal(self, total):
-            self.total = BV.MakeValid_Money(total)
+            self.total = total
         self.total_stream.subscribe(lambda total: SetTotal(self, total))
 
 
@@ -102,6 +106,7 @@ class BalanceEntry():
     def __init__(self, parent):
         self.parent = parent
         self._category = self.parent.vModel.Categories["<Default Category>"]
+        self._amount_stream = self.parent.total_stream
 
     @property
     def amount(self):

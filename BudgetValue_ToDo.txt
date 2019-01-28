@@ -7,6 +7,7 @@ Spendables
 	Simplify
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
 SpendingHistory-Dispose removed column subscriptions
+SpendingHistory-Highlighting
 ---------------------------------------------------------- Things I'm currently working on
 SpendingHistory-make totals observable
 ---------------------------------------------------------- Things I've done

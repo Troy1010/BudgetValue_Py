@@ -15,21 +15,16 @@ class SpendingHistory():
         self.cColumnNames = ["Category", "Timestamp", "Title", "Amount", "Description"]
         self.ObserveUpdatedCategory = rx.subjects.Subject()
         self.update_stream = rx.subjects.Subject()
-        self.categoryUpdate_stream = self.update_stream.filter(
-            lambda cArgs: cArgs['columnName'] == 'Category'
-        ).map(
-            lambda cArgs: {'old_category': self.vModel.Categories[cArgs['old_value']], 'new_category': self.vModel.Categories[cArgs['new_value']]}
-        )
         # Determine cCategoryTotalStreams
         self.cCategoryTotalStreams = dict()
         for categoryName in self.vModel.Categories.keys():
-            self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(self.GetTotalOfAmountsOfCategory(categoryName))
+            self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(self._GetTotalOfAmountsOfCategory(categoryName))
         # stream updates to cCategoryTotalStreams
 
         def RedoTotals(self, cArgs):
             if cArgs['columnName'] == "Category":
-                self.cCategoryTotalStreams[cArgs['old_value']].on_next(self.GetTotalOfAmountsOfCategory(cArgs['old_value']))
-                self.cCategoryTotalStreams[cArgs['new_value']].on_next(self.GetTotalOfAmountsOfCategory(cArgs['new_value']))
+                self.cCategoryTotalStreams[cArgs['old_value']].on_next(self._GetTotalOfAmountsOfCategory(cArgs['old_value']))
+                self.cCategoryTotalStreams[cArgs['new_value']].on_next(self._GetTotalOfAmountsOfCategory(cArgs['new_value']))
         self.update_stream.subscribe(lambda cArgs: RedoTotals(self, cArgs))
 
     def Import(self, sFilePath):
@@ -53,7 +48,7 @@ class SpendingHistory():
         sheet.to_sql(name, self.vModel.connection, index=True)
         self.vModel.connection.commit()
 
-    def GetTotalOfAmountsOfCategory(self, categoryName):
+    def _GetTotalOfAmountsOfCategory(self, categoryName):
         categoryCursor = self.vModel.connection.cursor()
         try:
             categoryCursor.execute("SELECT category FROM 'SpendingHistory'")

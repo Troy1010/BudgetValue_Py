@@ -13,7 +13,7 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         #
-        self.vModel.SpendingHistory.categoryUpdate_stream.subscribe(lambda cCategoryPair: self.Refresh())
+        # self.vModel.SpendingHistory.categoryUpdate_stream.subscribe(lambda cCategoryPair: self.Refresh())
         #
         self.dBalance = Decimal(0)
         #
@@ -24,11 +24,16 @@ class Table(TM.tk.TableFrame):
         self.vModel.PaycheckPlan.total_stream.subscribe(lambda total: ShowNewNetWorthTotal(self, total))
 
     def Refresh(self):
+        #print("Refresh! Called by:"+TM.FnName(1))
         # remove old
         for child in BV.GetAllChildren(self):
             child.grid_forget()
             child.destroy()
+        if hasattr(self, 'cDisposables'):
+            for disposable in self.cDisposables:
+                disposable.dispose()
         #
+        self.cDisposables = list()
         row = 0
         # Column Header
         WF.MakeHeader(self, (row, 0), text="Category")
@@ -57,16 +62,15 @@ class Table(TM.tk.TableFrame):
                     bEditableState = True
                     if category.name == "<Default Category>":
                         bEditableState = False
-                    w = WF.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount, bEditableState=bEditableState)
+                    w = WF.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name]._amount_stream, bEditableState=bEditableState)
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
                     w.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                     bMadeEntry = True
             # Spent
-            dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category.name)
-            if dSpendingHistoryTotal:
-                WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
+            if self.vModel.SpendingHistory.cCategoryTotalStreams[category.name].value:
+                w = WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=self.vModel.SpendingHistory.cCategoryTotalStreams[category.name])
                 bMadeEntry = True
             # Budgeted
             dSpendable = self.vModel.GetBudgetedAmount(category)
@@ -166,5 +170,4 @@ class Table(TM.tk.TableFrame):
     def SaveCellToModel(self, cell):
         iColumn = cell.column - 1
         categoryName = self.GetCell(cell.row, 0).text
-        self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = 0 if cell.text == "" else cell.text
-        self.Refresh()
+        self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = cell.text

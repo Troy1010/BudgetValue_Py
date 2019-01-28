@@ -1,6 +1,7 @@
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
 from . import Fonts
+import rx
 
 
 def MakeX(self, cRowColumnPair, command):
@@ -40,7 +41,17 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
     w = TM.tk.Entry(self, font=font, width=15, justify=justify,
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
-    w.text = text
+    # text
+    if isinstance(text, (rx.subjects.BehaviorSubject, rx.Observable)):
+        def AssignText(w, value):
+            try:
+                w.text = value
+            except tk.TclError:  # cell no longer exists
+                pass
+        text.subscribe(lambda value, w=w: AssignText(w, value))
+    else:
+        w.text = text
+    #
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
     w.bind('<Escape>', lambda event: self.FocusNothing())
     if bEditableState:
