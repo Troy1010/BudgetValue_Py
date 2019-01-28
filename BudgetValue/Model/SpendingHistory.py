@@ -5,15 +5,34 @@ import pandas as pd
 import os
 from decimal import Decimal
 import rx
+import BudgetValue as BV
 
 
 class SpendingHistory():
     def __init__(self, vModel):
+        assert(isinstance(vModel, BV.Model.Model))
         self.vModel = vModel
+        self.cColumnNames = ["Category", "Timestamp", "Title", "Amount", "Description"]
         self.ObserveUpdatedCategory = rx.subjects.Subject()
+        self.update_stream = rx.subjects.Subject()
+        self.categoryUpdate_stream = self.update_stream.filter(
+            lambda cArgs: cArgs['columnName'] == 'Category'
+        ).map(
+            lambda cArgs: {'old_category': self.vModel.Categories[cArgs['old_value']], 'new_category': self.vModel.Categories[cArgs['new_value']]}
+        )
+        # Determine cCategoryTotalStreams
+        self.cCategoryTotalStreams = dict()
+        for categoryName in self.vModel.Categories.keys():
+            self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(self.GetTotalOfAmountsOfCategory(categoryName))
+        # stream updates to cCategoryTotalStreams
+
+        def RedoTotals(self, cArgs):
+            if cArgs['columnName'] == "Category":
+                self.cCategoryTotalStreams[cArgs['old_value']].on_next(self.GetTotalOfAmountsOfCategory(cArgs['old_value']))
+                self.cCategoryTotalStreams[cArgs['new_value']].on_next(self.GetTotalOfAmountsOfCategory(cArgs['new_value']))
+        self.update_stream.subscribe(lambda cArgs: RedoTotals(self, cArgs))
 
     def Import(self, sFilePath):
-        columns = ["Category", "Timestamp", "Title", "Amount", "Description"]
         # Determine data
         data = []
         extension = os.path.splitext(sFilePath)[1][1:]
@@ -25,7 +44,7 @@ class SpendingHistory():
             BVLog.debug("Unrecognized file extension:" + extension)
             return
         # Write to database
-        sheet = pd.DataFrame(columns=columns, data=data)
+        sheet = pd.DataFrame(columns=self.cColumnNames, data=data)
         name = "SpendingHistory"
         try:
             self.vModel.connection.execute("DROP TABLE " + name)
@@ -34,7 +53,7 @@ class SpendingHistory():
         sheet.to_sql(name, self.vModel.connection, index=True)
         self.vModel.connection.commit()
 
-    def GetTotalOfAmountsOfCategory(self, category):
+    def GetTotalOfAmountsOfCategory(self, categoryName):
         categoryCursor = self.vModel.connection.cursor()
         try:
             categoryCursor.execute("SELECT category FROM 'SpendingHistory'")
@@ -48,8 +67,8 @@ class SpendingHistory():
         cCategoryNames = [x[0] for x in categoryCursor]
         cAmounts = [x[0] for x in amountCursor]
         dTotal = Decimal(0)
-        for categoryName, amount in zip(cCategoryNames, cAmounts):
-            if categoryName == str(category.name):
+        for categoryName_iter, amount in zip(cCategoryNames, cAmounts):
+            if categoryName_iter == str(categoryName):
                 dTotal += Decimal(str(amount))
         return dTotal
 
@@ -68,15 +87,34 @@ class SpendingHistory():
             header = []
         return header
 
-    def Update(self, cRowColumnPair, value):
+    def GetCellValue(self, row, columnName):
+        cursor = self.GetTable()
+        cursor.execute(
+            """ SELECT """ + columnName + """
+                FROM 'SpendingHistory'
+                WHERE `index` = ?
+                """,
+            [row]
+        )
+        return cursor.fetchone()[0]
+
+    def Update(self, row, columnName, value):
+        assert(columnName in self.cColumnNames)
+        old_value = self.GetCellValue(row, columnName)
         cursor = self.GetTable()
         cursor.execute(
             """ UPDATE 'SpendingHistory'
-                SET """ + str(cRowColumnPair[1]) + """ = ?
+                SET """ + columnName + """ = ?
                 WHERE `index` = ?
                 """,
-            [value, cRowColumnPair[0]]
+            [value, row]
         )
         self.vModel.connection.commit()
-        if str(cRowColumnPair[1]) == "Category":
+        if str(columnName) == "Category":
             self.ObserveUpdatedCategory.on_next(self.vModel.Categories[value])
+        self.update_stream.on_next({
+            "row": row,
+            "columnName": columnName,
+            "new_value": value,
+            "old_value": old_value,
+        })

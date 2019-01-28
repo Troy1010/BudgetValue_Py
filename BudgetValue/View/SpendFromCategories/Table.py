@@ -47,7 +47,7 @@ class Table(tk.Canvas):
             pass
 
     def SelectCategory(self, vCategory, cell):
-        self.Update((cell.grid_info()['row'], "Category"), vCategory.name)
+        self.Update(cell.grid_info()['row'], "Category", vCategory.name)
 
     def onFrameConfigure(self):
         '''Reset the scroll region to encompass the inner frame'''
@@ -56,13 +56,11 @@ class Table(tk.Canvas):
     def onMousewheel(self, event):
         self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    def Update(self, cRowColumnPair, value):
-        self.vModel.SpendingHistory.Update(cRowColumnPair, value)
-        if isinstance(cRowColumnPair[1], str):
-            column = self.vModel.SpendingHistory.GetHeader()[1:].index(cRowColumnPair[1])  # View's table is missing the index column
-        else:
-            column = cRowColumnPair[1]
-        cell = self.vTableWindow.grid_slaves(cRowColumnPair[0], column)[0]
+    def Update(self, row, columnName, value):
+        self.vModel.SpendingHistory.Update(row, columnName, value)
+        if isinstance(columnName, str):
+            iColumn = self.vModel.SpendingHistory.GetHeader()[1:].index(columnName)  # View's table is missing the index column
+        cell = self.vTableWindow.grid_slaves(row, iColumn)[0]
         cell.config(state="normal")
         cell.delete("1.0", tk.END)
         cell.insert(1.0, value)

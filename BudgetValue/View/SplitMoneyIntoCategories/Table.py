@@ -13,7 +13,7 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         #
-        self.vModel.SpendingHistory.ObserveUpdatedCategory.subscribe(lambda category: self.Refresh())
+        self.vModel.SpendingHistory.categoryUpdate_stream.subscribe(lambda cCategoryPair: self.Refresh())
         #
         self.dBalance = Decimal(0)
         #
@@ -64,7 +64,7 @@ class Table(TM.tk.TableFrame):
                     w.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                     bMadeEntry = True
             # Spent
-            dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category)
+            dSpendingHistoryTotal = self.vModel.SpendingHistory.GetTotalOfAmountsOfCategory(category.name)
             if dSpendingHistoryTotal:
                 WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=str(dSpendingHistoryTotal))
                 bMadeEntry = True
