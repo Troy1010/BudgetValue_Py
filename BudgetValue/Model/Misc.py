@@ -50,7 +50,7 @@ class List_AmountStreamStream(list):
         super().append(value)
 
     def __delitem__(self, key):
-        if key in self and hasattr(self[key], 'amount_stream'):
+        if hasattr(self[key], 'amount_stream'):  # key in self fails while self[key] works, hm.
             self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream))
         super().__delitem__(key)
 
