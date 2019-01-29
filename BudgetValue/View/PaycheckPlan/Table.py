@@ -51,7 +51,7 @@ class Table(TM.tk.TableFrame):
                 self.MakeEntry_Money((row, 3), text=amount_stream)
                 self.MakeRowValid(row)
             else:
-                bEditableState = amount_stream is not self.vModel.PaycheckPlan.total_stream
+                bEditableState = category.name != "<Default Category>"
                 self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
             row += 1
 

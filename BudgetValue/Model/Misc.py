@@ -18,8 +18,8 @@ class Dict_AmountStreamStream(dict):
         # if we have an old value and it isn't the new value, remove old value
         if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
             self._amountStream_stream.on_next(AddStreamPair(False, self[key].amount_stream))
-        # if new value isn't the old value, add that new value
-        if hasattr(value, 'amount_stream') and (key not in self or self[key] != value):
+        # if new value isn't the old value and new value isn't a BalanceEntry, add that new value
+        if hasattr(value, 'amount_stream') and (key not in self or self[key] != value) and not isinstance(value, BalanceEntry):
             self._amountStream_stream.on_next(AddStreamPair(True, value.amount_stream))
         super().__setitem__(key, value)
 
@@ -39,12 +39,12 @@ class List_AmountStreamStream(list):
         if key in self and self[key] != value:
             if hasattr(self[key], 'amount_stream'):
                 self._amountStream_stream.on_next(AddStreamPair(False, self[key].amount_stream))
-            if hasattr(value, 'amount_stream'):
+            if hasattr(value, 'amount_stream') and not isinstance(value, BalanceEntry):
                 self._amountStream_stream.on_next(AddStreamPair(True, value.amount_stream))
         super().__setitem__(key, value)
 
     def append(self, value):
-        if hasattr(value, 'amount_stream'):
+        if hasattr(value, 'amount_stream') and not isinstance(value, BalanceEntry):
             self._amountStream_stream.on_next(AddStreamPair(True, value.amount_stream))
         super().append(value)
 
@@ -73,9 +73,7 @@ class TotalStream_Inheritable():
                 del accumulator[value.stream]
             return accumulator
         self.total_stream = rx.subjects.BehaviorSubject(0)  # can probably make it a regular stream when there is no Refresh()
-        self._amountStream_stream.filter(  # filter out BalanceEntry
-            lambda cAddStreamPair: cAddStreamPair.stream != self.total_stream
-        ).scan(  # getting AddStreamPair
+        self._amountStream_stream.scan(  # getting AddStreamPair
             __AccumulateDiffStreams,
             dict()
         ).map(  # getting dict of amountStreams:diffStreams
@@ -106,11 +104,14 @@ class BalanceEntry():
     def __init__(self, parent):
         self.parent = parent
         self._category = self.parent.vModel.Categories["<Default Category>"]
-        self.amount_stream = self.parent.total_stream
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
+        self.parent.total_stream.map(
+            lambda total: -total
+        ).subscribe(self.amount_stream)  # FIX: Is this subscription leaking?
 
     @property
     def amount(self):
-        return -self.parent.total
+        return self.amount_stream.value
 
     @property
     def category(self):
