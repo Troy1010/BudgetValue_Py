@@ -46,9 +46,7 @@ class Table(TM.tk.TableFrame):
             # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
                 if category.name in split_money_history_column:
-                    bEditableState = True
-                    if category.name == "<Default Category>":
-                        bEditableState = False
+                    bEditableState = category.name != "<Default Category>"
                     w = WF.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount_stream, bEditableState=bEditableState)
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
