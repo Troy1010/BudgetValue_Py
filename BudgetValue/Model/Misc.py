@@ -72,7 +72,7 @@ class TotalStream_Inheritable():
                 value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
-        self.total_stream = rx.subjects.BehaviorSubject(0)  # can probably make it a regular stream when there is no Refresh()
+        self.total_stream = rx.subjects.BehaviorSubject(0)
         self._amountStream_stream.scan(  # getting AddStreamPair
             __AccumulateDiffStreams,
             dict()
@@ -83,13 +83,7 @@ class TotalStream_Inheritable():
         ).scan(  # getting merged difference stream
             lambda accumulator, value: BV.MakeValid_Money(accumulator + value),
             0
-        ).publish().ref_count().subscribe(self.total_stream)
-        self.total_stream.subscribe()
-        self.total = 0
-
-        def SetTotal(self, total):
-            self.total = total
-        self.total_stream.subscribe(lambda total: SetTotal(self, total))
+        ).subscribe(self.total_stream)
 
 
 class List_TotalStream(TotalStream_Inheritable, List_AmountStreamStream):

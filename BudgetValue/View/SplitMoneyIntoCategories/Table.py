@@ -96,7 +96,7 @@ class Table(TM.tk.TableFrame):
                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
         self.vBalanceNum.ValidationHandler = BV.MakeValid_Money
         self.vBalanceNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        self.dBalance = self.vModel.NetWorth.total - dTotalSpendableAmount
+        self.dBalance = self.vModel.NetWorth.total_stream.value - dTotalSpendableAmount
         self.vBalanceNum.text = self.dBalance
         if self.dBalance != 0:
             self.vBalanceNum.config(readonlybackground="pink")

@@ -6,7 +6,6 @@ from . import Misc
 
 
 class SplitMoneyHistory(list):
-
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SplitMoneyHistory.pickle")
