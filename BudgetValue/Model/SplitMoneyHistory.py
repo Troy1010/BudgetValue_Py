@@ -18,7 +18,7 @@ class SplitMoneyHistory(list):
         self.Load()
 
     def RemoveColumn(self, iColumn):
-        for disposable in self.cDisposables[iColumn]:
+        for disposable in self.cDisposables[iColumn].values():
             disposable.dispose()
         del self.cDisposables[iColumn]
         del self[iColumn]
