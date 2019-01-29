@@ -11,7 +11,7 @@ class StreamInfo():
 
 
 class Dict_AmountStreamStream(dict):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self._amountStream_stream = rx.subjects.Subject()
 
@@ -31,7 +31,7 @@ class Dict_AmountStreamStream(dict):
 
 
 class List_AmountStreamStream(list):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self._amountStream_stream = rx.subjects.Subject()
 
@@ -62,8 +62,8 @@ class DiffStreamCategoryNamePair():
 
 
 class DiffStreams_Inheritable():
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         def __AccumulateDiffStreams(accumulator, value):
             assert(isinstance(value, StreamInfo))
@@ -77,12 +77,13 @@ class DiffStreams_Inheritable():
         self._diffStreamCollection_stream = self._amountStream_stream.scan(  # getting StreamInfo
             __AccumulateDiffStreams,
             dict()
-        )
+        ).publish().ref_count()
 
 
 class CategoryTotalStreams_Inheritable():
-    def __init__(self):
-        super().__init__()
+    def __init__(self, vModel, *args, **kwargs):
+        super().__init__(vModel, *args, **kwargs)
+        self.vModel = vModel
 
         def __TryMerge(cStreams):
             if not cStreams:  # all streams are empty
@@ -90,43 +91,35 @@ class CategoryTotalStreams_Inheritable():
             else:
                 return rx.Observable.merge(cStreams)
 
-        # # Determine cCategoryTotalStreams
-        # self.cCategoryTotalStreams = dict()
-        # for categoryName in self.vModel.Categories.keys():
-        #     self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(self._GetTotalOfAmountsOfCategory(categoryName))
-        # # stream updates to cCategoryTotalStreams
-        # for categoryName, categoryTotal_stream in self.cCategoryTotalStreams.items():
-        #     self._amountStream_stream.filter(  # getting StreamInfo
-        #         lambda vStreamInfo, categoryName=categoryName: vStreamInfo.categoryName == categoryName
-        #     ).scan(  # getting StreamInfo of this category
-        #         __AccumulateDiffStreams,
-        #         dict()
-        #     ).switch_map(  # getting collection of difference streams
-        #         __TryMerge
-        #     ).scan(  # getting merged difference stream
-        #         lambda accumulator, value: BV.MakeValid_Money(accumulator + value),
-        #         0
-        #     ).subscribe(self.total_stream)
+        # Determine cCategoryTotalStreams
+        self.cCategoryTotalStreams = dict()
+        for categoryName in self.vModel.Categories.keys():
+            self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(0)
+        # stream updates to cCategoryTotalStreams
+        for categoryName, categoryTotal_stream in self.cCategoryTotalStreams.items():
+            self._diffStreamCollection_stream.map(  # getting dict of amountStreams:diffStreamCategoryNamePair
+                lambda cAmountToDiffStreamCategoryNamePair, categoryName=categoryName: (
+                    {k: v for k, v in cAmountToDiffStreamCategoryNamePair.items() if v.categoryName == categoryName}
+                )
+            ).map(  # getting dict of amountStreams:diffStreamCategoryNamePair for only this category
+                lambda cAmountToDiffStreamCategoryNamePair: [x.diffStream for x in cAmountToDiffStreamCategoryNamePair.values()]
+            ).switch_map(  # getting collection of difference streams
+                __TryMerge
+            ).scan(  # getting merged difference stream
+                lambda accumulator, value: BV.MakeValid_Money(accumulator + value),
+                0
+            ).subscribe(categoryTotal_stream)
 
 
 class TotalStream_Inheritable():
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         def __TryMerge(cStreams):
             if not cStreams:  # all streams are empty
                 return rx.Observable.of(0)
             else:
                 return rx.Observable.merge(cStreams)
-
-        def __AccumulateDiffStreams(accumulator, value):
-            assert(isinstance(value, StreamInfo))
-            if value.bAdd:
-                accumulator[value.stream] = value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0])
-            else:
-                value.stream.on_next(0)
-                del accumulator[value.stream]
-            return accumulator
         self.total_stream = rx.subjects.BehaviorSubject(0)
         self._diffStreamCollection_stream.map(  # getting dict of amountStreams:diffStreamCategoryNamePair
             lambda cAmountToDiffStreamCategoryNamePair: [x.diffStream for x in cAmountToDiffStreamCategoryNamePair.values()]

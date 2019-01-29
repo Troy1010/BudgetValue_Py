@@ -9,9 +9,18 @@ class SplitMoneyHistory(list):
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SplitMoneyHistory.pickle")
+        self.cDisposables = list()
+        # Determine cCategoryTotalStreams
+        self.cCategoryTotalStreams = dict()
+        for categoryName in self.vModel.Categories.keys():
+            self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(0)
+        # Load
         self.Load()
 
     def RemoveColumn(self, iColumn):
+        for disposable in self.cDisposables[iColumn]:
+            disposable.dispose()
+        del self.cDisposables[iColumn]
         del self[iColumn]
 
     def RemoveEntry(self, iColumn, categoryName):
@@ -19,6 +28,10 @@ class SplitMoneyHistory(list):
 
     def AddColumn(self):
         self.append(SplitMoneyHistoryColumn(self.vModel))
+        self.cDisposables.append(dict())
+        for categoryName, categoryTotal_stream in self.cCategoryTotalStreams.items():
+            disposable = self[-1].cCategoryTotalStreams[categoryName].subscribe(lambda columnCategoryTotal: categoryTotal_stream.on_next(categoryTotal_stream.value + columnCategoryTotal))
+            self.cDisposables[-1][categoryName] = disposable
 
     def AddEntry(self, iColumn, categoryName, amount=0):
         self[iColumn][categoryName] = SplitMoneyHistoryEntry()
@@ -54,9 +67,9 @@ class SplitMoneyHistory(list):
                     setattr(self[-1][categoryName], k, v)
 
 
-class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
+class SplitMoneyHistoryColumn(Misc.CategoryTotalStreams_Inheritable, Misc.Dict_TotalStream):
     def __init__(self, vModel):
-        super().__init__()
+        super().__init__(vModel)
         self.vModel = vModel
         self["<Default Category>"] = Misc.BalanceEntry(self)
 
