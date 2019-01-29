@@ -57,10 +57,10 @@ class Table(TM.tk.TableFrame):
                 w = WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=self.vModel.SpendingHistory.cCategoryTotalStreams[category.name])
                 bMadeEntry = True
             # Budgeted
-            dSpendable = self.vModel.GetBudgetedAmount(category)
+            dSpendable = self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name].value
             if (dSpendable != 0 or bMadeEntry) and category.type != BV.Model.CategoryType.income:
                 dTotalSpendableAmount += dSpendable
-                WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=str(dSpendable))
+                WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name])
                 bMadeEntry = True
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):

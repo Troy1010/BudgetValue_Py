@@ -3,7 +3,6 @@ import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import sqlite3
 import os
-from decimal import Decimal
 
 
 class Model():
@@ -18,12 +17,4 @@ class Model():
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.NetWorth = BV.Model.NetWorth(self)
         self.SplitMoneyHistory = BV.Model.SplitMoneyHistory(self)
-
-    def GetBudgetedAmount(self, category):
-        dSpendableAmount = Decimal(0)
-        # SplitMoneyHistory total for this category
-        dSpendableAmount += self.SplitMoneyHistory.cCategoryTotalStreams[category.name].value
-        # Spent total for this category
-        dSpendableAmount += self.SpendingHistory.cCategoryTotalStreams[category.name].value
-        #
-        return dSpendableAmount
+        self.BudgetedSpendables = BV.Model.BudgetedSpendables(self)
