@@ -22,7 +22,8 @@ class SplitMoneyHistory(list):
         self.append(SplitMoneyHistoryColumn(self.vModel))
 
     def AddEntry(self, iColumn, categoryName, amount=0):
-        self[iColumn][categoryName] = SplitMoneyHistoryEntry(amount=amount)
+        self[iColumn][categoryName] = SplitMoneyHistoryEntry()
+        self[iColumn][categoryName].amount = amount
 
     def Save(self):
         data = list()
@@ -62,9 +63,8 @@ class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
 
 
 class SplitMoneyHistoryEntry():
-    def __init__(self, amount=0):
+    def __init__(self):
         self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.amount = amount  # Does using this adjust the total_stream properly?
 
     @property
     def amount(self):

@@ -45,10 +45,9 @@ class NetWorth(List_TotalStream):
 
 
 class NetWorthRow():
-    def __init__(self, name=None, amount=0):
+    def __init__(self, name=None):
         self.name = name
         self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.amount = amount
 
     @property
     def amount(self):

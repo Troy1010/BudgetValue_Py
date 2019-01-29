@@ -55,9 +55,8 @@ class PaycheckPlan(Misc.Dict_TotalStream):
 
 
 class PaycheckPlanRow():
-    def __init__(self, amount=0, period=None):
+    def __init__(self, period=None):
         self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.amount = amount
         self.period = period
 
     @property
