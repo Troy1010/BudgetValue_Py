@@ -51,7 +51,6 @@ class Table(TM.tk.TableFrame):
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
-                    w.bind("<FocusOut>", lambda event: self.Refresh(), add="+")
                     bMadeEntry = True
             # Spent
             if self.vModel.SpendingHistory.cCategoryTotalStreams[category.name].value:
