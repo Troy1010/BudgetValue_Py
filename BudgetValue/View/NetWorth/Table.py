@@ -1,7 +1,6 @@
 import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
-from BudgetValue.View import Fonts
 from BudgetValue.View import WidgetFactories as WF
 
 
@@ -11,7 +10,6 @@ class Table(TM.tk.TableFrame):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        self.vModel.NetWorth.total_stream.subscribe(lambda total: None if not hasattr(self, 'vTotalNum') else setattr(self.vTotalNum, 'text', total))
 
     def Refresh(self):
         # remove old
@@ -28,20 +26,15 @@ class Table(TM.tk.TableFrame):
         for net_worth_row in self.vModel.NetWorth:
             assert isinstance(net_worth_row, BV.Model.NetWorthRow)
             self.MakeEntry((row, 0), text=net_worth_row.name)
-            w = self.MakeEntry((row, 1), text=net_worth_row.amount)
+            w = self.MakeEntry((row, 1), text=net_worth_row.amount_stream)
             w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
             WF.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
         # Total
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
         row += 1
-        vTotal = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
-                          relief='ridge', background='SystemButtonFace', text="Total")
-        vTotal.grid(row=row, column=0, columnspan=1, sticky="ewn")
-        self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
-                                     borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vTotalNum.grid(row=row, column=1, sticky="ewns")
-        self.vTotalNum.text = self.vModel.NetWorth.total
+        WF.MakeLable(self, (row, 0), text="Total")
+        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.NetWorth.total_stream)
         row += 1
 
     def RemoveRow(self, iRow):

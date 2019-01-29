@@ -2,6 +2,13 @@ import TM_CommonPy as TM  # noqa
 import tkinter as tk
 from . import Fonts
 import rx
+from .Skin import vSkin
+
+
+def MakeLable(self, cRowColumnPair, text=None, columnspan=1):
+    w = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
+                 relief='ridge', background=vSkin.HEADER, text="Total")
+    w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ewn")
 
 
 def MakeX(self, cRowColumnPair, command):
@@ -12,20 +19,20 @@ def MakeX(self, cRowColumnPair, command):
 
 def MakeHeader(self, cRowColumnPair, text=None):
     w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=15, height=1, relief='ridge',
-                 background='SystemButtonFace', text=text)
+                 background=vSkin.HEADER, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
     return w
-
-
-def MakeEntry_ReadOnly(*args, **kwargs):
-    kwargs["bEditableState"] = False
-    return MakeEntry(*args, **kwargs)
 
 
 def MakeRowHeader(*args, **kwargs):
     kwargs["bEditableState"] = False
     kwargs["justify"] = tk.LEFT
     kwargs["bBold"] = True
+    return MakeEntry(*args, **kwargs)
+
+
+def MakeEntry_ReadOnly(*args, **kwargs):
+    kwargs["bEditableState"] = False
     return MakeEntry(*args, **kwargs)
 
 

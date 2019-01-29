@@ -4,7 +4,6 @@ import TM_CommonPy as TM
 import BudgetValue as BV
 from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
-from BudgetValue.View.Skin import vSkin
 from BudgetValue.View import WidgetFactories as WF
 
 
@@ -40,7 +39,7 @@ class Table(TM.tk.TableFrame):
                 WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
             # generate row
-            amount = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount
+            amount_stream = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount_stream
             try:
                 period = self.vModel.PaycheckPlan[category.name].period
             except (AttributeError, KeyError):
@@ -49,25 +48,22 @@ class Table(TM.tk.TableFrame):
             if category.IsSpendable():
                 self.MakeEntry_Money((row, 1))
                 self.MakeEntry((row, 2), text=period)
-                self.MakeEntry_Money((row, 3), text=amount)
+                self.MakeEntry_Money((row, 3), text=amount_stream)
                 self.MakeRowValid(row)
             else:
-                if category.name == "<Default Category>":
-                    w = WF.MakeEntry_ReadOnly(self, (row, 3), text=amount, background=vSkin.READ_ONLY)
-                else:
-                    w = self.MakeEntry_Money((row, 3), text=amount)
-                if self.GetCategoryOfRow(w.row).name == "<Default Category>":
-                    self.vTotalNum = w
+                bEditableState = amount_stream is not self.vModel.PaycheckPlan.total_stream
+                self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
             row += 1
 
-    def MakeEntry(self, cRowColumnPair, text=None):
-        w = WF.MakeEntry(self, cRowColumnPair, text=text)
-        w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
-        w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
+    def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True):
+        w = WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState)
+        if bEditableState:
+            w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
+            w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
         return w
 
-    def MakeEntry_Money(self, cRowColumnPair, text=None):
-        w = self.MakeEntry(cRowColumnPair, text)
+    def MakeEntry_Money(self, cRowColumnPair, text=None, bEditableState=True):
+        w = self.MakeEntry(cRowColumnPair, text, bEditableState)
         w.ValidationHandler = BV.MakeValid_Money
         return w
 
