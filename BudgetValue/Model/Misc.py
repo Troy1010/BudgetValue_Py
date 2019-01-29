@@ -18,6 +18,7 @@ class Dict_AmountStreamStream(dict):
     def __setitem__(self, key, value):
         # if we have an old value and it isn't the new value, remove old value
         if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
+            self[key].amount_stream.on_next(0)
             self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key))
         # if new value isn't the old value and new value isn't a BalanceEntry, add that new value
         if hasattr(value, 'amount_stream') and (key not in self or self[key] != value) and not isinstance(value, BalanceEntry):
@@ -26,6 +27,7 @@ class Dict_AmountStreamStream(dict):
 
     def __delitem__(self, key):
         if key in self and hasattr(self[key], 'amount_stream'):
+            self[key].amount_stream.on_next(0)
             self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key))
         super().__delitem__(key)
 
@@ -39,6 +41,7 @@ class List_AmountStreamStream(list):
         # if value has amount_stream and value isn't old, remove the old and add the new
         if key in self and self[key] != value:
             if hasattr(self[key], 'amount_stream'):
+                self[key].amount_stream.on_next(0)
                 self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream))
             if hasattr(value, 'amount_stream') and not isinstance(value, BalanceEntry):
                 self._amountStream_stream.on_next(StreamInfo(True, value.amount_stream))
@@ -51,6 +54,7 @@ class List_AmountStreamStream(list):
 
     def __delitem__(self, key):
         if hasattr(self[key], 'amount_stream'):  # key in self fails while self[key] works, hm.
+            self[key].amount_stream.on_next(0)
             self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream))
         super().__delitem__(key)
 
@@ -70,7 +74,6 @@ class DiffStreams_Inheritable():
             if value.bAdd:
                 accumulator[value.stream] = DiffStreamCategoryNamePair(value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]), value.categoryName)
             else:
-                value.stream.on_next(0)
                 del accumulator[value.stream]
             return accumulator
 
