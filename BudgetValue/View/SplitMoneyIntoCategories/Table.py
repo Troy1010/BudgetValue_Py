@@ -13,15 +13,7 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         #
-        # self.vModel.SpendingHistory.categoryUpdate_stream.subscribe(lambda cCategoryPair: self.Refresh())
-        #
         self.dBalance = Decimal(0)
-        #
-
-        def ShowNewNetWorthTotal(self, total):
-            if hasattr(self, 'vTotalNum'):
-                self.vNetWorthNum.text = total
-        self.vModel.PaycheckPlan.total_stream.subscribe(lambda total: ShowNewNetWorthTotal(self, total))
 
     def Refresh(self):
         # remove old
@@ -91,15 +83,12 @@ class Table(TM.tk.TableFrame):
         self.vTotalNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
         self.vTotalNum.text = dTotalSpendableAmount
         row += 1
-        # NetWorth (to compare)
+        # NetWorth
         vNetWorth = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
                              relief='ridge', background='SystemButtonFace', text="Net Worth")
         vNetWorth.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
-        self.vNetWorthNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
-                                        borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vNetWorthNum.ValidationHandler = BV.MakeValid_Money
-        self.vNetWorthNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        self.vNetWorthNum.text = self.vModel.NetWorth.total
+        WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.NetWorth.total_stream, justify=tk.CENTER)
+        #
         row += 1
         # Balance
         vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
