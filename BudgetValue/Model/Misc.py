@@ -16,16 +16,16 @@ class Dict_AmountStreamStream(dict):
 
     def __setitem__(self, key, value):
         # if we have an old value and it isn't the new value, remove old value
-        if key in self and hasattr(self[key], '_amount_stream') and self[key] != value:
-            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key].amount_stream))
         # if new value isn't the old value, add that new value
-        if hasattr(value, '_amount_stream') and (key not in self or self[key] != value):
-            self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        if hasattr(value, 'amount_stream') and (key not in self or self[key] != value):
+            self._amountStream_stream.on_next(AddStreamPair(True, value.amount_stream))
         super().__setitem__(key, value)
 
     def __delitem__(self, key):
-        if key in self and hasattr(self[key], '_amount_stream'):
-            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        if key in self and hasattr(self[key], 'amount_stream'):
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key].amount_stream))
         super().__delitem__(key)
 
 
@@ -35,22 +35,22 @@ class List_AmountStreamStream(list):
         self._amountStream_stream = rx.subjects.Subject()
 
     def __setitem__(self, key, value):
-        # if value has _amount_stream and value isn't old, remove the old and add the new
+        # if value has amount_stream and value isn't old, remove the old and add the new
         if key in self and self[key] != value:
-            if hasattr(self[key], '_amount_stream'):
-                self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
-            if hasattr(value, '_amount_stream'):
-                self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+            if hasattr(self[key], 'amount_stream'):
+                self._amountStream_stream.on_next(AddStreamPair(False, self[key].amount_stream))
+            if hasattr(value, 'amount_stream'):
+                self._amountStream_stream.on_next(AddStreamPair(True, value.amount_stream))
         super().__setitem__(key, value)
 
     def append(self, value):
-        if hasattr(value, '_amount_stream'):
-            self._amountStream_stream.on_next(AddStreamPair(True, value._amount_stream))
+        if hasattr(value, 'amount_stream'):
+            self._amountStream_stream.on_next(AddStreamPair(True, value.amount_stream))
         super().append(value)
 
     def __delitem__(self, key):
-        if key in self and hasattr(self[key], '_amount_stream'):
-            self._amountStream_stream.on_next(AddStreamPair(False, self[key]._amount_stream))
+        if key in self and hasattr(self[key], 'amount_stream'):
+            self._amountStream_stream.on_next(AddStreamPair(False, self[key].amount_stream))
         super().__delitem__(key)
 
 
@@ -106,7 +106,7 @@ class BalanceEntry():
     def __init__(self, parent):
         self.parent = parent
         self._category = self.parent.vModel.Categories["<Default Category>"]
-        self._amount_stream = self.parent.total_stream
+        self.amount_stream = self.parent.total_stream
 
     @property
     def amount(self):

@@ -56,18 +56,17 @@ class PaycheckPlan(Misc.Dict_TotalStream):
 
 class PaycheckPlanRow():
     def __init__(self, amount=0, period=None):
-        self._amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
         self.amount = amount
         self.period = period
 
     @property
     def amount(self):
-        return self._amount_stream.value
+        return self.amount_stream.value
 
     @amount.setter
     def amount(self, value):
-        if BV.MakeValid_Money(value) != self._amount_stream.value:
-            self._amount_stream.on_next(BV.MakeValid_Money(value))
+        self.amount_stream.on_next(BV.MakeValid_Money(value))
 
     @property
     def period(self):

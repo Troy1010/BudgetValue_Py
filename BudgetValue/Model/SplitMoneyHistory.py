@@ -63,13 +63,13 @@ class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
 
 class SplitMoneyHistoryEntry():
     def __init__(self, amount=0):
-        self._amount_stream = rx.subjects.BehaviorSubject(0)
-        self.amount = amount
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount = amount  # Does using this adjust the total_stream properly?
 
     @property
     def amount(self):
-        return self._amount_stream.value
+        return self.amount_stream.value
 
     @amount.setter
     def amount(self, value):
-        self._amount_stream.on_next(BV.MakeValid_Money(value))
+        self.amount_stream.on_next(BV.MakeValid_Money(value))

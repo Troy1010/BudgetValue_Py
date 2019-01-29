@@ -47,13 +47,13 @@ class NetWorth(List_TotalStream):
 class NetWorthRow():
     def __init__(self, name=None, amount=0):
         self.name = name
-        self._amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount_stream = rx.subjects.BehaviorSubject(0)
         self.amount = amount
 
     @property
     def amount(self):
-        return self._amount_stream.value
+        return self.amount_stream.value
 
     @amount.setter
     def amount(self, value):
-        self._amount_stream.on_next(BV.MakeValid_Money(value))
+        self.amount_stream.on_next(BV.MakeValid_Money(value))
