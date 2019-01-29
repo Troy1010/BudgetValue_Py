@@ -24,16 +24,11 @@ class Table(TM.tk.TableFrame):
         self.vModel.PaycheckPlan.total_stream.subscribe(lambda total: ShowNewNetWorthTotal(self, total))
 
     def Refresh(self):
-        #print("Refresh! Called by:"+TM.FnName(1))
         # remove old
         for child in BV.GetAllChildren(self):
             child.grid_forget()
             child.destroy()
-        if hasattr(self, 'cDisposables'):
-            for disposable in self.cDisposables:
-                disposable.dispose()
         #
-        self.cDisposables = list()
         row = 0
         # Column Header
         WF.MakeHeader(self, (row, 0), text="Category")

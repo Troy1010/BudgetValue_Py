@@ -30,6 +30,7 @@ def MakeRowHeader(*args, **kwargs):
 
 
 def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background='SystemButtonFace'):
+    text_ValueOrValueStream = text
     if bEditableState:
         state = "normal"
     else:
@@ -42,15 +43,15 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
     # text
-    if isinstance(text, (rx.subjects.BehaviorSubject, rx.Observable)):
+    if isinstance(text_ValueOrValueStream, rx.subjects.BehaviorSubject):
         def AssignText(w, value):
             try:
                 w.text = value
             except tk.TclError:  # cell no longer exists
                 pass
-        text.subscribe(lambda value, w=w: AssignText(w, value))
+        w.AddDisposable(text_ValueOrValueStream.subscribe(lambda value, w=w: AssignText(w, value)))
     else:
-        w.text = text
+        w.text = text_ValueOrValueStream
     #
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
     w.bind('<Escape>', lambda event: self.FocusNothing())
