@@ -7,6 +7,7 @@ class StreamInfo():
     def __init__(self, bAdd, stream, categoryName=None):
         self.bAdd = bAdd
         self.stream = stream
+        self.diff_stream = stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0])
         self.categoryName = categoryName
 
 

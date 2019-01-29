@@ -9,7 +9,6 @@ class SplitMoneyHistory(list):
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SplitMoneyHistory.pickle")
-        self.cDisposables = list()
         # Determine cCategoryTotalStreams
         self.cCategoryTotalStreams = dict()
         for categoryName in self.vModel.Categories.keys():
@@ -18,20 +17,14 @@ class SplitMoneyHistory(list):
         self.Load()
 
     def RemoveColumn(self, iColumn):
-        for disposable in self.cDisposables[iColumn].values():
-            disposable.dispose()
-        del self.cDisposables[iColumn]
+        self[iColumn].DisposeAll()
         del self[iColumn]
 
     def RemoveEntry(self, iColumn, categoryName):
         del self[iColumn][categoryName]
 
     def AddColumn(self):
-        self.append(SplitMoneyHistoryColumn(self.vModel))
-        self.cDisposables.append(dict())
-        for categoryName, categoryTotal_stream in self.cCategoryTotalStreams.items():
-            disposable = self[-1].cCategoryTotalStreams[categoryName].subscribe(lambda columnCategoryTotal: categoryTotal_stream.on_next(categoryTotal_stream.value + columnCategoryTotal))
-            self.cDisposables[-1][categoryName] = disposable
+        self.append(SplitMoneyHistoryColumn(self.vModel, self))
 
     def AddEntry(self, iColumn, categoryName, amount=0):
         self[iColumn][categoryName] = SplitMoneyHistoryEntry()
@@ -67,11 +60,36 @@ class SplitMoneyHistory(list):
                     setattr(self[-1][categoryName], k, v)
 
 
-class SplitMoneyHistoryColumn(Misc.CategoryTotalStreams_Inheritable, Misc.Dict_TotalStream):
-    def __init__(self, vModel):
+class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
+    def __init__(self, vModel, parent):
+        assert(isinstance(vModel, BV.Model.Model))
+        assert(isinstance(parent, SplitMoneyHistory))
         super().__init__(vModel)
         self.vModel = vModel
+        self.parent = parent
+        self.cDisposables = dict()
         self["<Default Category>"] = Misc.BalanceEntry(self)
+
+        def __SubscribeCategoryTotalStream(self, stream_info):
+            assert(isinstance(stream_info, BV.Model.Misc.StreamInfo))
+            if stream_info.bAdd:
+                disposable = stream_info.diff_stream.subscribe(
+                    lambda value: self.parent.cCategoryTotalStreams[stream_info.categoryName].on_next(
+                        self.parent.cCategoryTotalStreams[stream_info.categoryName].value+value
+                    )
+                )
+                self.cDisposables[stream_info.stream] = disposable
+            else:
+                self.cDisposables[stream_info.stream].dispose()
+                del self.cDisposables[stream_info.stream]
+
+        self._amountStream_stream.map(
+            lambda stream_info: __SubscribeCategoryTotalStream(self, stream_info)
+        ).subscribe()
+
+    def DisposeAll(self):
+        for disposable in self.cDisposables:
+            disposable.dispose()
 
 
 class SplitMoneyHistoryEntry():
