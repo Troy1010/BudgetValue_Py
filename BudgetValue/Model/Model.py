@@ -23,9 +23,6 @@ class Model():
         dSpendableAmount = Decimal(0)
         # SplitMoneyHistory total for this category
         dSpendableAmount += self.SplitMoneyHistory.cCategoryTotalStreams[category.name].value
-        # for split_money_history_column in self.SplitMoneyHistory:
-        #     if category.name in split_money_history_column:
-        #         dSpendableAmount += 0 if split_money_history_column[category.name].amount is None else split_money_history_column[category.name].amount
         # Spent total for this category
         dSpendableAmount += self.SpendingHistory.cCategoryTotalStreams[category.name].value
         #

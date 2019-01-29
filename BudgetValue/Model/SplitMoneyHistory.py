@@ -82,6 +82,7 @@ class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
             else:
                 self.cDisposables[stream_info.stream].dispose()
                 del self.cDisposables[stream_info.stream]
+        __SubscribeCategoryTotalStream(self, BV.Model.Misc.StreamInfo(True, self["<Default Category>"].amount_stream, "<Default Category>"))
 
         self._amountStream_stream.map(
             lambda stream_info: __SubscribeCategoryTotalStream(self, stream_info)
