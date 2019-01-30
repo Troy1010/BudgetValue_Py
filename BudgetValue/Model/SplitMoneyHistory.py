@@ -16,8 +16,11 @@ class SplitMoneyHistory(list):
         # Load
         self.Load()
 
+    def __delitem__(self, key):
+        self[key].destroy()
+        super().__delitem__(key)
+
     def RemoveColumn(self, iColumn):
-        self[iColumn].DisposeAll()
         del self[iColumn]
 
     def RemoveEntry(self, iColumn, categoryName):
@@ -68,7 +71,6 @@ class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
         self.vModel = vModel
         self.parent = parent
         self.cDisposables = dict()
-        self["<Default Category>"] = Misc.BalanceEntry(self)
 
         def __SubscribeCategoryTotalStream(self, stream_info):
             assert(isinstance(stream_info, BV.Model.Misc.StreamInfo))
@@ -80,16 +82,25 @@ class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
                 )
                 self.cDisposables[stream_info.stream] = disposable
             else:
-                self.cDisposables[stream_info.stream].dispose()
-                del self.cDisposables[stream_info.stream]
-        __SubscribeCategoryTotalStream(self, BV.Model.Misc.StreamInfo(True, self["<Default Category>"].amount_stream, "<Default Category>"))
-
-        self._amountStream_stream.map(
+                try:
+                    self.cDisposables[stream_info.stream].dispose()
+                    del self.cDisposables[stream_info.stream]
+                except KeyError:
+                    pass
+        # Whenever a stream is added, subscribe a category_total_stream to it
+        self.cDisposables[0] = self._amountStream_stream.subscribe(
             lambda stream_info: __SubscribeCategoryTotalStream(self, stream_info)
-        ).subscribe()
+        )
+        #
+        self["<Default Category>"] = Misc.BalanceEntry(self, self.total_stream)
+        __SubscribeCategoryTotalStream(self, BV.Model.Misc.StreamInfo(True, self["<Default Category>"].amount_stream, "<Default Category>"))
+        # FIX: The above command should be unnecessary, but BalanceEntry is currently filtered from _amount_stream
 
-    def DisposeAll(self):
-        for disposable in self.cDisposables:
+    def destroy(self):
+        # trigger __delitem__ for each key
+        self.clear()
+        # dispose all subscriptions
+        for disposable in self.cDisposables.values():
             disposable.dispose()
 
 

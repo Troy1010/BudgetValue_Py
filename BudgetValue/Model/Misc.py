@@ -17,6 +17,8 @@ class Dict_AmountStreamStream(dict):
         self._amountStream_stream = rx.subjects.Subject()
 
     def __setitem__(self, key, value):
+        # if key is <Default Category> and it isn't a BalanceEntry, a mistake has been made
+        assert(not (key == "<Default Category>" and not isinstance(value, BalanceEntry)))
         # if we have an old value and it isn't the new value, remove old value
         if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
             self[key].amount_stream.on_next(0)
@@ -31,6 +33,13 @@ class Dict_AmountStreamStream(dict):
             self[key].amount_stream.on_next(0)
             self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key))
         super().__delitem__(key)
+
+    def clear(self):
+        # make sure __delitem__ is triggered
+        for key in list(self.keys()):
+            del self[key]
+        #
+        super().clear()
 
 
 class List_AmountStreamStream(list):
@@ -133,7 +142,7 @@ class TotalStream_Inheritable():
         ).scan(  # getting merged difference stream
             lambda accumulator, value: BV.MakeValid_Money(accumulator + value),
             0
-        ).subscribe(self.total_stream)
+        ).publish().ref_count().subscribe(self.total_stream)
 
 
 class List_TotalStream(TotalStream_Inheritable, DiffStreams_Inheritable, List_AmountStreamStream):
@@ -145,11 +154,11 @@ class Dict_TotalStream(TotalStream_Inheritable, DiffStreams_Inheritable, Dict_Am
 
 
 class BalanceEntry():
-    def __init__(self, parent):
+    def __init__(self, parent, total_stream):
         self.parent = parent
         self._category = self.parent.vModel.Categories["<Default Category>"]
         self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.parent.total_stream.map(
+        total_stream.map(
             lambda total: -total
         ).subscribe(self.amount_stream)  # FIX: Is this subscription leaking?
 

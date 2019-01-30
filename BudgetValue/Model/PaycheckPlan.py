@@ -12,7 +12,7 @@ class PaycheckPlan(Misc.Dict_TotalStream):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
         self.Load()
-        self["<Default Category>"] = Misc.BalanceEntry(self)
+        self["<Default Category>"] = Misc.BalanceEntry(self, self.total_stream)
 
     def __setitem__(self, key, value):
         # Keys must be a category name
