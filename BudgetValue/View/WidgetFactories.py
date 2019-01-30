@@ -7,7 +7,7 @@ from .Skin import vSkin
 
 def MakeLable(self, cRowColumnPair, text=None, columnspan=1):
     w = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
-                 relief='ridge', background=vSkin.HEADER, text="Total")
+                 relief='ridge', background=vSkin.HEADER, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ewn")
 
 
