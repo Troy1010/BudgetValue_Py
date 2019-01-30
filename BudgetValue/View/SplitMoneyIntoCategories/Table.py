@@ -1,7 +1,6 @@
 import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
-from BudgetValue.View import Fonts
 from BudgetValue.View import WidgetFactories as WF
 
 
@@ -11,15 +10,16 @@ class Table(TM.tk.TableFrame):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        self.cDisposables = []
 
     def Refresh(self):
         # remove old
         for child in BV.GetAllChildren(self):
             child.grid_forget()
             child.destroy()
-        for disposable in self.cDisposables:
-            disposable.dispose()
+        if hasattr(self, 'cDisposables'):
+            for disposable in self.cDisposables:
+                disposable.dispose()
+        self.cDisposables = []
         # add new
         row = 0
         # Column Header
@@ -123,11 +123,6 @@ class Table(TM.tk.TableFrame):
         vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty():
                               BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
-
-    def MakeX(self, cRowColumnPair):
-        w = tk.Button(self, text="X", font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=3, relief='ridge',
-                      command=lambda self=self: self.RemoveRow(cRowColumnPair[0]))
-        w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
 
     def RemoveRow(self, iRow):
         self.vModel.NetWorth.RemoveRow(iRow-1)  # skip header
