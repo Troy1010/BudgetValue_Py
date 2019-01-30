@@ -70,7 +70,8 @@ class SplitMoneyIntoCategories(tk.Frame):
     def SplitPaycheck(self):
         self.vModel.SplitMoneyHistory.AddColumn()
         for categoryName, paycheckPlan_row in self.vModel.PaycheckPlan.items():
-            self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=paycheckPlan_row.amount)
+            if categoryName != "<Default Category>":
+                self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=paycheckPlan_row.amount)
         self.vTable.Refresh()
 
     def SplitNetWorth(self, amount):
