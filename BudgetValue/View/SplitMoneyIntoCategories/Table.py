@@ -34,7 +34,6 @@ class Table(TM.tk.TableFrame):
         row += 1
         # Data
         prev_type = None
-        self.cActiveCategories = list()
         for category in self.vModel.Categories.Select():
             bMadeEntry = False
             # make separation label if needed
@@ -62,7 +61,6 @@ class Table(TM.tk.TableFrame):
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):
                 WF.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
-                self.cActiveCategories.append(category)
             #
             row += 1
         # Black bar
