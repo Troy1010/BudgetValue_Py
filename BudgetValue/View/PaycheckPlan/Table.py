@@ -14,11 +14,6 @@ class Table(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
 
-        def ShowNewTotal(self):
-            if hasattr(self, 'vTotalNum'):
-                self.vTotalNum.text = self.vModel.PaycheckPlan["<Default Category>"].amount
-        self.vModel.PaycheckPlan.total_stream.subscribe(lambda total: ShowNewTotal(self))
-
     def Refresh(self):
         # remove old
         for child in BV.GetAllChildren(self):

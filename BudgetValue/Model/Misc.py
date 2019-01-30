@@ -75,7 +75,8 @@ class DiffStreams_Inheritable():
             if value.bAdd:
                 accumulator[value.stream] = DiffStreamCategoryNamePair(value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]), value.categoryName)
             else:
-                del accumulator[value.stream]
+                if value.stream in accumulator:
+                    del accumulator[value.stream]
             return accumulator
 
         self._diffStreamCollection_stream = self._amountStream_stream.scan(  # getting StreamInfo

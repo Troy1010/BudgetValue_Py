@@ -46,6 +46,10 @@ class Categories(dict):
             self[category.name] = category
 
     def Select(self, types=None, types_exclude=None):
+        if types is not None and not isinstance(types, list):
+            types = [types]
+        if types_exclude is not None and not isinstance(types_exclude, list):
+            types_exclude = [types_exclude]
         returning = self.values()
         if types:
             returning = [category for category in returning if category.type in types]

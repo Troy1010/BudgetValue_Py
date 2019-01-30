@@ -18,3 +18,4 @@ class Model():
         self.NetWorth = BV.Model.NetWorth(self)
         self.SplitMoneyHistory = BV.Model.SplitMoneyHistory(self)
         self.BudgetedSpendables = BV.Model.BudgetedSpendables(self)
+        self.Balance = BV.Model.Balance(self)

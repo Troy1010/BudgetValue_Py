@@ -2,25 +2,25 @@ import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import Fonts
-from decimal import Decimal
 from BudgetValue.View import WidgetFactories as WF
 
 
 class Table(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
-        tk.Frame.__init__(self, parent)
         assert isinstance(vModel, BV.Model.Model)
+        tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        #
-        self.dBalance = Decimal(0)
+        self.cDisposables = []
 
     def Refresh(self):
         # remove old
         for child in BV.GetAllChildren(self):
             child.grid_forget()
             child.destroy()
-        #
+        for disposable in self.cDisposables:
+            disposable.dispose()
+        # add new
         row = 0
         # Column Header
         WF.MakeHeader(self, (row, 0), text="Category")
@@ -34,7 +34,6 @@ class Table(TM.tk.TableFrame):
         row += 1
         # Data
         prev_type = None
-        dTotalSpendableAmount = Decimal(0)
         self.cActiveCategories = list()
         for category in self.vModel.Categories.Select():
             bMadeEntry = False
@@ -57,9 +56,7 @@ class Table(TM.tk.TableFrame):
                 w = WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=self.vModel.SpendingHistory.cCategoryTotalStreams[category.name])
                 bMadeEntry = True
             # Budgeted
-            dSpendable = self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name].value
-            if (dSpendable != 0 or bMadeEntry) and category.type != BV.Model.CategoryType.income:
-                dTotalSpendableAmount += dSpendable
+            if bMadeEntry and category.type != BV.Model.CategoryType.income:
                 WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name])
                 bMadeEntry = True
             # Row Header
@@ -74,11 +71,7 @@ class Table(TM.tk.TableFrame):
         vTotal = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
                           relief='ridge', background='SystemButtonFace', text="Total")
         vTotal.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
-        self.vTotalNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
-                                     borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vTotalNum.ValidationHandler = BV.MakeValid_Money
-        self.vTotalNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        self.vTotalNum.text = dTotalSpendableAmount
+        WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
         row += 1
         # NetWorth
         vNetWorth = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
@@ -91,16 +84,16 @@ class Table(TM.tk.TableFrame):
         vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
                             relief='ridge', background='SystemButtonFace', text="Balance")
         vBalance.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
-        self.vBalanceNum = TM.tk.Entry(self, font=Fonts.FONT_SMALL, width=15,
-                                       borderwidth=2, relief='ridge', justify='center', state="readonly")
-        self.vBalanceNum.ValidationHandler = BV.MakeValid_Money
-        self.vBalanceNum.grid(row=row, column=self.iBudgetedColumn, sticky="ewns")
-        self.dBalance = self.vModel.NetWorth.total_stream.value - dTotalSpendableAmount
-        self.vBalanceNum.text = self.dBalance
-        if self.dBalance != 0:
-            self.vBalanceNum.config(readonlybackground="pink")
-        else:
-            self.vBalanceNum.config(readonlybackground="lightgreen")
+        vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
+
+        def __HighlightBalance(balance):
+            if balance:
+                vBalanceNum.config(readonlybackground="pink")
+            else:
+                vBalanceNum.config(readonlybackground="lightgreen")
+        self.cDisposables.append(self.vModel.Balance.balance_stream.subscribe(
+            __HighlightBalance
+        ))
         row += 1
 
     def ShowCellMenu(self, event):
