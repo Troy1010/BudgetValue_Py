@@ -65,25 +65,19 @@ class Table(TM.tk.TableFrame):
                 self.cActiveCategories.append(category)
             #
             row += 1
-        # Total
+        # Black bar
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.iBudgetedColumn+1, sticky="ew")
         row += 1
-        vTotal = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
-                          relief='ridge', background='SystemButtonFace', text="Total")
-        vTotal.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
+        # Total
+        WF.MakeLable(self, (row, 0), text="Total", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
         row += 1
         # NetWorth
-        vNetWorth = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, height=1,
-                             relief='ridge', background='SystemButtonFace', text="Net Worth")
-        vNetWorth.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
+        WF.MakeLable(self, (row, 0), text="Net Worth", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.NetWorth.total_stream, justify=tk.CENTER)
-        #
         row += 1
         # Balance
-        vBalance = tk.Label(self, font=Fonts.FONT_LARGE, borderwidth=2, width=15, height=1,
-                            relief='ridge', background='SystemButtonFace', text="Balance")
-        vBalance.grid(row=row, column=0, columnspan=self.iBudgetedColumn, sticky="ewn")
+        WF.MakeLable(self, (row, 0), text="Balance", columnspan=self.iBudgetedColumn)
         vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
 
         def __HighlightBalance(balance):
