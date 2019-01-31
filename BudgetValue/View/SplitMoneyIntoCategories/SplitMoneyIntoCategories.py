@@ -42,6 +42,7 @@ class SplitMoneyIntoCategories(tk.Frame):
             else:
                 vButton_SplitBalance.config(background=vSkin.BG_DEFAULT)
         self.vModel.Balance.balance_stream.subscribe(HighlightBalanceButton)
+        # Button_SplitAccounts
         vButton_SplitAccounts = ttk.Button(self.vButtonBar, text="Split Accounts",
                                            command=lambda self=self: self.buttonPressed.on_next(None))
         vButton_SplitAccounts.pack(side=tk.LEFT, anchor='w')
