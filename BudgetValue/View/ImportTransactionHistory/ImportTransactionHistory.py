@@ -69,13 +69,13 @@ class ImportTransactionHistory(tk.Frame):
         vFile = tk.filedialog.askopenfile()
         # Import
         if vFile is not None:
-            self.vModel.SpendingHistory.Import(vFile.name)
+            self.vModel.ImportTransactionHistory.Import(vFile.name)
         # Refresh view
         self.vTable.Refresh()
 
     def GetColWidths(self, vModel):
         cColWidths = {}
-        for row in itertools.chain([vModel.SpendingHistory.GetHeader()], vModel.SpendingHistory.GetTable()):
+        for row in itertools.chain([vModel.ImportTransactionHistory.GetHeader()], vModel.ImportTransactionHistory.GetTable()):
             for j, vItem in enumerate(row[1:]):
                 cColWidths[j] = max(cColWidths.get(j, 0), len(str(vItem)) + 1)
                 if vItem != row[-1]:

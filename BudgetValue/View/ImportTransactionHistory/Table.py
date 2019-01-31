@@ -19,7 +19,7 @@ class Table(tk.Canvas):
                 vWidget.grid_forget()
                 vWidget.destroy()
         # Place new data
-        for i, row in enumerate(self.vModel.SpendingHistory.GetTable()):
+        for i, row in enumerate(self.vModel.ImportTransactionHistory.GetTable()):
             for j, vItem in enumerate(row[1:]):
                 b = tk.Text(self.vTableWindow, font=vSkin.FONT_SMALL,
                             borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
@@ -57,9 +57,9 @@ class Table(tk.Canvas):
         self.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def Update(self, row, columnName, value):
-        self.vModel.SpendingHistory.Update(row, columnName, value)
+        self.vModel.ImportTransactionHistory.Update(row, columnName, value)
         if isinstance(columnName, str):
-            iColumn = self.vModel.SpendingHistory.GetHeader()[1:].index(columnName)  # View's table is missing the index column
+            iColumn = self.vModel.ImportTransactionHistory.GetHeader()[1:].index(columnName)  # View's table is missing the index column
         cell = self.vTableWindow.grid_slaves(row, iColumn)[0]
         cell.config(state="normal")
         cell.delete("1.0", tk.END)

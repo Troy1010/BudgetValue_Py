@@ -8,7 +8,7 @@ import rx
 import BudgetValue as BV
 
 
-class SpendingHistory():
+class ImportTransactionHistory():
     def __init__(self, vModel):
         assert(isinstance(vModel, BV.Model.Model))
         self.vModel = vModel
