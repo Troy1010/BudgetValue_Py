@@ -58,30 +58,6 @@ class Table(TM.tk.TableFrame):
                 WF.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
             #
             row += 1
-        # Black bar
-        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.GetMaxColumn()+1, sticky="ew")
-        row += 1
-        # Budgeted Total
-        WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=self.GetMaxColumn())
-        WF.MakeEntry_ReadOnly(self, (row, self.GetMaxColumn()), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
-        row += 1
-        # Accounts Total
-        WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=self.GetMaxColumn())
-        WF.MakeEntry_ReadOnly(self, (row, self.GetMaxColumn()), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
-        row += 1
-        # Balance
-        WF.MakeLable(self, (row, 0), text="Balance", columnspan=self.GetMaxColumn())
-        vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, self.GetMaxColumn()), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
-
-        def __HighlightBalance(balance):
-            if balance:
-                vBalanceNum.config(readonlybackground="pink")
-            else:
-                vBalanceNum.config(readonlybackground="lightgreen")
-        self.cDisposables.append(self.vModel.Balance.balance_stream.subscribe(
-            __HighlightBalance
-        ))
-        row += 1
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
