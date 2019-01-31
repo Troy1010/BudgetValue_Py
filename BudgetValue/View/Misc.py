@@ -57,7 +57,6 @@ class BudgetedTable(TM.tk.TableFrame):
         w = WF.MakeEntry_ReadOnly(self, *args, **kwargs)
         # validation
         w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
-        w.MakeValid()
         #
         return w
 

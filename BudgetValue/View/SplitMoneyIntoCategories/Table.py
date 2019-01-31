@@ -23,16 +23,23 @@ class Table(Misc.BudgetedTable):
                     if category.name == "<Default Category>":
                         bEditableState = False
                         background = vSkin.BG_READ_ONLY
-                    w = WF.MakeEntry(self, (row+self.iFirstDataRow, iColumn+self.iFirstDataColumn),
-                                     text=split_money_history_column[category.name].amount_stream,
-                                     bEditableState=bEditableState,
-                                     background=background
-                                     )
+                    w = self.MakeEntry((row+self.iFirstDataRow, iColumn+self.iFirstDataColumn),
+                                       text=split_money_history_column[category.name].amount_stream,
+                                       bEditableState=bEditableState,
+                                       background=background
+                                       )
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
         self.FinishRefresh()
+
+    def MakeEntry(self, *args, **kwargs):
+        w = WF.MakeEntry(self, *args, **kwargs)
+        # Validation
+        w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
+        #
+        return w
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
