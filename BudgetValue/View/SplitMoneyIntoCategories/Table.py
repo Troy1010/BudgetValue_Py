@@ -66,12 +66,12 @@ class Table(TM.tk.TableFrame):
         # Black bar
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.iBudgetedColumn+1, sticky="ew")
         row += 1
-        # Total
-        WF.MakeLable(self, (row, 0), text="Total", columnspan=self.iBudgetedColumn)
+        # Budgeted Total
+        WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
         row += 1
         # Accounts
-        WF.MakeLable(self, (row, 0), text="Net Worth", columnspan=self.iBudgetedColumn)
+        WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
         row += 1
         # Balance

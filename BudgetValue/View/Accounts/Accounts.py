@@ -5,7 +5,7 @@ import BudgetValue as BV
 
 
 class Accounts(tk.Frame):
-    name = "Accounts"
+    name = "Double Check Totals"
 
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)

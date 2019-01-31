@@ -8,6 +8,7 @@ Spendables
 		Make categories able to be compared without comparing names, or make that default, or make categories never stored
 SpendingHistory-Dispose removed column subscriptions
 SpendingHistory-Highlighting
+Observables - which algorithm is best for subscribing to stream_streams?
 ---------------------------------------------------------- Things I'm currently working on
 SpendingHistory-make totals observable
 ---------------------------------------------------------- Things I've done
