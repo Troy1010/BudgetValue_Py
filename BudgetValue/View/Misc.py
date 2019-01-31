@@ -37,6 +37,9 @@ class BudgetedTable(TM.tk.TableFrame):
             if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
                 WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name], background=vSkin.BUDGETED)
             row += 1
+        # if the name of the caller is Refresh, then we are trusting that that will call FinishRefresh when it's done
+        if TM.FnName(1) != "Refresh":
+            self.FinishRefresh()
 
     def FinishRefresh(self):
         self.AddRowHeaders()
