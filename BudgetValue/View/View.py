@@ -24,7 +24,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, PaycheckPlan, Accounts, Reports)
+        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, Accounts, Reports, PaycheckPlan)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -111,6 +111,3 @@ class Reports(tk.Frame):
         vLabel = ttk.Label(self, text="Reports",
                            font=Fonts.FONT_MEDIUM)
         vLabel.pack(pady=10, padx=10)
-
-        vButton1 = ttk.Button(self, text="Spending History",)
-        vButton1.pack()

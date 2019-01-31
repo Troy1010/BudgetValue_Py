@@ -10,8 +10,10 @@ SpendingHistory-Dispose removed column subscriptions
 SpendingHistory-Highlighting
 Observables - which algorithm is best for subscribing to stream_streams?
 ---------------------------------------------------------- Things I'm currently working on
-SpendingHistory-make totals observable
+Move PaycheckPlan far right, or under SplitMoney?
+Where does Spend Record go?
 ---------------------------------------------------------- Things I've done
+SpendingHistory-make totals observable
 SelectCategoryPopup-What to do when it's empty
 SplitMoney-Restructure
 SplitMoney-DirectOverflow always happens
