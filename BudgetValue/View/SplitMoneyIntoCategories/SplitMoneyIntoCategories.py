@@ -7,6 +7,8 @@ import tkinter.messagebox  # noqa
 from .Table import Table
 import BudgetValue as BV
 import rx
+from .. import WidgetFactories as WF
+from ..Skin import vSkin
 
 
 class SplitMoneyIntoCategories(tk.Frame):
@@ -26,9 +28,19 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                            command=lambda self=self: self.SplitPaycheck())
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
-        vButton_SplitBalance = ttk.Button(self.vButtonBar, text="Split Balance",
-                                          command=lambda self=self: self.SplitBalance())
-        vButton_SplitBalance.pack(side=tk.LEFT, anchor='w')
+        vSplitBalanceText_stream = rx.subjects.BehaviorSubject("Split Balance")
+        self.vModel.Balance.balance_stream.map(
+            lambda balance: "Split Balance (" + str(balance) + ")"
+        ).subscribe(vSplitBalanceText_stream)
+        vButton_SplitBalance = WF.MakeButton(self.vButtonBar, text=vSplitBalanceText_stream,
+                                             command=lambda self=self: self.SplitBalance())
+
+        def HighlightBalanceButton(balance):
+            if balance:
+                vButton_SplitBalance.config(background="pink")
+            else:
+                vButton_SplitBalance.config(background=vSkin.DEFAULT)
+        self.vModel.Balance.balance_stream.subscribe(HighlightBalanceButton)
         vButton_SplitAccounts = ttk.Button(self.vButtonBar, text="Split Accounts",
                                            command=lambda self=self: self.buttonPressed.on_next(None))
         vButton_SplitAccounts.pack(side=tk.LEFT, anchor='w')

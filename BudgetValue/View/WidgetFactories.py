@@ -42,6 +42,13 @@ def MakeEntry_ReadOnly(*args, **kwargs):
     return MakeEntry(*args, **kwargs)
 
 
+def MakeButton(*args, **kwargs):
+    kwargs['relief'] = "groove"
+    w = TM.tk.Button(*args, **kwargs)
+    w.pack(side=tk.LEFT, anchor='w')
+    return w
+
+
 def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background='SystemButtonFace'):
     text_ValueOrValueStream = text
     if bEditableState:
