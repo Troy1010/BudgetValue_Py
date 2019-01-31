@@ -70,7 +70,7 @@ class Table(TM.tk.TableFrame):
         WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
         row += 1
-        # Accounts
+        # Accounts Total
         WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
         row += 1

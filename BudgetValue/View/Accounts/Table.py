@@ -16,11 +16,15 @@ class Table(TM.tk.TableFrame):
         for child in BV.GetAllChildren(self):
             child.grid_forget()
             child.destroy()
+        if hasattr(self, 'cDisposables'):
+            for disposable in self.cDisposables:
+                disposable.dispose()
+        self.cDisposables = []
         # add new
         row = 0
         # Header
-        for j, header_name in enumerate(['Account', 'Amount']):
-            WF.MakeHeader(self, (row, j), text=header_name)
+        WF.MakeHeader(self, (row, 0), text='Account', width=30)
+        WF.MakeHeader(self, (row, 1), text='Amount')
         row += 1
         # Data
         for net_worth_row in self.vModel.Accounts:
@@ -30,11 +34,29 @@ class Table(TM.tk.TableFrame):
             w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
             WF.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
-        # Total
+        # Black bar
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
         row += 1
-        WF.MakeLable(self, (row, 0), text="Total")
-        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Accounts.total_stream)
+        # Accounts Total
+        WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=1)
+        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
+        row += 1
+        # Budgeted Total
+        WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=1)
+        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
+        row += 1
+        # Balance
+        WF.MakeLable(self, (row, 0), text="Balance", columnspan=1)
+        vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
+
+        def __HighlightBalance(balance):
+            if balance:
+                vBalanceNum.config(readonlybackground="pink")
+            else:
+                vBalanceNum.config(readonlybackground="lightgreen")
+        self.cDisposables.append(self.vModel.Balance.balance_stream.subscribe(
+            __HighlightBalance
+        ))
         row += 1
 
     def RemoveRow(self, iRow):
