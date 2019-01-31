@@ -17,9 +17,9 @@ def MakeX(self, cRowColumnPair, command):
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
 
 
-def MakeHeader(self, cRowColumnPair, text=None, width=15):
+def MakeHeader(self, cRowColumnPair, text=None, width=15, background=vSkin.HEADER):
     w = tk.Label(self, font=Fonts.FONT_SMALL_BOLD, borderwidth=2, width=width, height=1, relief='ridge',
-                 background=vSkin.HEADER, text=text)
+                 background=background, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
     return w
 

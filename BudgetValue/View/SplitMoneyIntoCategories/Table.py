@@ -2,6 +2,7 @@ import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
+from BudgetValue.View.Skin import vSkin
 
 
 class Table(TM.tk.TableFrame):
@@ -24,11 +25,11 @@ class Table(TM.tk.TableFrame):
         row = 0
         # Column Header
         WF.MakeHeader(self, (row, 0), text="Category")
+        WF.MakeHeader(self, (row, 1), text="Budgeted", background=vSkin.BUDGETED)
+        self.iFirstSplitColumn = 2
         for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
-            vColumnHeader = WF.MakeHeader(self, (row, iColumn+1), text="Column "+str(iColumn+1))
+            vColumnHeader = WF.MakeHeader(self, (row, iColumn+self.iFirstSplitColumn), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
-        self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+1
-        WF.MakeHeader(self, (row, self.iBudgetedColumn), text="Budgeted")
         row += 1
         # Data
         prev_type = None
@@ -39,38 +40,38 @@ class Table(TM.tk.TableFrame):
                 prev_type = category.type
                 WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
                 row += 1
+            # Budgeted
+            if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
+                WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name], background=vSkin.BUDGETED)
+                bMadeEntry = True
             # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
                 if category.name in split_money_history_column:
                     bEditableState = category.name != "<Default Category>"
-                    w = WF.MakeEntry(self, (row, iColumn+1), text=split_money_history_column[category.name].amount_stream, bEditableState=bEditableState)
+                    w = WF.MakeEntry(self, (row, iColumn+self.iFirstSplitColumn), text=split_money_history_column[category.name].amount_stream, bEditableState=bEditableState)
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
                     bMadeEntry = True
-            # Budgeted
-            if bMadeEntry and category.type != BV.Model.CategoryType.income:
-                WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name])
-                bMadeEntry = True
             # Row Header
             if bMadeEntry and not self.GetCell(row, 0):
                 WF.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
             #
             row += 1
         # Black bar
-        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.iBudgetedColumn+1, sticky="ew")
+        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.GetMaxColumn()+1, sticky="ew")
         row += 1
         # Budgeted Total
-        WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=self.iBudgetedColumn)
-        WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
+        WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=self.GetMaxColumn())
+        WF.MakeEntry_ReadOnly(self, (row, self.GetMaxColumn()), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
         row += 1
         # Accounts Total
-        WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=self.iBudgetedColumn)
-        WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
+        WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=self.GetMaxColumn())
+        WF.MakeEntry_ReadOnly(self, (row, self.GetMaxColumn()), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
         row += 1
         # Balance
-        WF.MakeLable(self, (row, 0), text="Balance", columnspan=self.iBudgetedColumn)
-        vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
+        WF.MakeLable(self, (row, 0), text="Balance", columnspan=self.GetMaxColumn())
+        vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, self.GetMaxColumn()), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
 
         def __HighlightBalance(balance):
             if balance:
@@ -123,6 +124,6 @@ class Table(TM.tk.TableFrame):
         self.Refresh()
 
     def SaveCellToModel(self, cell):
-        iColumn = cell.column - 1
+        iColumn = cell.column - self.iFirstSplitColumn
         categoryName = self.GetCell(cell.row, 0).text
         self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = cell.text
