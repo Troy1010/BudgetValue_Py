@@ -46,15 +46,27 @@ class BudgetedTable(TM.tk.TableFrame):
         self.AddSeparationLables()
 
     def AddSeparationLables(self):
-        row = self.iFirstDataRow
         prev_type = None
-        for category in self.vModel.Categories.Select():
+        row = self.iFirstDataRow
+        max_row = self.GetMaxRow()
+        while row <= max_row:
+            category = self.GetCategoryOfRow(row)
+            if category is None:
+                row += 1
+                continue
             if prev_type != category.type:
                 prev_type = category.type
                 self.InsertRow(row)
                 WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
+                max_row += 1
                 row += 1
             row += 1
+
+    def GetCategoryOfRow(self, row):
+        try:
+            return self.vModel.Categories[self.GetCell(row, 0).text]
+        except AttributeError:  # cell does not have .text
+            return None
 
     def AddRowHeaders(self):
         for row, category in enumerate(self.vModel.Categories.Select()):
