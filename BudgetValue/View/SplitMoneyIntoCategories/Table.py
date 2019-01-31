@@ -24,7 +24,7 @@ class Table(Misc.BudgetedTable):
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
-        super().FinishRefresh()
+        self.FinishRefresh()
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
