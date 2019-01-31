@@ -18,11 +18,11 @@ class Table(Misc.BudgetedTable):
             # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
                 if category.name in split_money_history_column:
-                    background = vSkin.DEFAULT
+                    background = vSkin.BG_DEFAULT
                     bEditableState = True
                     if category.name == "<Default Category>":
                         bEditableState = False
-                        background = vSkin.READ_ONLY
+                        background = vSkin.BG_READ_ONLY
                     w = WF.MakeEntry(self, (row+self.iFirstDataRow, iColumn+self.iFirstDataColumn),
                                      text=split_money_history_column[category.name].amount_stream,
                                      bEditableState=bEditableState,

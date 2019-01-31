@@ -29,17 +29,37 @@ class BudgetedTable(TM.tk.TableFrame):
         row = 0
         # Column Header
         WF.MakeHeader(self, (row, 0), text="Category")
-        WF.MakeHeader(self, (row, 1), text="Budgeted", background=vSkin.BUDGETED)
+        WF.MakeHeader(self, (row, 1), text="Budgeted", background=vSkin.BG_BUDGETED)
         row += 1
         # Data
         for category in self.vModel.Categories.Select():
             # Budgeted
             if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
-                WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name], background=vSkin.BUDGETED)
+                w = self.MakeEntry_ReadOnly((row, 1), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name])
+            # Highlight Budgeted
+
+            def HighlightBudgeted(budgeted_amount, w):
+                if budgeted_amount < 0:
+                    w.configure(readonlybackground=vSkin.BG_BUDGETED_BAD)
+                else:
+                    w.configure(readonlybackground=vSkin.BG_BUDGETED)
+            if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
+                disposable = self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name].subscribe(
+                    lambda budgeted_amount, w=w: HighlightBudgeted(budgeted_amount, w)
+                )
+                self.cDisposables.append(disposable)
             row += 1
         # if the name of the caller is Refresh, then we are trusting that that will call FinishRefresh when it's done
         if TM.FnName(1) != "Refresh":
             self.FinishRefresh()
+
+    def MakeEntry_ReadOnly(self, *args, **kwargs):
+        w = WF.MakeEntry_ReadOnly(self, *args, **kwargs)
+        # validation
+        w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
+        w.MakeValid()
+        #
+        return w
 
     def FinishRefresh(self):
         self.AddRowHeaders()

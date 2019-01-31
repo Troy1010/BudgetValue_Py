@@ -3,6 +3,7 @@ import tkinter as tk  # noqa
 import BudgetValue as BV  # noqa
 from BudgetValue.View import WidgetFactories as WF  # noqa
 from .. import Misc  # noqa
+from ..Skin import vSkin
 
 
 class Difference(tk.Frame):
@@ -29,9 +30,9 @@ class Difference(tk.Frame):
 
         def __HighlightBalance(balance):
             if balance:
-                vDifferenceNum.config(readonlybackground="pink")
+                vDifferenceNum.config(readonlybackground=vSkin.BG_BAD)
             else:
-                vDifferenceNum.config(readonlybackground="lightgreen")
+                vDifferenceNum.config(readonlybackground=vSkin.BG_GOOD)
         self.cDisposables.append(self.vModel.Balance.balance_stream.subscribe(
             __HighlightBalance
         ))

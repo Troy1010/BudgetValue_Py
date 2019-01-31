@@ -1,9 +1,12 @@
 class Skin():
-    ENTRY = "SystemButtonFace"
-    HEADER = "SystemButtonFace"
-    READ_ONLY = "#d6d6d6"
-    BUDGETED = "#d6d6ff"
-    DEFAULT = "SystemButtonFace"
+    BG_ENTRY = "SystemButtonFace"
+    BG_HEADER = "SystemButtonFace"
+    BG_READ_ONLY = "#d6d6d6"
+    BG_BUDGETED = "#d6d6ff"
+    BG_BUDGETED_BAD = "#ffb0d0"
+    BG_DEFAULT = "SystemButtonFace"
+    BG_BAD = "lightpink"
+    BG_GOOD = "lightgreen"
     # fonts
     FONT_LARGE = ("Verdana", 14)
     FONT_MEDIUM = ("Verdana", 12)

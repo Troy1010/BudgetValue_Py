@@ -1,6 +1,5 @@
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
-import rx
 from .Skin import vSkin
 
 
@@ -13,17 +12,19 @@ def MakeLable(self, cRowColumnPair, text=None, columnspan=1, width=0):
     if isinstance(width, Buffer):
         width = len(text) + width.value
     w = tk.Label(self, font=vSkin.FONT_LARGE, borderwidth=2, width=width, height=1,
-                 relief='ridge', background=vSkin.HEADER, text=text)
+                 relief='ridge', background=vSkin.BG_HEADER, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ewn")
+    return w
 
 
 def MakeX(self, cRowColumnPair, command):
     w = tk.Button(self, text="X", font=vSkin.FONT_SMALL_BOLD, borderwidth=2, width=3, relief='ridge',
                   command=command)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="ns")
+    return w
 
 
-def MakeHeader(self, cRowColumnPair, text=None, width=15, background=vSkin.HEADER):
+def MakeHeader(self, cRowColumnPair, text=None, width=15, background=vSkin.BG_HEADER):
     w = tk.Label(self, font=vSkin.FONT_SMALL_BOLD, borderwidth=2, width=width, height=1, relief='ridge',
                  background=background, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="nsew")
@@ -49,8 +50,7 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.DEFAULT):
-    text_ValueOrValueStream = text
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT):
     if bEditableState:
         state = "normal"
     else:
@@ -59,21 +59,11 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
         font = vSkin.FONT_SMALL_BOLD
     else:
         font = vSkin.FONT_SMALL
-    w = TM.tk.Entry(self, font=font, width=15, justify=justify,
+    w = TM.tk.Entry(self, font=font, width=15, justify=justify, text=text,
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
-    # text
-    if isinstance(text_ValueOrValueStream, rx.subjects.BehaviorSubject):
-        def AssignText(w, value):
-            try:
-                w.text = value
-            except tk.TclError:  # cell no longer exists
-                pass
-        w.AddDisposable(text_ValueOrValueStream.subscribe(lambda value, w=w: AssignText(w, value)))
-    else:
-        w.text = text_ValueOrValueStream
-    #
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
+    # Events
     w.bind('<Escape>', lambda event: self.FocusNothing())
     if bEditableState:
         w.bind("<FocusIn>", lambda event, w=w: OnFocusIn_MakeObvious(w))
