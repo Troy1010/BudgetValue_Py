@@ -28,6 +28,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                            command=lambda self=self: self.SplitPaycheck())
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
+        # Button_SplitBalance
         vSplitBalanceText_stream = rx.subjects.BehaviorSubject("Split Balance")
         self.vModel.Balance.balance_stream.map(
             lambda balance: "Split Balance (" + str(balance) + ")"
@@ -49,6 +50,7 @@ class SplitMoneyIntoCategories(tk.Frame):
             self.vModel.Accounts.total_stream,
             lambda pressEvent, total: total
         ).subscribe(lambda x: self.SplitAccounts(x))
+        #
         vButton_Print = ttk.Button(self.vButtonBar, text="Print",
                                    command=lambda self=self: self.Print())
         vButton_Print.pack(side=tk.LEFT, anchor='w')
