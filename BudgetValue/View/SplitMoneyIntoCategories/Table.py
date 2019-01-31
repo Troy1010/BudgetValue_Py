@@ -27,9 +27,7 @@ class Table(TM.tk.TableFrame):
         for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
             vColumnHeader = WF.MakeHeader(self, (row, iColumn+1), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
-        self.iSpentColumn = len(self.vModel.SplitMoneyHistory)+1
-        WF.MakeHeader(self, (row, self.iSpentColumn), text="Spent")
-        self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+2
+        self.iBudgetedColumn = len(self.vModel.SplitMoneyHistory)+1
         WF.MakeHeader(self, (row, self.iBudgetedColumn), text="Budgeted")
         row += 1
         # Data
@@ -50,10 +48,6 @@ class Table(TM.tk.TableFrame):
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
                     bMadeEntry = True
-            # Spent
-            if self.vModel.SpendingHistory.cCategoryTotalStreams[category.name].value:
-                w = WF.MakeEntry_ReadOnly(self, (row, self.iSpentColumn), text=self.vModel.SpendingHistory.cCategoryTotalStreams[category.name])
-                bMadeEntry = True
             # Budgeted
             if bMadeEntry and category.type != BV.Model.CategoryType.income:
                 WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name])
