@@ -25,6 +25,7 @@ class Difference(tk.Frame):
         # Balance
         WF.MakeLable(self, (0, 0), text="Difference", columnspan=1, width=BV.Buffer(1))
         vBalanceNum = WF.MakeEntry_ReadOnly(self, (0, 1), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
+        vBalanceNum.ValidationHandler = BV.MakeValid_Money
 
         def __HighlightBalance(balance):
             if balance:
