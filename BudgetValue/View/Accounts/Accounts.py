@@ -20,9 +20,6 @@ class Accounts(tk.Frame):
         vButton_AddRow = ttk.Button(self.vButtonBar, text="AddRow",
                                     command=lambda self=self: self.AddRow())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
-        vButton_TriggerNonDistinctChange = ttk.Button(self.vButtonBar, text="TriggerChange",
-                                                      command=lambda self=self: self.TriggerChange())
-        vButton_TriggerNonDistinctChange.pack(side=tk.LEFT, anchor='w')
         # Frame of tables
         self.vFrameOfTables = tk.Frame(self)
         self.vFrameOfTables.pack(side=tk.TOP, anchor='w')
@@ -53,11 +50,6 @@ class Accounts(tk.Frame):
         self.vDifferenceCanvas.create_window((0, 0), window=self.vDifference, anchor='nw')
         self.vDifference.pack(anchor='nw')
         self.vDifference.Refresh()
-
-    def TriggerChange(self):
-        if len(self.vModel.Accounts) > 2:
-            self.vModel.Accounts[0], self.vModel.Accounts[1] = self.vModel.Accounts[1], self.vModel.Accounts[0]
-        self.vAccountsTable.Refresh()
 
     def AddRow(self):
         self.vModel.Accounts.AddRow()
