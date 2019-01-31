@@ -1,63 +1,30 @@
-import TM_CommonPy as TM
+import TM_CommonPy as TM  # noqa
 import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
-from BudgetValue.View.Skin import vSkin
+from BudgetValue.View.Skin import vSkin  # noqa
+from ..Misc import BudgetedTable
 
 
-class Table(TM.tk.TableFrame):
-    def __init__(self, parent, vModel):
-        assert isinstance(vModel, BV.Model.Model)
-        tk.Frame.__init__(self, parent)
-        self.vModel = vModel
-        self.parent = parent
-
+class Table(BudgetedTable):
     def Refresh(self):
-        # remove old
-        for child in BV.GetAllChildren(self):
-            child.grid_forget()
-            child.destroy()
-        if hasattr(self, 'cDisposables'):
-            for disposable in self.cDisposables:
-                disposable.dispose()
-        self.cDisposables = []
-        # add new
-        row = 0
+        super().Refresh()
         # Column Header
-        WF.MakeHeader(self, (row, 0), text="Category")
-        WF.MakeHeader(self, (row, 1), text="Budgeted", background=vSkin.BUDGETED)
-        self.iFirstSplitColumn = 2
         for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
-            vColumnHeader = WF.MakeHeader(self, (row, iColumn+self.iFirstSplitColumn), text="Column "+str(iColumn+1))
+            vColumnHeader = WF.MakeHeader(self, (0, iColumn+self.iFirstDataColumn), text="Column "+str(iColumn+1))
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
-        row += 1
         # Data
-        prev_type = None
-        for category in self.vModel.Categories.Select():
-            bMadeEntry = False
-            # make separation label if needed
-            if prev_type != category.type:
-                prev_type = category.type
-                WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
-                row += 1
-            # Budgeted
-            if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
-                WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name], background=vSkin.BUDGETED)
-                bMadeEntry = True
+        for row, category in enumerate(self.vModel.Categories.Select()):
             # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
                 if category.name in split_money_history_column:
                     bEditableState = category.name != "<Default Category>"
-                    w = WF.MakeEntry(self, (row, iColumn+self.iFirstSplitColumn), text=split_money_history_column[category.name].amount_stream, bEditableState=bEditableState)
+                    w = WF.MakeEntry(self, (row+self.iFirstDataRow, iColumn+self.iFirstDataColumn), text=split_money_history_column[category.name].amount_stream, bEditableState=bEditableState)
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
-                    bMadeEntry = True
-            # Row Header
-            if bMadeEntry and not self.GetCell(row, 0):
-                WF.MakeEntry_ReadOnly(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True)
-            #
-            row += 1
+        #
+        super().FinishRefresh()
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
@@ -65,7 +32,7 @@ class Table(TM.tk.TableFrame):
         vDropdown.post(event.x_root, event.y_root)
 
     def RemoveCell(self, cell):
-        iColumn = cell.grid_info()['column'] - 1
+        iColumn = cell.grid_info()['column'] - self.iFirstDataColumn
         categoryName = self.GetCell(cell.row, 0).text
         cell.text = 0
         self.SaveCellToModel(cell)
@@ -88,18 +55,14 @@ class Table(TM.tk.TableFrame):
         self.Refresh()
 
     def ShowHeaderMenu(self, event):
-        iColumn = event.widget.grid_info()['column'] - 1
+        iColumn = event.widget.grid_info()['column'] - self.iFirstDataColumn
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
         vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty():
                               BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
         vDropdown.post(event.x_root, event.y_root)
 
-    def RemoveRow(self, iRow):
-        self.vModel.Accounts.RemoveRow(iRow-1)  # skip header
-        self.Refresh()
-
     def SaveCellToModel(self, cell):
-        iColumn = cell.column - self.iFirstSplitColumn
+        iColumn = cell.column - self.iFirstDataColumn
         categoryName = self.GetCell(cell.row, 0).text
         self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = cell.text
