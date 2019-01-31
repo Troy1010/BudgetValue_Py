@@ -18,7 +18,7 @@ class View(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
-        self.geometry('700x800')
+        self.geometry('900x800')
         self.bind("<Destroy>", lambda event: self._destroy())
         self.sSaveFile = os.path.join(vModel.sWorkspace, "View.pickle")
         self.vLastShownTab = SplitMoneyIntoCategories
