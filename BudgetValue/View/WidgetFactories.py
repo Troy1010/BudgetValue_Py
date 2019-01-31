@@ -11,6 +11,7 @@ class Buffer():
 def MakeLable(self, cRowColumnPair, text=None, columnspan=1, width=0):
     if isinstance(width, Buffer):
         width = len(text) + width.value
+    #
     w = tk.Label(self, font=vSkin.FONT_LARGE, borderwidth=2, width=width, height=1,
                  relief='ridge', background=vSkin.BG_HEADER, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ewn")
@@ -25,6 +26,9 @@ def MakeX(self, cRowColumnPair, command):
 
 
 def MakeHeader(self, cRowColumnPair, text=None, width=15, background=vSkin.BG_HEADER):
+    if isinstance(width, Buffer):
+        width = len(text) + width.value
+    #
     w = tk.Label(self, font=vSkin.FONT_SMALL_BOLD, borderwidth=2, width=width, height=1, relief='ridge',
                  background=background, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], sticky="nsew")
@@ -50,7 +54,10 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT):
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0):
+    if isinstance(width, Buffer):
+        width = len(text) + width.value
+    #
     if bEditableState:
         state = "normal"
     else:
@@ -59,7 +66,7 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
         font = vSkin.FONT_SMALL_BOLD
     else:
         font = vSkin.FONT_SMALL
-    w = TM.tk.Entry(self, font=font, width=15, justify=justify, text=text,
+    w = TM.tk.Entry(self, font=font, width=width, justify=justify, text=text,
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
