@@ -19,3 +19,4 @@ class Model():
         self.SplitMoneyHistory = BV.Model.SplitMoneyHistory(self)
         self.BudgetedSpendables = BV.Model.BudgetedSpendables(self)
         self.Balance = BV.Model.Balance(self)
+        self.SpendingHistory = BV.Model.SpendingHistory(self)

@@ -9,6 +9,7 @@ from BudgetValue.View.ImportTransactionHistory import ImportTransactionHistory
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
+from BudgetValue.View.SpendingHistory import SpendingHistory
 import os
 import pickle
 
@@ -24,7 +25,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SplitMoneyIntoCategories, Accounts, Reports, PaycheckPlan, ImportTransactionHistory)
+        cTabPages = (SplitMoneyIntoCategories, SpendingHistory, Accounts, Reports, PaycheckPlan, ImportTransactionHistory)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
