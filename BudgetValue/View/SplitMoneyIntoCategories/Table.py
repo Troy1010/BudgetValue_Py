@@ -3,10 +3,10 @@ import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
 from BudgetValue.View.Skin import vSkin  # noqa
-from ..Misc import BudgetedTable
+from .. import Misc
 
 
-class Table(BudgetedTable):
+class Table(Misc.BudgetedTable):
     def Refresh(self):
         super().Refresh()
         # Column Header

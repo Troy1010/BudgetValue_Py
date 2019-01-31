@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from .AccountsTable import AccountsTable
 import BudgetValue as BV
-from ..Misc import BudgetedTable
+from .BudgetedTable import BudgetedTable
 
 
 class Accounts(tk.Frame):

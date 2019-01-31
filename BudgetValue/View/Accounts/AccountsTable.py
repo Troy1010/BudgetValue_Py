@@ -23,7 +23,7 @@ class AccountsTable(TM.tk.TableFrame):
         # add new
         row = 0
         # Header
-        WF.MakeHeader(self, (row, 0), text='Account', width=30)
+        WF.MakeHeader(self, (row, 0), text='Account')
         WF.MakeHeader(self, (row, 1), text='Amount')
         row += 1
         # Data
@@ -40,23 +40,6 @@ class AccountsTable(TM.tk.TableFrame):
         # Accounts Total
         WF.MakeLable(self, (row, 0), text="Accounts Total", columnspan=1)
         WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
-        row += 1
-        # Budgeted Total
-        WF.MakeLable(self, (row, 0), text="Budgeted Total", columnspan=1)
-        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
-        row += 1
-        # Balance
-        WF.MakeLable(self, (row, 0), text="Balance", columnspan=1)
-        vBalanceNum = WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
-
-        def __HighlightBalance(balance):
-            if balance:
-                vBalanceNum.config(readonlybackground="pink")
-            else:
-                vBalanceNum.config(readonlybackground="lightgreen")
-        self.cDisposables.append(self.vModel.Balance.balance_stream.subscribe(
-            __HighlightBalance
-        ))
         row += 1
 
     def RemoveRow(self, iRow):
