@@ -18,8 +18,16 @@ class Table(Misc.BudgetedTable):
             # SplitMoneyHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
                 if category.name in split_money_history_column:
-                    bEditableState = category.name != "<Default Category>"
-                    w = WF.MakeEntry(self, (row+self.iFirstDataRow, iColumn+self.iFirstDataColumn), text=split_money_history_column[category.name].amount_stream, bEditableState=bEditableState)
+                    background = vSkin.DEFAULT
+                    bEditableState = True
+                    if category.name == "<Default Category>":
+                        bEditableState = False
+                        background = vSkin.READ_ONLY
+                    w = WF.MakeEntry(self, (row+self.iFirstDataRow, iColumn+self.iFirstDataColumn),
+                                     text=split_money_history_column[category.name].amount_stream,
+                                     bEditableState=bEditableState,
+                                     background=background
+                                     )
                     if bEditableState:
                         w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
