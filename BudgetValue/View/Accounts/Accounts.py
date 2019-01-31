@@ -3,6 +3,7 @@ from tkinter import ttk
 from .AccountsTable import AccountsTable
 import BudgetValue as BV
 from .BudgetedTable import BudgetedTable
+from .Difference import Difference
 
 
 class Accounts(tk.Frame):
@@ -22,26 +23,36 @@ class Accounts(tk.Frame):
         vButton_TriggerNonDistinctChange = ttk.Button(self.vButtonBar, text="TriggerChange",
                                                       command=lambda self=self: self.TriggerChange())
         vButton_TriggerNonDistinctChange.pack(side=tk.LEFT, anchor='w')
-        # Frame of both tables
-        self.vFrameOfBothTables = tk.Frame(self)
-        self.vFrameOfBothTables.pack(side=tk.TOP, anchor='w')
+        # Frame of tables
+        self.vFrameOfTables = tk.Frame(self)
+        self.vFrameOfTables.pack(side=tk.TOP, anchor='w')
         # BudgetedTable
-        self.vBudgetedTableCanvas = tk.Canvas(self.vFrameOfBothTables, highlightthickness=0)
+        self.vBudgetedTableCanvas = tk.Canvas(self.vFrameOfTables, highlightthickness=0)
         self.vBudgetedTableCanvas.pack(side=tk.LEFT, anchor='nw')
         self.vBudgetedTable = BudgetedTable(self.vBudgetedTableCanvas, vModel)
         self.vBudgetedTableCanvas.create_window((0, 0), window=self.vBudgetedTable, anchor='nw')
         self.vBudgetedTable.pack(anchor='nw')
         self.vBudgetedTable.Refresh()
         # Verticle Separator
-        self.vVerticleSeparator = tk.Frame(self.vFrameOfBothTables, width=20)
+        self.vVerticleSeparator = tk.Frame(self.vFrameOfTables, width=20)
         self.vVerticleSeparator.pack(side=tk.LEFT, anchor='nw', fill='both')
         # AccountsTable
-        self.vCanvas = tk.Canvas(self.vFrameOfBothTables, highlightthickness=0)
-        self.vCanvas.pack(side=tk.LEFT, fill='x', anchor='nw')
-        self.vAccountsTable = AccountsTable(self.vCanvas, vModel)
-        self.vCanvas.create_window((0, 0), window=self.vAccountsTable, anchor='nw')
+        self.vAccountsCanvas = tk.Canvas(self.vFrameOfTables, highlightthickness=0)
+        self.vAccountsCanvas.pack(side=tk.LEFT, fill='x', anchor='nw')
+        self.vAccountsTable = AccountsTable(self.vAccountsCanvas, vModel)
+        self.vAccountsCanvas.create_window((0, 0), window=self.vAccountsTable, anchor='nw')
         self.vAccountsTable.pack(anchor='nw')
         self.vAccountsTable.Refresh()
+        # Verticle Separator
+        self.vVerticleSeparator = tk.Frame(self.vFrameOfTables, width=20)
+        self.vVerticleSeparator.pack(side=tk.LEFT, anchor='nw', fill='both')
+        # Difference
+        self.vDifferenceCanvas = tk.Canvas(self.vFrameOfTables, highlightthickness=0)
+        self.vDifferenceCanvas.pack(side=tk.LEFT, fill='x', anchor='nw')
+        self.vDifference = Difference(self.vDifferenceCanvas, vModel)
+        self.vDifferenceCanvas.create_window((0, 0), window=self.vDifference, anchor='nw')
+        self.vDifference.pack(anchor='nw')
+        self.vDifference.Refresh()
 
     def TriggerChange(self):
         if len(self.vModel.Accounts) > 2:

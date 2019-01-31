@@ -2,10 +2,13 @@ import TM_CommonPy as TM  # noqa
 import tkinter as tk
 import rx
 from .Skin import vSkin
+import BudgetValue as BV
 
 
-def MakeLable(self, cRowColumnPair, text=None, columnspan=1):
-    w = tk.Label(self, font=vSkin.FONT_LARGE, borderwidth=2, height=1,
+def MakeLable(self, cRowColumnPair, text=None, columnspan=1, width=0):
+    if isinstance(width, BV.Buffer):
+        width = len(text) + width.value
+    w = tk.Label(self, font=vSkin.FONT_LARGE, borderwidth=2, width=width, height=1,
                  relief='ridge', background=vSkin.HEADER, text=text)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ewn")
 
