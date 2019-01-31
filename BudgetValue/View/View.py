@@ -4,7 +4,7 @@ import tkinter as tk
 import tkinter.filedialog  # noqa
 from tkinter import ttk
 import BudgetValue as BV
-from BudgetValue.View import Fonts
+from BudgetValue.View.Skin import vSkin
 from BudgetValue.View.SpendFromCategories import SpendFromCategories
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
@@ -83,7 +83,7 @@ class TabBar(tk.Frame):
         self.cTabButtons = {}
         self.parent = parent
         for i, page in enumerate(cTabPages):
-            vButton = tk.Button(self, text=page.name, font=Fonts.FONT_MEDIUM,
+            vButton = tk.Button(self, text=page.name, font=vSkin.FONT_MEDIUM,
                                 command=lambda page=page: self.ShowTab(page))
             self.cTabButtons[page] = vButton
             # Make width at least 15
@@ -109,5 +109,5 @@ class Reports(tk.Frame):
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
         vLabel = ttk.Label(self, text="Reports",
-                           font=Fonts.FONT_MEDIUM)
+                           font=vSkin.FONT_MEDIUM)
         vLabel.pack(pady=10, padx=10)

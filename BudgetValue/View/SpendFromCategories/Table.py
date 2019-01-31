@@ -1,6 +1,6 @@
 import tkinter as tk
 import BudgetValue as BV
-from BudgetValue.View import Fonts
+from BudgetValue.View.Skin import vSkin
 
 
 class Table(tk.Canvas):
@@ -21,7 +21,7 @@ class Table(tk.Canvas):
         # Place new data
         for i, row in enumerate(self.vModel.SpendingHistory.GetTable()):
             for j, vItem in enumerate(row[1:]):
-                b = tk.Text(self.vTableWindow, font=Fonts.FONT_SMALL,
+                b = tk.Text(self.vTableWindow, font=vSkin.FONT_SMALL,
                             borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
                 b.insert(1.0, str(vItem))
                 b.grid(row=i, column=j)
