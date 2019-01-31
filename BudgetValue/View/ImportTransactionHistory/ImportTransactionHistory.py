@@ -10,8 +10,8 @@ from .Table import Table
 from .Header import Header
 
 
-class SpendFromCategories(tk.Frame):
-    name = "Spend From Categories"
+class ImportTransactionHistory(tk.Frame):
+    name = "Import Transaction History"
 
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)

@@ -5,7 +5,7 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View.Skin import vSkin
-from BudgetValue.View.SpendFromCategories import SpendFromCategories
+from BudgetValue.View.ImportTransactionHistory import ImportTransactionHistory
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
@@ -24,7 +24,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, Accounts, Reports, PaycheckPlan)
+        cTabPages = (SplitMoneyIntoCategories, ImportTransactionHistory, Accounts, Reports, PaycheckPlan)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -47,7 +47,7 @@ class View(tk.Tk):
         self.Save()
 
     def Save(self):
-        data = self.vLastShownTab
+        data = [self.vLastShownTab]
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -58,7 +58,7 @@ class View(tk.Tk):
             data = pickle.load(f)
         if not data:
             return
-        self.vLastShownTab = data
+        self.vLastShownTab = data[0]
 
 
 class MenuBar(tk.Menu):
@@ -66,7 +66,7 @@ class MenuBar(tk.Menu):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
         vFileMenu.add_command(label="Import Spending History",
-                              command=lambda vModel=vModel: BV.View.SpendFromCategories.ImportHistory(vModel))
+                              command=lambda vModel=vModel: BV.View.ImportTransactionHistory.ImportHistory(vModel))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)
