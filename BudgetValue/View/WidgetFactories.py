@@ -2,11 +2,15 @@ import TM_CommonPy as TM  # noqa
 import tkinter as tk
 import rx
 from .Skin import vSkin
-import BudgetValue as BV
+
+
+class Buffer():
+    def __init__(self, value):
+        self.value = value - 1  # the -1 lets Buffer(0) do nothing as expected
 
 
 def MakeLable(self, cRowColumnPair, text=None, columnspan=1, width=0):
-    if isinstance(width, BV.Buffer):
+    if isinstance(width, Buffer):
         width = len(text) + width.value
     w = tk.Label(self, font=vSkin.FONT_LARGE, borderwidth=2, width=width, height=1,
                  relief='ridge', background=vSkin.HEADER, text=text)

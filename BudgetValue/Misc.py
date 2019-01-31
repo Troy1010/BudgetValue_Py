@@ -3,11 +3,6 @@ from decimal import Decimal
 from ._Logger import BVLog
 
 
-class Buffer():
-    def __init__(self, value):
-        self.value = value - 1  # the -1 lets Buffer(0) do nothing as expected
-
-
 def Hello():
     BVLog.debug("Hello")
 
