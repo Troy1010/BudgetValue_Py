@@ -10,6 +10,6 @@ class Balance():
         self.balance_stream = rx.subjects.BehaviorSubject(0)
         rx.Observable.combine_latest(
             self.vModel.BudgetedSpendables.total_stream,
-            self.vModel.NetWorth.total_stream,
+            self.vModel.Accounts.total_stream,
             lambda x, y: BV.MakeValid_Money(x-y)
         ).subscribe(self.balance_stream)

@@ -23,8 +23,8 @@ class Table(TM.tk.TableFrame):
             WF.MakeHeader(self, (row, j), text=header_name)
         row += 1
         # Data
-        for net_worth_row in self.vModel.NetWorth:
-            assert isinstance(net_worth_row, BV.Model.NetWorthRow)
+        for net_worth_row in self.vModel.Accounts:
+            assert isinstance(net_worth_row, BV.Model.AccountsRow)
             self.MakeEntry((row, 0), text=net_worth_row.name)
             w = self.MakeEntry((row, 1), text=net_worth_row.amount_stream)
             w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
@@ -34,11 +34,11 @@ class Table(TM.tk.TableFrame):
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
         row += 1
         WF.MakeLable(self, (row, 0), text="Total")
-        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.NetWorth.total_stream)
+        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Accounts.total_stream)
         row += 1
 
     def RemoveRow(self, iRow):
-        self.vModel.NetWorth.RemoveRow(iRow-1)  # skip header
+        self.vModel.Accounts.RemoveRow(iRow-1)  # skip header
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None):
@@ -68,11 +68,11 @@ class Table(TM.tk.TableFrame):
         x, y = event.widget.winfo_pointerxy()
         target = event.widget.winfo_containing(x, y)
         if target.row != event.widget.row:
-            self.vModel.NetWorth[target.row-1], self.vModel.NetWorth[event.widget.row-1] = self.vModel.NetWorth[event.widget.row-1], self.vModel.NetWorth[target.row-1]
+            self.vModel.Accounts[target.row-1], self.vModel.Accounts[event.widget.row-1] = self.vModel.Accounts[event.widget.row-1], self.vModel.Accounts[target.row-1]
             self.Refresh()
 
     def SaveEntryInModel(self, cell):
         if cell.column == 0:
-            self.vModel.NetWorth[cell.row-1].name = cell.text
+            self.vModel.Accounts[cell.row-1].name = cell.text
         elif cell.column == 1:
-            self.vModel.NetWorth[cell.row-1].amount = cell.text
+            self.vModel.Accounts[cell.row-1].amount = cell.text

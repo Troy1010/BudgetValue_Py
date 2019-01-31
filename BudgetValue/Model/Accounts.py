@@ -6,17 +6,17 @@ import TM_CommonPy as TM  # noqa
 from .Misc import List_TotalStream
 
 
-class NetWorth(List_TotalStream):
+class Accounts(List_TotalStream):
     def __init__(self, vModel):
         assert isinstance(vModel, BV.Model.Model)
         super().__init__()
         self.vModel = vModel
-        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "NetWorth.pickle")
+        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Accounts.pickle")
         # Load
         self.Load()
 
     def AddRow(self):
-        self.append(NetWorthRow())
+        self.append(AccountsRow())
 
     def RemoveRow(self, iRow):
         del self[iRow]
@@ -39,12 +39,12 @@ class NetWorth(List_TotalStream):
         if not data:
             return
         for net_worth_row in data:
-            self.append(NetWorthRow())
+            self.append(AccountsRow())
             for k, v in net_worth_row.items():
                 setattr(self[-1], k, v)
 
 
-class NetWorthRow():
+class AccountsRow():
     def __init__(self, name=None):
         self.name = name
         self.amount_stream = rx.subjects.BehaviorSubject(0)

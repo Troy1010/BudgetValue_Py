@@ -70,9 +70,9 @@ class Table(TM.tk.TableFrame):
         WF.MakeLable(self, (row, 0), text="Total", columnspan=self.iBudgetedColumn)
         WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.BudgetedSpendables.total_stream, justify=tk.CENTER)
         row += 1
-        # NetWorth
+        # Accounts
         WF.MakeLable(self, (row, 0), text="Net Worth", columnspan=self.iBudgetedColumn)
-        WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.NetWorth.total_stream, justify=tk.CENTER)
+        WF.MakeEntry_ReadOnly(self, (row, self.iBudgetedColumn), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
         row += 1
         # Balance
         WF.MakeLable(self, (row, 0), text="Balance", columnspan=self.iBudgetedColumn)
@@ -125,7 +125,7 @@ class Table(TM.tk.TableFrame):
         vDropdown.post(event.x_root, event.y_root)
 
     def RemoveRow(self, iRow):
-        self.vModel.NetWorth.RemoveRow(iRow-1)  # skip header
+        self.vModel.Accounts.RemoveRow(iRow-1)  # skip header
         self.Refresh()
 
     def SaveCellToModel(self, cell):

@@ -15,7 +15,7 @@ class Model():
         self.Categories = BV.Model.Categories(self)
         self.SpendingHistory = BV.Model.SpendingHistory(self)
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
-        self.NetWorth = BV.Model.NetWorth(self)
+        self.Accounts = BV.Model.Accounts(self)
         self.SplitMoneyHistory = BV.Model.SplitMoneyHistory(self)
         self.BudgetedSpendables = BV.Model.BudgetedSpendables(self)
         self.Balance = BV.Model.Balance(self)

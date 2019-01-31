@@ -4,8 +4,8 @@ from .Table import Table
 import BudgetValue as BV
 
 
-class NetWorth(tk.Frame):
-    name = "Net Worth"
+class Accounts(tk.Frame):
+    name = "Accounts"
 
     def __init__(self, parent, vModel):
         tk.Frame.__init__(self, parent)
@@ -30,13 +30,13 @@ class NetWorth(tk.Frame):
         self.vTable.Refresh()
 
     def TriggerChange(self):
-        if len(self.vModel.NetWorth) > 2:
-            self.vModel.NetWorth[0], self.vModel.NetWorth[1] = self.vModel.NetWorth[1], self.vModel.NetWorth[0]
+        if len(self.vModel.Accounts) > 2:
+            self.vModel.Accounts[0], self.vModel.Accounts[1] = self.vModel.Accounts[1], self.vModel.Accounts[0]
         self.vTable.Refresh()
 
     def AddRow(self):
-        self.vModel.NetWorth.AddRow()
+        self.vModel.Accounts.AddRow()
         self.vTable.Refresh()
 
     def _destroy(self):
-        self.vModel.NetWorth.Save()
+        self.vModel.Accounts.Save()

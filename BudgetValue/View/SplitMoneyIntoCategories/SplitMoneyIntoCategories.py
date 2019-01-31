@@ -29,14 +29,14 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_SplitBalance = ttk.Button(self.vButtonBar, text="Split Balance",
                                           command=lambda self=self: self.SplitBalance())
         vButton_SplitBalance.pack(side=tk.LEFT, anchor='w')
-        vButton_SplitNetWorth = ttk.Button(self.vButtonBar, text="Split NetWorth",
+        vButton_SplitAccounts = ttk.Button(self.vButtonBar, text="Split Accounts",
                                            command=lambda self=self: self.buttonPressed.on_next(None))
-        vButton_SplitNetWorth.pack(side=tk.LEFT, anchor='w')
+        vButton_SplitAccounts.pack(side=tk.LEFT, anchor='w')
         self.buttonPressed = rx.subjects.Subject()
         self.buttonPressed.with_latest_from(
-            self.vModel.NetWorth.total_stream,
+            self.vModel.Accounts.total_stream,
             lambda pressEvent, total: total
-        ).subscribe(lambda x: self.SplitNetWorth(x))
+        ).subscribe(lambda x: self.SplitAccounts(x))
         vButton_Print = ttk.Button(self.vButtonBar, text="Print",
                                    command=lambda self=self: self.Print())
         vButton_Print.pack(side=tk.LEFT, anchor='w')
@@ -74,7 +74,7 @@ class SplitMoneyIntoCategories(tk.Frame):
                 self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=paycheckPlan_row.amount)
         self.vTable.Refresh()
 
-    def SplitNetWorth(self, amount):
+    def SplitAccounts(self, amount):
         self.vModel.SplitMoneyHistory.AddColumn()
         self.vModel.SplitMoneyHistory.AddEntry(-1, "Net Worth", amount=amount)
         self.vTable.Refresh()

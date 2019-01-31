@@ -7,7 +7,7 @@ import BudgetValue as BV
 from BudgetValue.View import Fonts
 from BudgetValue.View.SpendFromCategories import SpendFromCategories
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
-from BudgetValue.View.NetWorth import NetWorth
+from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 import os
 import pickle
@@ -24,7 +24,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, PaycheckPlan, NetWorth, Reports)
+        cTabPages = (SplitMoneyIntoCategories, SpendFromCategories, PaycheckPlan, Accounts, Reports)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
