@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-from .Table import Table
+from .AccountsTable import AccountsTable
 import BudgetValue as BV
+from ..Misc import BudgetedTable
 
 
 class Accounts(tk.Frame):
@@ -21,22 +22,35 @@ class Accounts(tk.Frame):
         vButton_TriggerNonDistinctChange = ttk.Button(self.vButtonBar, text="TriggerChange",
                                                       command=lambda self=self: self.TriggerChange())
         vButton_TriggerNonDistinctChange.pack(side=tk.LEFT, anchor='w')
-        # Table
-        self.vCanvas = tk.Canvas(self, highlightthickness=0)
-        self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
-        self.vTable = Table(self.vCanvas, vModel)
-        self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
-        self.vTable.pack(anchor='nw')
-        self.vTable.Refresh()
+        # Frame of both tables
+        self.vFrameOfBothTables = tk.Frame(self)
+        self.vFrameOfBothTables.pack(side=tk.TOP, anchor='w')
+        # BudgetedTable
+        self.vBudgetedTableCanvas = tk.Canvas(self.vFrameOfBothTables, highlightthickness=0)
+        self.vBudgetedTableCanvas.pack(side=tk.LEFT, anchor='nw')
+        self.vBudgetedTable = BudgetedTable(self.vBudgetedTableCanvas, vModel)
+        self.vBudgetedTableCanvas.create_window((0, 0), window=self.vBudgetedTable, anchor='nw')
+        self.vBudgetedTable.pack(anchor='nw')
+        self.vBudgetedTable.Refresh()
+        # Verticle Separator
+        self.vVerticleSeparator = tk.Frame(self.vFrameOfBothTables, width=20)
+        self.vVerticleSeparator.pack(side=tk.LEFT, anchor='nw', fill='both')
+        # AccountsTable
+        self.vCanvas = tk.Canvas(self.vFrameOfBothTables, highlightthickness=0)
+        self.vCanvas.pack(side=tk.LEFT, fill='x', anchor='nw')
+        self.vAccountsTable = AccountsTable(self.vCanvas, vModel)
+        self.vCanvas.create_window((0, 0), window=self.vAccountsTable, anchor='nw')
+        self.vAccountsTable.pack(anchor='nw')
+        self.vAccountsTable.Refresh()
 
     def TriggerChange(self):
         if len(self.vModel.Accounts) > 2:
             self.vModel.Accounts[0], self.vModel.Accounts[1] = self.vModel.Accounts[1], self.vModel.Accounts[0]
-        self.vTable.Refresh()
+        self.vAccountsTable.Refresh()
 
     def AddRow(self):
         self.vModel.Accounts.AddRow()
-        self.vTable.Refresh()
+        self.vAccountsTable.Refresh()
 
     def _destroy(self):
         self.vModel.Accounts.Save()

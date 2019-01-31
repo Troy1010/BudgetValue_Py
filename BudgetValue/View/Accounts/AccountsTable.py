@@ -4,7 +4,7 @@ import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
 
 
-class Table(TM.tk.TableFrame):
+class AccountsTable(TM.tk.TableFrame):
     def __init__(self, parent, vModel):
         assert isinstance(vModel, BV.Model.Model)
         tk.Frame.__init__(self, parent)

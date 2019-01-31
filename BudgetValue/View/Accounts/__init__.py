@@ -1,4 +1,4 @@
 from .Accounts import Accounts
-from .Table import Table
+from .AccountsTable import AccountsTable
 
-__all__ = ["Accounts", "Table"]
+__all__ = ["Accounts", "AccountsTable"]
