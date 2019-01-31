@@ -22,16 +22,16 @@ class Difference(tk.Frame):
                 disposable.dispose()
         self.cDisposables = []
         # add new
-        # Balance
+        # Difference
         WF.MakeLable(self, (0, 0), text="Difference", columnspan=1, width=BV.Buffer(1))
-        vBalanceNum = WF.MakeEntry_ReadOnly(self, (0, 1), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
-        vBalanceNum.ValidationHandler = BV.MakeValid_Money
+        vDifferenceNum = WF.MakeEntry_ReadOnly(self, (0, 1), text=self.vModel.Balance.balance_stream, justify=tk.CENTER)
+        vDifferenceNum.ValidationHandler = BV.MakeValid_Money
 
         def __HighlightBalance(balance):
             if balance:
-                vBalanceNum.config(readonlybackground="pink")
+                vDifferenceNum.config(readonlybackground="pink")
             else:
-                vBalanceNum.config(readonlybackground="lightgreen")
+                vDifferenceNum.config(readonlybackground="lightgreen")
         self.cDisposables.append(self.vModel.Balance.balance_stream.subscribe(
             __HighlightBalance
         ))
