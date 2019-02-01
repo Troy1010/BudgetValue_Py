@@ -8,8 +8,8 @@ from .Accounts import Accounts
 from .Accounts import AccountsRow
 from .SplitMoneyHistory import SplitMoneyHistory
 from .PaycheckPlan import PaycheckPlanRow
-from .BudgetedSpendables import BudgetedSpendables
+from .Budgeted import Budgeted
 from .Balance import Balance
 from .SpendingHistory import SpendingHistory
 
-__all__ = ['Categories', 'Category', 'Model', 'ImportTransactionHistory', 'PaycheckPlan', 'CategoryType', 'Accounts', 'AccountsRow', 'SplitMoneyHistory', 'PaycheckPlanRow', 'BudgetedSpendables', 'Balance', 'SpendingHistory']
+__all__ = ['Categories', 'Category', 'Model', 'ImportTransactionHistory', 'PaycheckPlan', 'CategoryType', 'Accounts', 'AccountsRow', 'SplitMoneyHistory', 'PaycheckPlanRow', 'Budgeted', 'Balance', 'SpendingHistory']

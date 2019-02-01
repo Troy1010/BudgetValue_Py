@@ -2,7 +2,7 @@ import BudgetValue as BV
 import rx
 
 
-class BudgetedSpendables():
+class Budgeted():
     def __init__(self, vModel):
         assert(isinstance(vModel, BV.Model.Model))
         self.vModel = vModel

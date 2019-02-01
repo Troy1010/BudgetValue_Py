@@ -95,17 +95,16 @@ class BudgetedTable(CategoryTable):
         # Data
         for category in self.vModel.Categories.Select():
             # Budgeted
-            if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
-                w = self.__BudgetedCell((row, 1), text=self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name])
-            # Highlight Budgeted
+            if category.name in self.vModel.Budgeted.cCategoryTotalStreams:
+                w = self.__BudgetedCell((row, 1), text=self.vModel.Budgeted.cCategoryTotalStreams[category.name])
+                # Highlight
 
-            def HighlightBudgeted(budgeted_amount, w):
-                if budgeted_amount < 0:
-                    w.configure(readonlybackground=vSkin.BG_BUDGETED_BAD)
-                else:
-                    w.configure(readonlybackground=vSkin.BG_BUDGETED)
-            if category.name in self.vModel.BudgetedSpendables.cCategoryTotalStreams:
-                disposable = self.vModel.BudgetedSpendables.cCategoryTotalStreams[category.name].subscribe(
+                def HighlightBudgeted(budgeted_amount, w):
+                    if budgeted_amount < 0:
+                        w.configure(readonlybackground=vSkin.BG_BUDGETED_BAD)
+                    else:
+                        w.configure(readonlybackground=vSkin.BG_BUDGETED)
+                disposable = self.vModel.Budgeted.cCategoryTotalStreams[category.name].subscribe(
                     lambda budgeted_amount, w=w: HighlightBudgeted(budgeted_amount, w)
                 )
                 self.cDisposables.append(disposable)
