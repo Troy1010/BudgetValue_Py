@@ -1,6 +1,7 @@
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
 from .Skin import vSkin
+import rx
 
 
 class Buffer():
@@ -49,6 +50,10 @@ def MakeEntry_ReadOnly(*args, **kwargs):
 
 def MakeButton(*args, **kwargs):
     kwargs['relief'] = "groove"
+    if 'width' not in kwargs:
+        text = kwargs['text'] if not isinstance(kwargs['text'], rx.subjects.BehaviorSubject) else kwargs['text'].value
+        if len(text)-1 < 10:
+            kwargs['width'] = 10
     w = TM.tk.Button(*args, **kwargs)
     w.pack(side=tk.LEFT, anchor='w')
     return w
