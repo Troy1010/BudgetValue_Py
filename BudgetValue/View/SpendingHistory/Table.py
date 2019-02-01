@@ -68,8 +68,11 @@ class Table(Misc.BudgetedTable):
     def GetAddableCategories(self, iColumn):
         cAddableCategories = list()
         for category in self.vModel.Categories.values():
-            if category.name not in self.vModel.SpendingHistory[iColumn].keys():
-                cAddableCategories.append(category)
+            if category.type == BV.Model.CategoryType.income:
+                continue
+            if category.name in self.vModel.SpendingHistory[iColumn].keys():
+                continue
+            cAddableCategories.append(category)
         return cAddableCategories
 
     def AddCategoryToColumn(self, category, iColumn):
