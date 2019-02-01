@@ -1,55 +1,42 @@
 from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
-import TM_CommonPy as TM
 import BudgetValue as BV
 from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
 from BudgetValue.View import WidgetFactories as WF
 from ...Model.Categories import Categories
+from .. import Misc
 
 
-class Table(TM.tk.TableFrame):
+class Table(Misc.CategoryTable):
     def __init__(self, parent, vModel):
+        super().__init__(parent, vModel)
         assert isinstance(vModel, BV.Model.Model)
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
 
     def Refresh(self):
-        # remove old
-        for child in BV.GetAllChildren(self):
-            child.grid_forget()
-            child.destroy()
-        # add new
-        row = 0
+        super().Refresh()
         # Header
-        for j, header_name in enumerate(['Category', 'Amount', 'Period', 'Plan']):
-            WF.MakeHeader(self, (row, j), text=header_name)
-        row += 1
+        for j, header_name in enumerate(['Amount', 'Period', 'Plan']):
+            WF.MakeHeader(self, (0, j+self.iFirstDataColumn), text=header_name)
         # Data
-        prev_type = None
-        for category in self.vModel.Categories.Select():
-            # make separation label if needed
-            if prev_type != category.type:
-                prev_type = category.type
-                WF.MakeSeparationLable(self, row, "  " + prev_type.name.capitalize())
-                row += 1
+        for row, category in enumerate(self.vModel.Categories.Select(), self.iFirstDataRow):
             # generate row
             amount_stream = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount_stream
             try:
                 period = self.vModel.PaycheckPlan[category.name].period
             except (AttributeError, KeyError):
                 period = None
-            WF.MakeRowHeader(self, (row, 0), text=category.name, columnspan=3)
             if category.IsSpendable():
                 self.MakeEntry_Money((row, 1))
                 self.MakeEntry((row, 2), text=period)
                 self.MakeEntry_Money((row, 3), text=amount_stream)
-                self.MakeRowValid(row)
             else:
                 bEditableState = category != Categories.default_category
                 self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
-            row += 1
+        super().FinishRefresh()
 
     def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True):
         w = WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState)
