@@ -38,7 +38,7 @@ class AccountsTable(TM.tk.TableFrame):
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
         row += 1
         # Accounts Total
-        WF.MakeLable(self, (row, 0), text="Accounts Total", width=WF.Buffer(1))
+        WF.MakeLable(self, (row, 0), text="Total", width=WF.Buffer(1))
         WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
         row += 1
 

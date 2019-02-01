@@ -123,4 +123,4 @@ class SpendingHistoryEntry():
 
     @amount.setter
     def amount(self, value):
-        self.amount_stream.on_next(BV.MakeValid_Money(value))
+        self.amount_stream.on_next(BV.MakeValid_Money_Negative(value))

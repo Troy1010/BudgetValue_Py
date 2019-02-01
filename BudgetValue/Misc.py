@@ -42,3 +42,11 @@ def MakeValid_Money(value):
 def MakeValid_Money_ZeroIsNone(value):
     value = MakeValid_Money(value)
     return None if not value or value == 0 else value
+
+
+def MakeValid_Money_Negative(value):
+    value = MakeValid_Money(value)
+    if value > 0:
+        return Decimal(0)
+    else:
+        return value

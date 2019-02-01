@@ -15,6 +15,6 @@ class BudgetedTable(Misc.BudgetedTable):
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.GetMaxColumn()+1, sticky="ew")
         row += 1
         # Budgeted Total
-        WF.MakeLable(self, (row, 0), text="Budgeted Total", width=WF.Buffer(1))
+        WF.MakeLable(self, (row, 0), text="Total", width=WF.Buffer(1))
         WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Budgeted.total_stream, justify=tk.CENTER)
         row += 1
