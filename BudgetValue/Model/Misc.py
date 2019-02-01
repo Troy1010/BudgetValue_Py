@@ -3,6 +3,14 @@ import rx
 import TM_CommonPy as TM  # noqa
 
 
+def GetDiffStream(stream):
+    temp_stream = rx.subjects.BehaviorSubject(0)
+    diff_stream = temp_stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).replay(1).ref_count()
+    diff_stream.subscribe()
+    stream.subscribe(temp_stream)
+    return diff_stream
+
+
 class StreamInfo():
     def __init__(self, bAdd, stream, categoryName=None):
         self.bAdd = bAdd
@@ -17,8 +25,6 @@ class Dict_AmountStreamStream(dict):
         self._amountStream_stream = rx.subjects.Subject()
 
     def __setitem__(self, key, value):
-        # if key is <Default Category> and it isn't a BalanceEntry, a mistake has been made
-        assert(not (key == "<Default Category>" and not isinstance(value, BalanceEntry)))
         # if we have an old value and it isn't the new value, remove old value
         if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
             self[key].amount_stream.on_next(0)
