@@ -3,6 +3,7 @@ import pickle
 import BudgetValue as BV
 import rx
 from . import Misc
+from .Misc import GetDiffStream
 
 
 class SpendingHistory(list):
@@ -15,6 +16,17 @@ class SpendingHistory(list):
             self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(0)
         # Load
         self.Load()
+        # subscribe cCategoryTotalStreams to ImportTransactionsTotals
+
+        def AdjustTotal(value, categoryName):
+            self.cCategoryTotalStreams[categoryName].on_next(
+                self.cCategoryTotalStreams[categoryName].value+value
+            )
+
+        for categoryName, stream in self.vModel.ImportTransactionHistory.cCategoryTotalStreams.items():
+            GetDiffStream(stream).subscribe(
+                lambda value, categoryName=categoryName: AdjustTotal(value, categoryName)
+            )
 
     def __delitem__(self, key):
         self[key].destroy()
@@ -56,8 +68,6 @@ class SpendingHistory(list):
         for cColumn in data:
             self.AddColumn()
             for categoryName, entry in cColumn.items():
-                if categoryName == "<Default Category>":
-                    continue
                 self.AddEntry(-1, categoryName)
                 for k, v in entry.items():
                     setattr(self[-1][categoryName], k, v)
@@ -91,10 +101,6 @@ class SpendingHistoryColumn(Misc.Dict_TotalStream):
         self.cDisposables[0] = self._amountStream_stream.subscribe(
             lambda stream_info: __SubscribeCategoryTotalStream(self, stream_info)
         )
-        #
-        self["<Default Category>"] = Misc.BalanceEntry(self, self.total_stream)
-        __SubscribeCategoryTotalStream(self, BV.Model.Misc.StreamInfo(True, self["<Default Category>"].amount_stream, "<Default Category>"))
-        # FIX: The above command should be unnecessary, but BalanceEntry is currently filtered from _amount_stream
 
     def destroy(self):
         # trigger __delitem__ for each key
