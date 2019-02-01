@@ -9,17 +9,10 @@ from .. import Misc
 class Table(Misc.BudgetedTable):
     def Refresh(self):
         super().Refresh()
-        # Category Total
-        # Header
-        WF.MakeHeader(self, (0, self.iFirstDataColumn), text="Category Total", background=vSkin.BG_READ_ONLY)
-        # Category Total
-        for row, category_total_stream in enumerate(self.vModel.SpendingHistory.cCategoryTotalStreams.values()):
-            self.MakeEntry((row+self.iFirstDataRow, self.iFirstDataColumn), text=category_total_stream, bEditableState=False,
-                           background=vSkin.BG_READ_ONLY)
-        self.iFirstDataColumn += 1
-        # Header
-        WF.MakeHeader(self, (0, self.iFirstDataColumn), text="Import Transactions", background=vSkin.BG_READ_ONLY)
         # Import Transactions
+        #  Header
+        WF.MakeHeader(self, (0, self.iFirstDataColumn), text="Import Transactions", background=vSkin.BG_READ_ONLY)
+        #  Cells
         for row, category_total_stream in enumerate(self.vModel.ImportTransactionHistory.cCategoryTotalStreams.values()):
             self.MakeEntry((row+self.iFirstDataRow, self.iFirstDataColumn), text=category_total_stream, bEditableState=False,
                            background=vSkin.BG_READ_ONLY)
