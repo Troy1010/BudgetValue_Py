@@ -9,6 +9,7 @@ import BudgetValue as BV
 import rx
 from .. import WidgetFactories as WF
 from ..Skin import vSkin
+from ...Model.Categories import Categories
 
 
 class SplitMoneyIntoCategories(tk.Frame):
@@ -28,19 +29,19 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                            command=lambda self=self: self.SplitPaycheck())
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
-        # Button_SplitBalance
-        vSplitBalanceText_stream = rx.subjects.BehaviorSubject("Split Balance")
+        # Button_SplitDifference
+        vSplitDifferenceText_stream = rx.subjects.BehaviorSubject("")
         self.vModel.Balance.balance_stream.map(
-            lambda balance: "Split Balance (" + str(balance) + ")"
-        ).subscribe(vSplitBalanceText_stream)
-        vButton_SplitBalance = WF.MakeButton(self.vButtonBar, text=vSplitBalanceText_stream,
-                                             command=lambda self=self: self.SplitBalance())
+            lambda balance: "Split Difference (" + str(balance) + ")"
+        ).subscribe(vSplitDifferenceText_stream)
+        vButton_SplitDifference = WF.MakeButton(self.vButtonBar, text=vSplitDifferenceText_stream,
+                                                command=lambda self=self: self.SplitDifference())
 
         def HighlightBalanceButton(balance):
             if balance:
-                vButton_SplitBalance.config(background=vSkin.BG_BAD)
+                vButton_SplitDifference.config(background=vSkin.BG_BAD)
             else:
-                vButton_SplitBalance.config(background=vSkin.BG_DEFAULT)
+                vButton_SplitDifference.config(background=vSkin.BG_DEFAULT)
         self.vModel.Balance.balance_stream.subscribe(HighlightBalanceButton)
         # Button_SplitAccounts
         vButton_SplitAccounts = ttk.Button(self.vButtonBar, text="Split Accounts",
@@ -51,10 +52,6 @@ class SplitMoneyIntoCategories(tk.Frame):
             self.vModel.Accounts.total_stream,
             lambda pressEvent, total: total
         ).subscribe(lambda x: self.SplitAccounts(x))
-        #
-        vButton_Print = ttk.Button(self.vButtonBar, text="Print",
-                                   command=lambda self=self: self.Print())
-        vButton_Print.pack(side=tk.LEFT, anchor='w')
         # Table
         self.vCanvas = tk.Canvas(self, highlightthickness=0)
         self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
@@ -67,31 +64,25 @@ class SplitMoneyIntoCategories(tk.Frame):
                                      command=lambda self=self: self.vTable.Refresh())
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
-    def Print(self):
-        print("self.vModel.SplitMoneyHistory..")
-        for i, cColumn in enumerate(self.vModel.SplitMoneyHistory):
-            print(" Column "+str(i))
-            for vEntry in cColumn:
-                print("  "+vEntry.category.name+" - "+str(vEntry.amount))
-
     def _destroy(self):
         self.vModel.SplitMoneyHistory.Save()
 
-    def SplitBalance(self):
+    def SplitDifference(self):
         self.vModel.SplitMoneyHistory.AddColumn()
-        self.vModel.SplitMoneyHistory.AddEntry(-1, "Income", amount=self.vModel.Balance.balance_stream.value)
+        self.vModel.SplitMoneyHistory.AddEntry(-1, Categories.default_income, amount=self.vModel.Balance.balance_stream.value)
         self.vTable.Refresh()
 
     def SplitPaycheck(self):
         self.vModel.SplitMoneyHistory.AddColumn()
         for categoryName, paycheckPlan_row in self.vModel.PaycheckPlan.items():
-            if categoryName != "<Default Category>":
-                self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=paycheckPlan_row.amount)
+            if categoryName == Categories.default_category.name:
+                continue
+            self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=paycheckPlan_row.amount)
         self.vTable.Refresh()
 
     def SplitAccounts(self, amount):
         self.vModel.SplitMoneyHistory.AddColumn()
-        self.vModel.SplitMoneyHistory.AddEntry(-1, "Net Worth", amount=amount)
+        self.vModel.SplitMoneyHistory.AddEntry(-1, Categories.default_income, amount=amount)
         self.vTable.Refresh()
 
     def AddSplitMoneyHistoryColumn(self):

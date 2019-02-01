@@ -3,6 +3,7 @@ import pickle
 import os
 import rx
 from . import Misc
+from .Categories import Categories
 
 
 class PaycheckPlan(Misc.Dict_TotalStream):
@@ -12,7 +13,7 @@ class PaycheckPlan(Misc.Dict_TotalStream):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
         self.Load()
-        self["<Default Category>"] = Misc.BalanceEntry(self, self.total_stream)
+        self[Categories.default_category.name] = Misc.BalanceEntry(self, self.total_stream)
 
     def __setitem__(self, key, value):
         # Keys must be a category name
@@ -31,12 +32,12 @@ class PaycheckPlan(Misc.Dict_TotalStream):
 
     def Save(self):
         data = dict()
-        for categoryName, category_plan in dict(self).items():
-            if categoryName == "<Default Category>":
+        for categoryName, paycheck_plan_row in dict(self).items():
+            if isinstance(paycheck_plan_row, Misc.BalanceEntry):
                 continue
             category_plan_storable = dict()
-            category_plan_storable['amount'] = category_plan.amount
-            category_plan_storable['period'] = category_plan.period
+            category_plan_storable['amount'] = paycheck_plan_row.amount
+            category_plan_storable['period'] = paycheck_plan_row.period
             data[categoryName] = category_plan_storable
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
@@ -49,6 +50,8 @@ class PaycheckPlan(Misc.Dict_TotalStream):
         if not data:
             return
         for categoryName, categoryPlan in data.items():
+            if categoryName not in self.vModel.Categories.keys():
+                continue
             self[categoryName] = PaycheckPlanRow()
             for k, v in categoryPlan.items():
                 setattr(self[categoryName], k, v)

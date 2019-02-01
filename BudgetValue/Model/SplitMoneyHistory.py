@@ -3,6 +3,7 @@ import pickle
 import BudgetValue as BV
 import rx
 from . import Misc
+from .Categories import Categories
 
 
 class SplitMoneyHistory(list):
@@ -30,6 +31,8 @@ class SplitMoneyHistory(list):
         self.append(SplitMoneyHistoryColumn(self.vModel, self))
 
     def AddEntry(self, iColumn, categoryName, amount=0):
+        if isinstance(categoryName, BV.Model.Category):
+            categoryName = categoryName.name
         self[iColumn][categoryName] = SplitMoneyHistoryEntry()
         self[iColumn][categoryName].amount = amount
 
@@ -42,6 +45,7 @@ class SplitMoneyHistory(list):
                     continue
                 cSplitMoneyHistoryEntry_storable = dict()
                 cSplitMoneyHistoryEntry_storable['amount'] = vSplitMoneyHistoryEntry.amount
+                cSplitMoneyHistoryEntry_storable['bIncome'] = self.vModel.Categories[categoryName].type == BV.Model.CategoryType.income
                 data[-1][categoryName] = cSplitMoneyHistoryEntry_storable
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
@@ -56,7 +60,10 @@ class SplitMoneyHistory(list):
         for cColumn in data:
             self.AddColumn()
             for categoryName, entry in cColumn.items():
-                if categoryName == "<Default Category>":
+                if categoryName == Categories.default_category.name:
+                    continue
+                if categoryName not in self.vModel.Categories.keys():
+                    print("WARNING: SplitMoneyHistory- loading an unknown categoryName:"+categoryName)
                     continue
                 self.AddEntry(-1, categoryName)
                 for k, v in entry.items():
@@ -92,8 +99,8 @@ class SplitMoneyHistoryColumn(Misc.Dict_TotalStream):
             lambda stream_info: __SubscribeCategoryTotalStream(self, stream_info)
         )
         #
-        self["<Default Category>"] = Misc.BalanceEntry(self, self.total_stream)
-        __SubscribeCategoryTotalStream(self, BV.Model.Misc.StreamInfo(True, self["<Default Category>"].amount_stream, "<Default Category>"))
+        self[Categories.default_category.name] = Misc.BalanceEntry(self, self.total_stream)
+        __SubscribeCategoryTotalStream(self, BV.Model.Misc.StreamInfo(True, self[Categories.default_category.name].amount_stream, Categories.default_category.name))
         # FIX: The above command should be unnecessary, but BalanceEntry is currently filtered from _amount_stream
 
     def destroy(self):

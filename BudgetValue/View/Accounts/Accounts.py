@@ -1,9 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
 from .AccountsTable import AccountsTable
 import BudgetValue as BV
 from .BudgetedTable import BudgetedTable
 from .Difference import Difference
+from .. import WidgetFactories as WF
 
 
 class Accounts(tk.Frame):
@@ -17,8 +17,8 @@ class Accounts(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-        vButton_AddRow = ttk.Button(self.vButtonBar, text="AddRow",
-                                    command=lambda self=self: self.AddRow())
+        vButton_AddRow = WF.MakeButton(self.vButtonBar, text="Add Row",
+                                       command=lambda self=self: self.AddRow())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
         # Frame of tables
         self.vFrameOfTables = tk.Frame(self)

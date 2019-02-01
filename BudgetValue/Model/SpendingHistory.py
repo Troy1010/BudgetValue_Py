@@ -68,6 +68,9 @@ class SpendingHistory(list):
         for cColumn in data:
             self.AddColumn()
             for categoryName, entry in cColumn.items():
+                if categoryName not in self.vModel.Categories.keys():
+                    print("WARNING: SpendingHistory- loading an unknown categoryName:"+categoryName)
+                    continue
                 self.AddEntry(-1, categoryName)
                 for k, v in entry.items():
                     setattr(self[-1][categoryName], k, v)

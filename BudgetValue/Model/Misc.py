@@ -1,6 +1,7 @@
 import BudgetValue as BV
 import rx
 import TM_CommonPy as TM  # noqa
+from .Categories import Categories
 
 
 def GetDiffStream(stream):
@@ -162,7 +163,7 @@ class Dict_TotalStream(TotalStream_Inheritable, DiffStreams_Inheritable, Dict_Am
 class BalanceEntry():
     def __init__(self, parent, total_stream):
         self.parent = parent
-        self._category = self.parent.vModel.Categories["<Default Category>"]
+        self._category = self.parent.vModel.Categories[Categories.default_category.name]
         self.amount_stream = rx.subjects.BehaviorSubject(0)
         total_stream.map(
             lambda total: -total

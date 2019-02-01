@@ -5,6 +5,7 @@ import BudgetValue as BV
 from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
 from BudgetValue.View import WidgetFactories as WF
+from ...Model.Categories import Categories
 
 
 class Table(TM.tk.TableFrame):
@@ -46,7 +47,7 @@ class Table(TM.tk.TableFrame):
                 self.MakeEntry_Money((row, 3), text=amount_stream)
                 self.MakeRowValid(row)
             else:
-                bEditableState = category.name != "<Default Category>"
+                bEditableState = category != Categories.default_category
                 self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
             row += 1
 

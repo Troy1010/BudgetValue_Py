@@ -6,6 +6,7 @@ import os
 from decimal import Decimal
 import rx
 import BudgetValue as BV
+from .Categories import Categories
 
 
 class ImportTransactionHistory():
@@ -33,7 +34,7 @@ class ImportTransactionHistory():
         extension = os.path.splitext(sFilePath)[1][1:]
         if extension == 'csv':
             for index, row in pd.read_csv(sFilePath).iterrows():
-                data.append(["<Default Category>", row[0], row[2],
+                data.append([Categories.default_category.name, row[0], row[2],
                              row[3] if not pd.isnull(row[3]) else row[4], row[5]])
         else:
             BVLog.debug("Unrecognized file extension:" + extension)
