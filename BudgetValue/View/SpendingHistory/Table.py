@@ -90,5 +90,4 @@ class Table(Misc.BudgetedTable):
     def SaveCellToModel(self, cell):
         iColumn = cell.column - self.iFirstDataColumn
         categoryName = self.GetCell(cell.row, 0).text
-        print('SaveCellToModel. categoryName:'+categoryName+" amount:"+str(cell.text))
         self.vModel.SpendingHistory[iColumn][categoryName].amount = cell.text
