@@ -9,6 +9,19 @@ from .. import Misc
 class Table(Misc.BudgetedTable):
     def Refresh(self):
         super().Refresh()
+        # Category Total
+        # Header
+        WF.MakeHeader(self, (0, self.iFirstDataColumn), text="Category Total")
+        # Category Total
+        for row, category_total_stream in enumerate(self.vModel.SpendingHistory.cCategoryTotalStreams.values()):
+            self.MakeEntry((row+self.iFirstDataRow, self.iFirstDataColumn), text=category_total_stream, bEditableState=False)
+        self.iFirstDataColumn += 1
+        # Header
+        WF.MakeHeader(self, (0, self.iFirstDataColumn), text="Import Transactions")
+        # Import Transactions
+        for row, category_total_stream in enumerate(self.vModel.ImportTransactionHistory.cCategoryTotalStreams.values()):
+            self.MakeEntry((row+self.iFirstDataRow, self.iFirstDataColumn), text=category_total_stream, bEditableState=False)
+        self.iFirstDataColumn += 1
         # Column Header
         for iColumn, split_money_history_column in enumerate(self.vModel.SpendingHistory):
             vColumnHeader = WF.MakeHeader(self, (0, iColumn+self.iFirstDataColumn), text="Column "+str(iColumn+1))
@@ -18,16 +31,11 @@ class Table(Misc.BudgetedTable):
             # SpendingHistory
             for iColumn, split_money_history_column in enumerate(self.vModel.SpendingHistory):
                 if category.name in split_money_history_column:
-                    background = vSkin.BG_READ_ONLY if category.name == "<Default Category>" else vSkin.BG_DEFAULT
-                    bEditableState = category.name != "<Default Category>"
                     w = self.MakeEntry((row+self.iFirstDataRow, iColumn+self.iFirstDataColumn),
-                                       text=split_money_history_column[category.name].amount_stream,
-                                       bEditableState=bEditableState,
-                                       background=background
+                                       text=split_money_history_column[category.name].amount_stream
                                        )
-                    if bEditableState:
-                        w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
-                        w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+                    w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
+                    w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
         self.FinishRefresh()
 
@@ -77,4 +85,5 @@ class Table(Misc.BudgetedTable):
     def SaveCellToModel(self, cell):
         iColumn = cell.column - self.iFirstDataColumn
         categoryName = self.GetCell(cell.row, 0).text
+        print('SaveCellToModel. categoryName:'+categoryName+" amount:"+str(cell.text))
         self.vModel.SpendingHistory[iColumn][categoryName].amount = cell.text
