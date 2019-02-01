@@ -34,8 +34,12 @@ class ImportTransactionHistory():
         extension = os.path.splitext(sFilePath)[1][1:]
         if extension == 'csv':
             for index, row in pd.read_csv(sFilePath).iterrows():
-                data.append([Categories.default_category.name, row[0], row[2],
-                             row[3] if not pd.isnull(row[3]) else row[4], row[5]])
+                if not pd.isnull(row[3]):
+                    data.append([Categories.default_category.name, row[0], row[2],
+                                 row[3], row[5]])
+                else:
+                    data.append([Categories.default_income.name, row[0], row[2],
+                                 row[4], row[5]])
         else:
             BVLog.debug("Unrecognized file extension:" + extension)
             return
@@ -48,6 +52,9 @@ class ImportTransactionHistory():
             pass
         sheet.to_sql(name, self.vModel.connection, index=True)
         self.vModel.connection.commit()
+        # trigger ObserveUpdatedCategory
+        for category in self.vModel.Categories.values():
+            self.ObserveUpdatedCategory.on_next(category)
 
     def _GetTotalOfAmountsOfCategory(self, categoryName):
         categoryCursor = self.vModel.connection.cursor()
