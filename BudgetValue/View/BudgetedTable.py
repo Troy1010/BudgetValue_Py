@@ -2,7 +2,7 @@ import TM_CommonPy as TM  # noqa
 import tkinter as tk  # noqa
 import BudgetValue as BV  # noqa
 from BudgetValue.View import WidgetFactories as WF  # noqa
-from .. import Misc  # noqa
+from . import Misc  # noqa
 
 
 class BudgetedTable(Misc.BudgetedTable):

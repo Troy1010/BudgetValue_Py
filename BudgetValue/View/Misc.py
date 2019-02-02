@@ -6,8 +6,8 @@ import BudgetValue as BV
 from . import WidgetFactories as WF
 
 
-class CategoryTable(TM.tk.TableFrame):
-    iFirstDataColumn = 1
+class ModelTable(TM.tk.TableFrame):
+    iFirstDataColumn = 0
     iFirstDataRow = 1
 
     def __init__(self, parent, vModel):
@@ -16,7 +16,6 @@ class CategoryTable(TM.tk.TableFrame):
         self.vModel = vModel
         self.parent = parent
         self.cDisposables = []
-        self._cRowToCategory = {}
 
     def Refresh(self):
         # remove old
@@ -27,6 +26,18 @@ class CategoryTable(TM.tk.TableFrame):
             for disposable in self.cDisposables:
                 disposable.dispose()
         self.cDisposables = []
+
+
+class CategoryTable(ModelTable):
+    iFirstDataColumn = 1
+    iFirstDataRow = 1
+
+    def __init__(self, parent, vModel):
+        super().__init__(parent, vModel)
+        self._cRowToCategory = {}
+
+    def Refresh(self):
+        super().Refresh()
         # add new
         # Column Header
         WF.MakeHeader(self, (0, 0), text="Category")
@@ -37,9 +48,9 @@ class CategoryTable(TM.tk.TableFrame):
     def FinishRefresh(self):
         self.AddRowHeaders()
         self.AddSeparationLables()
-        self.PopulateRowToCategory()
+        self._PopulateRowToCategory()
 
-    def PopulateRowToCategory(self):
+    def _PopulateRowToCategory(self):
         # Populate _cRowToCategory
         row = self.iFirstDataRow
         max_row = self.GetMaxRow()

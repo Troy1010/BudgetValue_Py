@@ -12,6 +12,7 @@ class Model():
         self.sSpendingHistoryFile = os.path.join(self.sWorkspace, "SpendingsHistory.db")
         self.connection = sqlite3.connect(self.sSpendingHistoryFile)
         self.connection.row_factory = sqlite3.Row
+        #
         self.Categories = BV.Model.Categories()
         self.ImportTransactionHistory = BV.Model.ImportTransactionHistory(self)
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)

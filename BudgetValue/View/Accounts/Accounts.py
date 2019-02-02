@@ -1,7 +1,7 @@
 import tkinter as tk
 from .AccountsTable import AccountsTable
 import BudgetValue as BV
-from .BudgetedTable import BudgetedTable
+from ..BudgetedTable import BudgetedTable
 from .Difference import Difference
 from .. import WidgetFactories as WF
 
