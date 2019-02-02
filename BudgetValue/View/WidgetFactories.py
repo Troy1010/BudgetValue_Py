@@ -59,7 +59,7 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0):
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, validation=None):
     if isinstance(width, Buffer):
         width = len(text) + width.value
     #
@@ -75,6 +75,8 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
+    # Validation
+    w.ValidationHandler = validation
     # Events
     w.bind('<Escape>', lambda event: self.FocusNothing())
     if bEditableState:
