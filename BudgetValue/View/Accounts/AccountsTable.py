@@ -36,7 +36,7 @@ class AccountsTable(TM.tk.TableFrame):
             WF.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
         # Black bar
-        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=4, sticky="ew")
+        tk.Frame(self, background='black', height=2).grid(row=row, columnspan=2, sticky="ew")
         row += 1
         # Accounts Total
         WF.MakeLable(self, (row, 0), text="Total", width=WF.Buffer(1))

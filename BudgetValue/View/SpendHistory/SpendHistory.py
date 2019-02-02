@@ -22,8 +22,6 @@ class SpendHistory(tk.Frame):
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
         WF.MakeButton(self.vButtonBar, text="Boop")
-        WF.MakeButton(self.vButtonBar, text="Add Spend",
-                      command=lambda: self.vModel.SpendHistory.AddSpend(time.time()))
         # Frame of tables
         self.vFrameOfTables = tk.Frame(self)
         self.vFrameOfTables.pack(side=tk.TOP, anchor='w')
@@ -45,6 +43,8 @@ class SpendHistory(tk.Frame):
         self.vTable.pack(anchor='nw')
         self.vTable.Refresh()
         # ButtonBar More
+        WF.MakeButton(self.vButtonBar, text="Add Spend",
+                      command=lambda: (self.vModel.SpendHistory.AddSpend(time.time()), self.vTable.Refresh())[0])
         vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
                                      command=lambda self=self: self.vTable.Refresh())
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
