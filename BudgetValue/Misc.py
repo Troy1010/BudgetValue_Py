@@ -50,3 +50,8 @@ def MakeValid_Money_Negative(value):
         return Decimal(0)
     else:
         return value
+
+
+def MakeValid_Money_Negative_ZeroIsNone(value):
+    value = MakeValid_Money_Negative(value)
+    return None if not value or value == 0 else value
