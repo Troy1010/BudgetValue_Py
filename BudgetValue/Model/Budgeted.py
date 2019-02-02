@@ -20,6 +20,6 @@ class Budgeted():
             # feed category_total_stream
             rx.Observable.combine_latest(
                 self.vModel.SplitMoneyHistory.cCategoryTotalStreams[category.name],
-                self.vModel.SpendingHistory.cCategoryTotalStreams[category.name],
+                self.vModel.SpendHistory.cCategoryTotalStreams[category.name],
                 lambda x, y: BV.MakeValid_Money(x+y)
             ).subscribe(self.cCategoryTotalStreams[category.name])

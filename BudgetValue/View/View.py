@@ -9,7 +9,7 @@ from BudgetValue.View.ImportTransactionHistory import ImportTransactionHistory
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
-from BudgetValue.View.SpendingHistory import SpendingHistory
+from BudgetValue.View.SpendHistory import SpendHistory
 import os
 import pickle
 
@@ -25,7 +25,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SplitMoneyIntoCategories, SpendingHistory, Accounts, Reports, PaycheckPlan, ImportTransactionHistory)
+        cTabPages = (SplitMoneyIntoCategories, SpendHistory, Accounts, Reports, PaycheckPlan, ImportTransactionHistory)
         # MenuBar
         vMenuBar = MenuBar(vModel)
         self.config(menu=vMenuBar)
@@ -56,8 +56,12 @@ class View(tk.Tk):
         if not os.path.exists(self.sSaveFile):
             return
         with open(self.sSaveFile, 'rb') as f:
-            data = pickle.load(f)
-        if not data:
+            data = None
+            try:
+                data = pickle.load(f)
+            except ModuleNotFoundError:  # module has been renamed
+                pass
+        if data is None:
             return
         self.vLastShownTab = data[0]
 
@@ -66,7 +70,7 @@ class MenuBar(tk.Menu):
     def __init__(self, vModel):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
-        vFileMenu.add_command(label="Import Spending History",
+        vFileMenu.add_command(label="Import Spend History",
                               command=lambda vModel=vModel: BV.View.ImportTransactionHistory.ImportHistory(vModel))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)

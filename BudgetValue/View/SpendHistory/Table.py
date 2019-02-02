@@ -10,5 +10,7 @@ class Table(Misc.BudgetedTable):
     def Refresh(self):
         super().Refresh()
         # Data
+        for spend in self.vModel.SpendHistory:
+            pass
         #
         self.FinishRefresh()

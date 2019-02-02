@@ -9,7 +9,7 @@ import BudgetValue as BV
 from .. import WidgetFactories as WF
 
 
-class SpendingHistory(tk.Frame):
+class SpendHistory(tk.Frame):
     name = "Spend From Categories"
 
     def __init__(self, parent, vModel):
@@ -20,9 +20,7 @@ class SpendingHistory(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-        vButton_AddColumn = WF.MakeButton(self.vButtonBar, text="Add Column",
-                                          command=lambda self=self: self.AddSpendingHistoryColumn())
-        vButton_AddColumn.pack(side=tk.LEFT, anchor='w')
+        WF.MakeButton(self.vButtonBar, text="Boop")
         # Table
         self.vCanvas = tk.Canvas(self, highlightthickness=0)
         self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
@@ -36,8 +34,4 @@ class SpendingHistory(tk.Frame):
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def _destroy(self):
-        self.vModel.SpendingHistory.Save()
-
-    def AddSpendingHistoryColumn(self):
-        self.vModel.SpendingHistory.AddColumn()
-        self.vTable.Refresh()
+        self.vModel.SpendHistory.Save()

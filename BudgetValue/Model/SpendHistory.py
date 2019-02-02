@@ -8,10 +8,10 @@ from .Categories import Categories
 import time
 
 
-class SpendingHistory(dict):
+class SpendHistory(dict):
     def __init__(self, vModel):
         self.vModel = vModel
-        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SpendingHistory.pickle")
+        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SpendHistory.pickle")
         # Determine cCategoryTotalStreams
         self.cCategoryTotalStreams = dict()
         for categoryName in self.vModel.Categories.keys():
@@ -29,6 +29,24 @@ class SpendingHistory(dict):
             GetDiffStream(stream).subscribe(
                 lambda value, categoryName=categoryName: AdjustTotal(value, categoryName)
             )
+
+    def values_flat(self):
+        for spend_list in self.values():
+            for spend in spend_list:
+                yield spend
+
+    def AddSpend(self, timestamp, amount=None, description=None, category=None):
+        if timestamp not in self:
+            self[timestamp] = list(SpendEntry(self))
+        else:
+            self[timestamp].append(SpendEntry(self))
+        self[timestamp][-1].timestamp = timestamp
+        if amount is not None:
+            self[timestamp][-1].amount = amount
+        if description is not None:
+            self[timestamp][-1].description = description
+        if category is not None:
+            self[timestamp][-1].category = category
 
     def Save(self):
         data = dict()
@@ -49,11 +67,39 @@ class SpendingHistory(dict):
 
 
 class SpendEntry():
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.amount_stream = rx.subjects.BehaviorSubject(0)
         self.category_stream = rx.subjects.BehaviorSubject(Categories.default_category)
         self.timestamp_stream = rx.subjects.BehaviorSubject(time.time())
         self.description_stream = rx.subjects.BehaviorSubject("")
+
+    @property
+    def description(self):
+        return self.description_stream.value
+
+    @description.setter
+    def description(self, value):
+        self.description_stream.on_next(value)
+
+    @property
+    def timestamp(self):
+        return self.timestamp_stream.value
+
+    @timestamp.setter
+    def timestamp(self, value):
+        self.timestamp_stream.on_next(value)
+
+    @property
+    def category(self):
+        return self.category_stream.value
+
+    @category.setter
+    def category(self, value):
+        if isinstance(value, str) and value in Categories:
+            value = Categories[value]
+        assert(isinstance(value, BV.Model.Category))
+        self.category_stream.on_next(value)
 
     @property
     def amount(self):
