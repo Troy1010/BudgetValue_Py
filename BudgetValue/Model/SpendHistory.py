@@ -8,7 +8,7 @@ from .Categories import Categories
 import time
 
 
-class SpendHistory(dict):
+class SpendHistory(list):
     def __init__(self, vModel):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "SpendHistory.pickle")
@@ -30,53 +30,25 @@ class SpendHistory(dict):
                 lambda value, categoryName=categoryName: AdjustTotal(value, categoryName)
             )
 
-    def values_flat(self):
-        for spend_list in self.values():
-            for spend in spend_list:
-                yield spend
-
-    def AddSpend(self, timestamp, amount=None, description=None, category=None):
-        if timestamp not in self:
-            self[timestamp] = [SpendEntry(self)]
-        else:
-            self[timestamp].append(SpendEntry(self))
-        self[timestamp][-1].timestamp = timestamp
+    def AddSpend(self, timestamp=None, amount=None, description=None, category=None):
+        spend = Spend(self)
+        self.append(spend)
+        if timestamp is not None:
+            spend.timestamp = timestamp
         if amount is not None:
-            self[timestamp][-1].amount = amount
+            spend.amount = amount
         if description is not None:
-            self[timestamp][-1].description = description
+            spend.description = description
         if category is not None:
-            self[timestamp][-1].category = category
+            spend.category = category
 
     def RemoveSpend(self, spend):
-        outer_key_to_remove = None
-        inner_key_to_remove = None
-        list_to_remove_inner_key_from = None
-        bExit = False
-        for outer_key, spend_list in self.items():
-            for key, spend_iter in enumerate(spend_list):
-                if spend_iter == spend:
-                    list_to_remove_inner_key_from = spend_list
-                    inner_key_to_remove = key
-                    if not len(spend_list):
-                        outer_key_to_remove = outer_key
-                    bExit = True
-                    break
-            if bExit:
-                break
-        else:
-            raise Exception("RemoveSpend`Could not find spend")
-        if list_to_remove_inner_key_from:
-            del list_to_remove_inner_key_from[inner_key_to_remove]
-        if outer_key_to_remove:
-            del self[outer_key_to_remove]
+        self.remove(spend)
 
     def Save(self):
-        data = dict()
-        for timestamp, v in dict(self).items():
-            data[timestamp] = list()
-            for i, spend in enumerate(v):
-                data[timestamp].append(self[timestamp][i].GetSavable())
+        data = list()
+        for spend in self:
+            data.append(spend.GetSavable())
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -87,14 +59,13 @@ class SpendHistory(dict):
             data = pickle.load(f)
         if not data:
             return
-        for timestamp, spend_list in data.items():
-            self[timestamp] = list()
-            for i, spend_savable in enumerate(spend_list):
-                self[timestamp].append(SpendEntry(self))
-                self[timestamp][-1].Load(spend_savable)
+        for spend_savable in data:
+            spend = Spend(self)
+            self.append(spend)
+            spend.Load(spend_savable)
 
 
-class SpendEntry():
+class Spend():
     def __init__(self, parent):
         self.parent = parent
         self.amount_stream = rx.subjects.BehaviorSubject(0)
