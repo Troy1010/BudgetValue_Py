@@ -19,6 +19,13 @@ class Table(Misc.ModelTable):
             assert(isinstance(spend, BV.Model.Spend))
             WF.MakeEntry_ReadOnly(self, (row, 1), text=spend.timestamp_stream, justify=tk.LEFT, bTextIsTimestamp=True)
             WF.MakeEntry_ReadOnly(self, (row, 2), text=spend.category_stream, justify=tk.LEFT)
-            WF.MakeEntry_ReadOnly(self, (row, 3), text=spend.amount_stream)
+            self.MakeEntry_Amount((row, 3), spend=spend, text=spend.amount_stream)
             WF.MakeEntry_ReadOnly(self, (row, 4), text=spend.description_stream, justify=tk.LEFT)
             WF.MakeX(self, (row, 5), lambda spend=spend: (self.vModel.SpendHistory.RemoveSpend(spend), self.Refresh())[0])
+
+    def MakeEntry_Amount(self, cRowColumnPair, spend, text):
+        w = WF.MakeEntry(self, cRowColumnPair, text=text, validation=BV.MakeValid_Money_Negative_ZeroIsNone)
+
+        def AssignAmount(spend, amount):
+            spend.amount = amount
+        w.bind("<FocusOut>", lambda event, spend=spend: AssignAmount(spend, w.text), add="+")
