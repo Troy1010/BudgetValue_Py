@@ -2,6 +2,8 @@ import TM_CommonPy as TM  # noqa
 import tkinter as tk
 from .Skin import vSkin
 import rx
+import BudgetValue as BV  # noqa
+from datetime import datetime
 
 
 class Buffer():
@@ -59,10 +61,18 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, validation=None):
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, validation=None, bTextIsTimestamp=False):
+    cDisposables = []
     if isinstance(width, Buffer):
         width = len(text) + width.value
-    #
+    if isinstance(text, rx.subjects.BehaviorSubject) and isinstance(text.value, BV.Model.Category):
+        temp_subject = rx.subjects.BehaviorSubject("")
+        cDisposables.append(text.map(lambda category: category.name).subscribe(temp_subject))
+        text = temp_subject
+    if bTextIsTimestamp:
+        temp_subject = rx.subjects.BehaviorSubject("")
+        cDisposables.append(text.map(lambda timestamp: datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M')).subscribe(temp_subject))
+        text = temp_subject
     if bEditableState:
         state = "normal"
     else:
@@ -84,6 +94,9 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
         w.bind("<FocusOut>", lambda event, w=w: w.MakeValid(), add="+")
         w.bind("<FocusOut>", lambda event, w=w: OnFocusOut_MakeObvious(w), add="+")
         w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
+    # Remember disposables
+    w.cDisposables.extend(cDisposables)
+    #
     return w
 
 

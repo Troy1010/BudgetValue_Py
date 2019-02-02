@@ -11,6 +11,7 @@ SpendingHistory-Highlighting
 Observables - which algorithm is best for subscribing to stream_streams?
 Make SeparationLabels selectable
 return focuses nothing, and focuses back in with another return
+set read_only default background
 ---------------------------------------------------------- Things I'm currently working on
 ---------------------------------------------------------- Things I've done
 SpendingHistory-make totals observable

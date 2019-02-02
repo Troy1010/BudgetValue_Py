@@ -37,7 +37,7 @@ class SpendHistory(dict):
 
     def AddSpend(self, timestamp, amount=None, description=None, category=None):
         if timestamp not in self:
-            self[timestamp] = list(SpendEntry(self))
+            self[timestamp] = [SpendEntry(self)]
         else:
             self[timestamp].append(SpendEntry(self))
         self[timestamp][-1].timestamp = timestamp

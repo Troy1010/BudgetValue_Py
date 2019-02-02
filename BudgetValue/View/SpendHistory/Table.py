@@ -15,9 +15,9 @@ class Table(Misc.ModelTable):
         WF.MakeHeader(self, (0, 3), text="Amount")
         WF.MakeHeader(self, (0, 4), text="Description")
         # Data
-        for row, spend in enumerate(self.vModel.SpendHistory, self.iFirstDataRow):
+        for row, spend in enumerate(self.vModel.SpendHistory.values_flat(), self.iFirstDataRow):
             assert(isinstance(spend, BV.Model.SpendEntry))
-            WF.MakeEntry(self, (row, 1), text=spend.timestamp)
-            WF.MakeEntry(self, (row, 2), text=spend.category)
-            WF.MakeEntry(self, (row, 3), text=spend.amount)
-            WF.MakeEntry(self, (row, 4), text=spend.description)
+            WF.MakeEntry(self, (row, 1), text=spend.timestamp_stream, justify=tk.LEFT, bTextIsTimestamp=True)
+            WF.MakeEntry(self, (row, 2), text=spend.category_stream, justify=tk.LEFT)
+            WF.MakeEntry(self, (row, 3), text=spend.amount_stream)
+            WF.MakeEntry(self, (row, 4), text=spend.description_stream, justify=tk.LEFT)
