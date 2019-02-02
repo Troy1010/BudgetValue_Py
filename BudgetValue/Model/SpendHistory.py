@@ -48,6 +48,29 @@ class SpendHistory(dict):
         if category is not None:
             self[timestamp][-1].category = category
 
+    def RemoveSpend(self, spend):
+        outer_key_to_remove = None
+        inner_key_to_remove = None
+        list_to_remove_inner_key_from = None
+        bExit = False
+        for outer_key, spend_list in self.items():
+            for key, spend_iter in enumerate(spend_list):
+                if spend_iter == spend:
+                    list_to_remove_inner_key_from = spend_list
+                    inner_key_to_remove = key
+                    if not len(spend_list):
+                        outer_key_to_remove = outer_key
+                    bExit = True
+                    break
+            if bExit:
+                break
+        else:
+            raise Exception("RemoveSpend`Could not find spend")
+        if list_to_remove_inner_key_from:
+            del list_to_remove_inner_key_from[inner_key_to_remove]
+        if outer_key_to_remove:
+            del self[outer_key_to_remove]
+
     def Save(self):
         data = dict()
         for k, v in dict(self).items():
@@ -73,6 +96,9 @@ class SpendEntry():
         self.category_stream = rx.subjects.BehaviorSubject(Categories.default_category)
         self.timestamp_stream = rx.subjects.BehaviorSubject(time.time())
         self.description_stream = rx.subjects.BehaviorSubject("")
+
+    def destroy(self):
+        self.amount = 0
 
     @property
     def description(self):

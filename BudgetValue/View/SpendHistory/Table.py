@@ -21,3 +21,4 @@ class Table(Misc.ModelTable):
             WF.MakeEntry(self, (row, 2), text=spend.category_stream, justify=tk.LEFT)
             WF.MakeEntry(self, (row, 3), text=spend.amount_stream)
             WF.MakeEntry(self, (row, 4), text=spend.description_stream, justify=tk.LEFT)
+            WF.MakeX(self, (row, 5), lambda spend=spend: (self.vModel.SpendHistory.RemoveSpend(spend), self.Refresh())[0])
