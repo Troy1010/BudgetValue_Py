@@ -73,8 +73,10 @@ class SpendHistory(dict):
 
     def Save(self):
         data = dict()
-        for k, v in dict(self).items():
-            pass
+        for timestamp, v in dict(self).items():
+            data[timestamp] = list()
+            for i, spend in enumerate(v):
+                data[timestamp].append(self[timestamp][i].GetSavable())
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -85,8 +87,11 @@ class SpendHistory(dict):
             data = pickle.load(f)
         if not data:
             return
-        for item in data:
-            pass
+        for timestamp, spend_list in data.items():
+            self[timestamp] = list()
+            for i, spend_savable in enumerate(spend_list):
+                self[timestamp].append(SpendEntry(self))
+                self[timestamp][-1].Load(spend_savable)
 
 
 class SpendEntry():
@@ -134,3 +139,18 @@ class SpendEntry():
     @amount.setter
     def amount(self, value):
         self.amount_stream.on_next(BV.MakeValid_Money_Negative(value))
+
+    def GetSavable(self):
+        return {'amount': self.amount,
+                'categoryName': self.category.name,
+                'timestamp': self.timestamp,
+                'description': self.description}
+
+    def Load(self, vSavable):
+        self.amount = vSavable['amount']
+        if vSavable['categoryName'] in self.parent.vModel.Categories:
+            self.category = self.parent.vModel.Categories[vSavable['categoryName']]
+        else:
+            print("WARNING: SpendEntry`Load could not retrieve category")
+        self.timestamp = vSavable['timestamp']
+        self.description = vSavable['description']
