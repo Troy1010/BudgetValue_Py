@@ -3,6 +3,7 @@ import tkinter as tk  # noqa
 import BudgetValue as BV  # noqa
 from BudgetValue.View import WidgetFactories as WF  # noqa
 from . import Misc  # noqa
+from .Skin import vSkin
 
 
 class BudgetedTable(Misc.BudgetedTable):
@@ -16,5 +17,5 @@ class BudgetedTable(Misc.BudgetedTable):
         row += 1
         # Budgeted Total
         WF.MakeLable(self, (row, 0), text="Total", width=WF.Buffer(1))
-        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Budgeted.total_stream, justify=tk.CENTER)
+        WF.MakeEntry(self, (row, 1), text=self.vModel.Budgeted.total_stream, justify=tk.CENTER, bEditableState=False, background=vSkin.BG_ENTRY)
         row += 1

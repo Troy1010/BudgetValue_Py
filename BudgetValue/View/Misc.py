@@ -90,7 +90,7 @@ class CategoryTable(ModelTable):
         for row, category in enumerate(self.vModel.Categories.Select()):
             # Row Header
             if not self.GetCell(row+self.iFirstDataRow, 0) and not self.IsRowEmpty(row+self.iFirstDataRow):
-                WF.MakeEntry_ReadOnly(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True)
+                WF.MakeEntry(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
 
 
 class BudgetedTable(CategoryTable):

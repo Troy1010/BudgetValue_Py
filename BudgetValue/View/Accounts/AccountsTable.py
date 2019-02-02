@@ -2,6 +2,7 @@ import TM_CommonPy as TM
 import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
+from ..Skin import vSkin  # noqa
 
 
 class AccountsTable(TM.tk.TableFrame):
@@ -39,7 +40,7 @@ class AccountsTable(TM.tk.TableFrame):
         row += 1
         # Accounts Total
         WF.MakeLable(self, (row, 0), text="Total", width=WF.Buffer(1))
-        WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Accounts.total_stream, justify=tk.CENTER)
+        WF.MakeEntry(self, (row, 1), text=self.vModel.Accounts.total_stream, justify=tk.CENTER, bEditableState=False)
         row += 1
 
     def RemoveRow(self, iRow):

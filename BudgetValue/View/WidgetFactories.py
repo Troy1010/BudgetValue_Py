@@ -47,6 +47,8 @@ def MakeRowHeader(*args, **kwargs):
 
 def MakeEntry_ReadOnly(*args, **kwargs):
     kwargs["bEditableState"] = False
+    if 'background' not in kwargs:
+        kwargs["background"] = vSkin.BG_READ_ONLY
     return MakeEntry(*args, **kwargs)
 
 
