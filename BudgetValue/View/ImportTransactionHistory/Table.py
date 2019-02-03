@@ -21,24 +21,28 @@ class Table(tk.Canvas):
         # Place new data
         for i, row in enumerate(self.vModel.ImportTransactionHistory.GetTable()):
             for j, vItem in enumerate(row[1:]):
-                b = tk.Text(self.vTableWindow, font=vSkin.FONT_SMALL,
+                w = tk.Text(self.vTableWindow, font=vSkin.FONT_SMALL,
                             borderwidth=2, width=self.parent.cColWidths[j], height=1, relief='ridge', background='SystemButtonFace')
-                b.insert(1.0, str(vItem))
-                b.grid(row=i, column=j)
-                b.configure(state="disabled")
-                b.parent = self
-                b.iRow = i
+                w.insert(1.0, str(vItem))
+                w.grid(row=i, column=j)
+                w.configure(state="disabled")
+                w.parent = self
+                w.iRow = i
+                if j == 0:  # category row
+                    w.bind('<Button-1>', lambda event, w=w, x=w.winfo_width(), y=0: (
+                        w.config(background="grey"),
+                        BV.View.SelectCategoryPopup(self.winfo_toplevel(),
+                                                    lambda category, w=w: self.SelectCategory(category, w),
+                                                    self.vModel.Categories.values(),
+                                                    vDestroyHandler=lambda w=w: self.DestroyHandler(w)
+                                                    )
+                    ))
+        #
         self.update_idletasks()
         # Make scrollable
         self.vTableWindow.bind("<Configure>", lambda event: self.onFrameConfigure())
         for vWidget in BV.GetAllChildren(self, bIncludeRoot=True):
             vWidget.bind("<MouseWheel>", self.onMousewheel)
-        # Popup - Select Category
-        for cell in self.vTableWindow.children.values():
-            if cell.grid_info()['column'] == 0:
-                cell.bind('<Button-1>', lambda event, cell=cell, x=cell.winfo_width(), y=0: (
-                          cell.config(background="grey"),
-                          BV.View.SelectCategoryPopup(self.parent, self.SelectCategory, self.vModel.Categories.values(), (x, y), cell, vDestroyHandler=self.DestroyHandler)))
 
     def DestroyHandler(self, cell):
         try:

@@ -34,14 +34,13 @@ class Table(Misc.ModelTable):
             except tk.TclError:  # w does not exist
                 pass
 
-        def ClosingHandler(spend, category):
+        def CategoryHandler(spend, category):
             spend.category = category
         w.bind('<Button-1>', lambda event, w=w, x=self.winfo_rootx(), y=self.winfo_rooty(): (
             w.config(readonlybackground="grey"),
-            BV.View.SelectCategoryPopup(self,
-                                        lambda category, spend=spend: ClosingHandler(spend, category),
+            BV.View.SelectCategoryPopup(self.winfo_toplevel(),
+                                        lambda category, spend=spend: CategoryHandler(spend, category),
                                         self.vModel.Categories.values(),
-                                        (0, 0),
                                         vDestroyHandler=lambda w=w, background=w['background']: DestroyHandler(w, background)
                                         )
         ))

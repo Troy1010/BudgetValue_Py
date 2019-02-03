@@ -70,8 +70,13 @@ class Table(Misc.BudgetedTable):
         iColumn = event.widget.grid_info()['column'] - self.iFirstDataColumn
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
-        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty():
-                              BV.View.SelectCategoryPopup(self.parent, self.AddCategoryToColumn, self.GetAddableCategories(iColumn), (x, y), iColumn))
+        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty(): (
+                              BV.View.SelectCategoryPopup(self.parent,
+                                                          lambda category, iColumn=iColumn: self.AddCategoryToColumn(category, iColumn),
+                                                          self.GetAddableCategories(iColumn),
+                                                          cPos=(x, y)
+                                                          )
+                              ))
         vDropdown.post(event.x_root, event.y_root)
 
     def SaveCellToModel(self, cell):
