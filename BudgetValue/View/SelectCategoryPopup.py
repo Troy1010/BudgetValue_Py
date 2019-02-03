@@ -8,8 +8,7 @@ class SelectCategoryPopup(tk.Frame):
 
     def __init__(self, parent, category_handler, cCategories, cPos=None, vDestroyHandler=None):
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
-        self.category_handler = category_handler
-        self.bDestroyed = False
+        # Hook destroy handlers
 
         def ForgetPrevPopup():
             self.__class__.previous_popup = None
@@ -29,14 +28,10 @@ class SelectCategoryPopup(tk.Frame):
         if cCategories is not None and len(cCategories):
             for category in cCategories:
                 b = tk.Button(self, text=category.name,
-                              command=lambda category=category: (self.category_handler(category), self.destroy()))
+                              command=lambda category=category: (category_handler(category), self.destroy()))
                 b.pack(fill=tk.BOTH, expand=True)
         else:
             b = tk.Button(self, text="No Categories To Add", command=self.destroy)
             b.pack(fill=tk.BOTH, expand=True)
         # Bind Escape to exit
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy(), add='+')
-
-    def SelectCategory(self, category):
-        self.category_handler(category)
-        self.destroy()
