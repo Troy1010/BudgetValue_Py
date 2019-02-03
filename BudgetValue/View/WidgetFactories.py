@@ -75,14 +75,9 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
         temp_subject = rx.subjects.BehaviorSubject("")
         cDisposables.append(text.map(lambda timestamp: datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M')).subscribe(temp_subject))
         text = temp_subject
-    if bEditableState:
-        state = "normal"
-    else:
-        state = "readonly"
-    if bBold:
-        font = vSkin.FONT_SMALL_BOLD
-    else:
-        font = vSkin.FONT_SMALL
+    state = "normal" if bEditableState else "readonly"
+    font = vSkin.FONT_SMALL_BOLD if bBold else vSkin.FONT_SMALL
+    #
     w = TM.tk.Entry(self, font=font, width=width, justify=justify, text=text,
                     borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                     readonlybackground=background, state=state)
