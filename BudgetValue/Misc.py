@@ -1,6 +1,8 @@
 import decimal
 from decimal import Decimal
 from ._Logger import BVLog
+from ._Logger import Log  # noqa
+import TM_CommonPy as TM  # noqa
 
 
 def Hello():

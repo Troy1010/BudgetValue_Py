@@ -4,9 +4,11 @@ import BudgetValue as BV  # noqa
 from BudgetValue.View import WidgetFactories as WF  # noqa
 from BudgetValue.View.Skin import vSkin  # noqa
 from .. import Misc  # noqa
+from BudgetValue._Logger import Log  # noqa
 
 
 class Table(Misc.ModelTable):
+
     def Refresh(self):
         super().Refresh()
         # Header
@@ -27,7 +29,10 @@ class Table(Misc.ModelTable):
         w = WF.MakeEntry(self, cRowColumnPair, text=text, justify=justify, bEditableState=False)
 
         def DestroyHandler(w, background):
-            w.config(readonlybackground=background)
+            try:
+                w.config(readonlybackground=background)
+            except tk.TclError:  # w does not exist
+                pass
 
         def ClosingHandler(spend, category):
             spend.category = category

@@ -1,5 +1,6 @@
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
+from BudgetValue._Logger import Log  # noqa
 
 
 class SelectCategoryPopup(tk.Frame):
@@ -9,8 +10,7 @@ class SelectCategoryPopup(tk.Frame):
         # print("parent.winfo_toplevel():"+TM.Narrate(parent.winfo_toplevel()))
         parent = parent.winfo_toplevel()
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
-        if vDestroyHandler is not None:
-            self.destroy = self.DestoyDecorator(self.destroy, vDestroyHandler)
+        self.destroy = TM.Hook(self.destroy, vDestroyHandler, bPrintAndQuitOnError=True)
         self.vClosingHandler = vClosingHandler
         # Delete old popup
         if self.__class__.previous_popup is not None:
@@ -31,15 +31,6 @@ class SelectCategoryPopup(tk.Frame):
             b.pack(fill=tk.BOTH, expand=True)
         # Bind Escape to exit
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy())
-
-    class DestoyDecorator:
-        def __init__(self, method, vDestroyHandler):
-            self.vDestroyHandler = vDestroyHandler
-            self.method = method
-
-        def __call__(self, *args, **kwargs):
-            self.vDestroyHandler()
-            self.method(*args, **kwargs)
 
     def SelectCategory(self, vCategory):
         self.vClosingHandler(vCategory)
