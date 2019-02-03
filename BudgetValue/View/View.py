@@ -17,6 +17,7 @@ import pickle
 class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        self.protocol("WM_DELETE_WINDOW", lambda: (self.quit()))
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('900x800')
@@ -44,7 +45,7 @@ class View(tk.Tk):
 
         vTabBar.ShowTab(self.vLastShownTab)
 
-    def _destroy(self):
+    def _destroy(self):  # FIX: runs multiple times on close
         self.Save()
 
     def Save(self):
