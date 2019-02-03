@@ -12,3 +12,7 @@ except FileNotFoundError:
     pass
 if bWriteLog:
     BVLog.addHandler(logging.FileHandler(sLogFile))
+
+
+def Log(*args, **kwargs):
+    BVLog.debug(*args, **kwargs)
