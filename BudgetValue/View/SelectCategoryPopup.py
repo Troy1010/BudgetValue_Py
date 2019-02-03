@@ -5,13 +5,13 @@ import tkinter as tk
 class SelectCategoryPopup(tk.Frame):
     previous_popup = None
 
-    def __init__(self, parent, vClosingHandler, cCategories, cPos, *args, vDestroyHandler=None):
+    def __init__(self, parent, vClosingHandler, cCategories, cPos, vDestroyHandler=None):
+        # print("parent.winfo_toplevel():"+TM.Narrate(parent.winfo_toplevel()))
+        parent = parent.winfo_toplevel()
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
         if vDestroyHandler is not None:
-            self.destroy = self.DestoyDecorator(self.destroy, vDestroyHandler, *args)
+            self.destroy = self.DestoyDecorator(self.destroy, vDestroyHandler)
         self.vClosingHandler = vClosingHandler
-        self.args = args
-        self.parent = parent
         # Delete old popup
         if self.__class__.previous_popup is not None:
             self.__class__.previous_popup.destroy()
@@ -33,15 +33,14 @@ class SelectCategoryPopup(tk.Frame):
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy())
 
     class DestoyDecorator:
-        def __init__(self, method, vDestroyHandler, *args):
+        def __init__(self, method, vDestroyHandler):
             self.vDestroyHandler = vDestroyHandler
             self.method = method
-            self.args = args
 
         def __call__(self, *args, **kwargs):
-            self.vDestroyHandler(*self.args)
+            self.vDestroyHandler()
             self.method(*args, **kwargs)
 
     def SelectCategory(self, vCategory):
-        self.vClosingHandler(vCategory, *self.args)
+        self.vClosingHandler(vCategory)
         self.destroy()
