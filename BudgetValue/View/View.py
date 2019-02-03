@@ -17,19 +17,18 @@ import pickle
 class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.protocol("WM_DELETE_WINDOW", lambda: (self.quit()))
+        self.destroy = TM.Hook(self.destroy, self.Save, bPrintAndQuitOnError=True)
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
         self.title("Budget Value")
         self.geometry('900x800')
-        self.bind("<Destroy>", lambda event: self._destroy())
         self.sSaveFile = os.path.join(vModel.sWorkspace, "View.pickle")
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
         cTabPages = (SplitMoneyIntoCategories, SpendHistory, Accounts, Reports, PaycheckPlan, ImportTransactionHistory)
         # MenuBar
-        vMenuBar = MenuBar(vModel)
-        self.config(menu=vMenuBar)
+        self.config(menu=MenuBar(vModel))
         # TabBar
         vTabBar = TabBar(self, vModel, cTabPages)
         vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
@@ -44,9 +43,6 @@ class View(tk.Tk):
             frame.grid(row=0, sticky="nsew")
 
         vTabBar.ShowTab(self.vLastShownTab)
-
-    def _destroy(self):  # FIX: runs multiple times on close
-        self.Save()
 
     def Save(self):
         data = [self.vLastShownTab]
