@@ -12,5 +12,6 @@ from .Budgeted import Budgeted
 from .Balance import Balance
 from .SpendHistory import SpendHistory
 from .SpendHistory import Spend
+from .TransactionHistory import TransactionHistory
 
-__all__ = ['Categories', 'Category', 'Model', 'ImportTransactionHistory', 'PaycheckPlan', 'CategoryType', 'Accounts', 'AccountsRow', 'SplitMoneyHistory', 'PaycheckPlanRow', 'Budgeted', 'Balance', 'SpendHistory', 'Spend']
+__all__ = ['Categories', 'Category', 'Model', 'ImportTransactionHistory', 'PaycheckPlan', 'CategoryType', 'Accounts', 'AccountsRow', 'SplitMoneyHistory', 'PaycheckPlanRow', 'Budgeted', 'Balance', 'SpendHistory', 'Spend', 'TransactionHistory']
