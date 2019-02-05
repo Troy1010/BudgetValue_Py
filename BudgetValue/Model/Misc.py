@@ -4,6 +4,34 @@ import TM_CommonPy as TM  # noqa
 from .Categories import Categories
 
 
+class ValueAddPair():
+    def __init__(self, bAdd, value):
+        self.value = value
+        self.bAdd = bAdd
+
+
+class List_ValueStream(list):
+    def __init__(self, *args, **kwargs):
+        self._value_stream = rx.subjects.Subject()
+        super().__init__()
+
+    def __setitem__(self, key, value):
+        # if value isn't old, remove the old and add the new
+        if key in self and self[key] != value:
+            self._value_stream.on_next(ValueAddPair(False, self[key]))
+        self._value_stream.on_next(ValueAddPair(True, value))
+        super().__setitem__(key, value)
+
+    def append(self, value):
+        print("List_ValueStream. value:"+str(value))
+        self._value_stream.on_next(ValueAddPair(True, value))
+        super().append(value)
+
+    def __delitem__(self, key):
+        self._value_stream.on_next(ValueAddPair(False, self[key]))
+        super().__delitem__(key)
+
+
 def GetDiffStream(stream):
     temp_stream = rx.subjects.BehaviorSubject(0)
     diff_stream = temp_stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).replay(1).ref_count()
