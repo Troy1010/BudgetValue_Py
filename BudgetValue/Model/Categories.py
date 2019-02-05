@@ -36,14 +36,16 @@ class Category():
 class Categories(dict):
     default_category = Category("<Default Category>", CategoryType.extra)
     default_income = Category("<Default Income>", CategoryType.income)
+    rent = Category("Rent", CategoryType.always)
+    commute = Category("Commute", CategoryType.always)
     __default_catagories = [
         default_category,
         default_income,
         Category("Paycheck", CategoryType.income),
         Category("Bonus", CategoryType.income),
-        Category("Rent", CategoryType.always),
+        rent,
         Category("Hair", CategoryType.always),
-        Category("Commute", CategoryType.always),
+        commute,
         Category("Christmas", CategoryType.always),
         Category("Food", CategoryType.always),
         Category("Hair", CategoryType.always),

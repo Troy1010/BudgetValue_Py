@@ -13,8 +13,14 @@ Make SeparationLabels selectable
 return focuses nothing, and focuses back in with another return
 set read_only default background
 ---------------------------------------------------------- Things I'm currently working on
-Split up paycheck
-
+Basics
+	Import transactions or manually add income
+	Split up paycheck
+	Import transactions or manually add spend
+	Catagorize spends
+		Should there be a transcations tab or nah?
+			-The 'spends' tab is bascially a transactions tab without any of the income.
+			
 ---------------------------------------------------------- Things I've done
 SpendingHistory-make totals observable
 SelectCategoryPopup-What to do when it's empty
