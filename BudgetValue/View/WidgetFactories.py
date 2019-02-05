@@ -63,7 +63,7 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, validation=None, bTextIsTimestamp=False):
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, validation=None, bTextIsTimestamp=False, bFocusNothingOnReturn=False):
     cDisposables = []
     if isinstance(width, Buffer):
         width = len(text) + width.value
@@ -73,24 +73,38 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
         text = temp_subject
     if bTextIsTimestamp:
         temp_subject = rx.subjects.BehaviorSubject("")
-        cDisposables.append(text.map(lambda timestamp: datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M')).subscribe(temp_subject))
+
+        def MapTimestampToDatetimeString(timestamp):
+            if timestamp == 0:
+                return ""
+            dt = datetime.fromtimestamp(timestamp)
+            str_ = dt.strftime('%Y-%m-%d %H:%M')
+            return str_
+        obs = text.map(MapTimestampToDatetimeString)
+        disposable = obs.subscribe(temp_subject)
+        cDisposables.append(disposable)
         text = temp_subject
+    #
     state = "normal" if bEditableState else "readonly"
     font = vSkin.FONT_SMALL_BOLD if bBold else vSkin.FONT_SMALL
     #
-    w = TM.tk.Entry(self, font=font, width=width, justify=justify, text=text,
-                    borderwidth=2, relief='ridge', background=background, disabledbackground=background,
-                    readonlybackground=background, state=state)
+    w = TM.tk.Entry_DirectStream(self, font=font, width=width, justify=justify, text=text,
+                                 borderwidth=2, relief='ridge', background=background, disabledbackground=background,
+                                 readonlybackground=background, state=state)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
     # Validation
     w.ValidationHandler = validation
+    # return_handler
+    if bFocusNothingOnReturn:
+        w.bind("<Return>", lambda x: w.FocusNothing())
     # Events
-    w.bind('<Escape>', lambda event: self.FocusNothing())
+    w.bind('<Escape>', lambda event, w=w: w.FocusNothing())
     if bEditableState:
         w.bind("<FocusIn>", lambda event, w=w: OnFocusIn_MakeObvious(w))
         w.bind("<FocusOut>", lambda event, w=w: w.MakeValid(), add="+")
         w.bind("<FocusOut>", lambda event, w=w: OnFocusOut_MakeObvious(w), add="+")
-        w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
+        if hasattr(self, 'FocusNextWritableCell'):
+            w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
     # Remember disposables
     w.cDisposables.extend(cDisposables)
     #
