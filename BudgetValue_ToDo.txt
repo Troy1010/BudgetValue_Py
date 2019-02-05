@@ -13,6 +13,8 @@ Make SeparationLabels selectable
 return focuses nothing, and focuses back in with another return
 set read_only default background
 ---------------------------------------------------------- Things I'm currently working on
+Split up paycheck
+
 ---------------------------------------------------------- Things I've done
 SpendingHistory-make totals observable
 SelectCategoryPopup-What to do when it's empty
