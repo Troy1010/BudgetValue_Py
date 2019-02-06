@@ -63,7 +63,7 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, bTextIsTimestamp=False, bFocusNothingOnReturn=False, validation=None, display=None):
+def MakeEntry(self, cRowColumnPair, text=None, stream=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, bTextIsTimestamp=False, bFocusNothingOnReturn=False, validation=None, display=None):
     cDisposables = []
     if isinstance(width, Buffer):
         width = len(text) + width.value
@@ -85,10 +85,14 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
         cDisposables.append(disposable)
         text = temp_subject
     #
+    if isinstance(text, rx.Observable):  # FIX: unnecessary when usages are fixed.
+        stream = text
+        text = None
+    #
     state = "normal" if bEditableState else "readonly"
     font = vSkin.FONT_SMALL_BOLD if bBold else vSkin.FONT_SMALL
     #
-    w = TM.tk.Entry_DirectStream(self, font=font, width=width, justify=justify, text=text,
+    w = TM.tk.Entry_DirectStream(self, font=font, width=width, justify=justify, text=text, stream=stream,
                                  borderwidth=2, relief='ridge', background=background, disabledbackground=background,
                                  readonlybackground=background, state=state, validation=validation, display=display)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
