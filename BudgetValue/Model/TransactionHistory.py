@@ -13,9 +13,10 @@ class TransactionHistory(Misc.List_ValueStream):
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "TransactionHistory.pickle")
         #
-        self.cDisposables = {}
         self.cCategoryTotals = {}
-        # Subscribe CategoryTotals to transaction_stream
+        self.total_stream = rx.subjects.BehaviorSubject(0)
+        # Subscribe CategoryTotals
+        self.cDisposables = {}
         self._merged_amountStream_stream = rx.subjects.Subject()
 
         def MergeAmountStreamStreams(vValueAddPair):
@@ -38,8 +39,24 @@ class TransactionHistory(Misc.List_ValueStream):
                 )
             else:
                 # FIX: remove empty self.cCategoryTotals[stream_info.categoryName]
+                self.cDisposables[stream_info.stream].dispose()
                 del self.cDisposables[stream_info.stream]
         self._merged_amountStream_stream.subscribe(FeedCategoryTotals)
+        # Subscribe total_stream
+        self.cDisposables2 = {}
+
+        def FeedTotal(stream_info):
+            if stream_info.bAdd:
+                self.cDisposables2[stream_info.categoryName] = stream_info.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).subscribe(
+                    lambda diff:
+                        self.total_stream.on_next(
+                            self.total_stream.value + diff
+                        )
+                )
+            else:
+                self.cDisposables2[stream_info.categoryName].dispose()
+                del self.cDisposables2[stream_info.categoryName]
+        self._merged_amountStream_stream.subscribe(FeedTotal)
         # Load
         self.Load()
 
@@ -165,7 +182,9 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         self.vModel = vModel
         # derivative data
         self.balance_stream = rx.subjects.BehaviorSubject(0)
-        # subscribe balance_stream to categories total_stream and parent's amount_stream
+        # manually merge balance_stream into parent's cCategoryTotals
+        self.parent.parent._merged_amountStream_stream.on_next(Misc.StreamInfo(True, self.balance_stream, Categories.default_category.name))
+        # subscribe balance_stream
         rx.Observable.combine_latest(
             self.parent.amount_stream,
             self.total_stream,
