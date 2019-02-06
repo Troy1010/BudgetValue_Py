@@ -105,7 +105,7 @@ class BudgetedTable(CategoryTable):
         for category in self.vModel.Categories.Select():
             # Budgeted
             if category.name in self.vModel.Budgeted.cCategoryTotalStreams:
-                w = self.__BudgetedCell((row, 1), text=self.vModel.Budgeted.cCategoryTotalStreams[category.name])
+                w = WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Budgeted.cCategoryTotalStreams[category.name], validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
                 # Highlight
 
                 def HighlightBudgeted(budgeted_amount, w):
@@ -121,10 +121,3 @@ class BudgetedTable(CategoryTable):
         # if the name of the caller is Refresh, then we are trusting that that will call FinishRefresh when it's done
         if TM.FnName(1) != "Refresh":
             self.FinishRefresh()
-
-    def __BudgetedCell(self, *args, **kwargs):
-        w = WF.MakeEntry_ReadOnly(self, *args, **kwargs)
-        # validation
-        w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
-        #
-        return w
