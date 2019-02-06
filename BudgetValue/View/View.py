@@ -16,7 +16,9 @@ import pickle
 
 class View(tk.Tk):
     def __init__(self, vModel, *args, **kwargs):
+        assert(isinstance(vModel, BV.Model.Model))
         tk.Tk.__init__(self, *args, **kwargs)
+        self.vModel = vModel
         self.destroy = TM.Hook(self.destroy, self.Save, bPrintAndQuitOnError=True)
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.iconbitmap(self, default="res/icon_coin_0MC_icon.ico")
@@ -45,6 +47,8 @@ class View(tk.Tk):
         vTabBar.ShowTab(self.vLastShownTab)
 
     def Save(self):
+        self.vModel.TransactionHistory.Save()
+        #
         data = [self.vLastShownTab]
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)

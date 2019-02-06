@@ -12,8 +12,7 @@ class TransactionHistory(Misc.List_ValueStream):
         super().__init__()
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "TransactionHistory.pickle")
-        # Load
-        self.Load()
+        #
         self.cDisposables = {}
         self.cCategoryTotals = {}
         # Subscribe CategoryTotals to transaction_stream
@@ -41,6 +40,8 @@ class TransactionHistory(Misc.List_ValueStream):
                 # FIX: remove empty self.cCategoryTotals[stream_info.categoryName]
                 del self.cDisposables[stream_info.stream]
         self._merged_amountStream_stream.subscribe(FeedCategoryTotals)
+        # Load
+        self.Load()
 
     def Iter_Spend(self):
         for transaction in self:
@@ -55,23 +56,29 @@ class TransactionHistory(Misc.List_ValueStream):
     def GetIncome(self):
         return list(self.Iter_Income())
 
+    def GetSpends(self):
+        return list(self.Iter_Spend())
+
     def AddTransaction(self, amount=None, timestamp=None, description=None):
         transaction = Transaction(self.vModel, self)
+        self.append(transaction)
         if amount is not None:
             transaction.amount = amount
         if timestamp is not None:
             transaction.timestamp = timestamp
         if description is not None:
             transaction.description = description
-        self.append(transaction)
 
     def RemoveTransaction(self, transaction):
-        self.remove(transaction)
+        if isinstance(transaction, Transaction):
+            self.remove(transaction)
+        elif isinstance(transaction, int):
+            del self[transaction]
 
     def Save(self):
         data = list()
         for transaction in self:
-            pass
+            data.append(transaction.GetSavable())
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -82,8 +89,10 @@ class TransactionHistory(Misc.List_ValueStream):
             data = pickle.load(f)
         if not data:
             return
-        for transaction in data:
-            pass
+        for transaction_savable in data:
+            transaction = Transaction(self.vModel, self)
+            self.append(transaction)
+            transaction.LoadSavable(transaction_savable)
 
 
 class Transaction():
@@ -95,8 +104,8 @@ class Transaction():
         self.timestamp_stream = rx.subjects.BehaviorSubject(time.time())
         self.description_stream = rx.subjects.BehaviorSubject("")
         self.categoryAmounts = CategoryAmounts(vModel, self)
-        self.ValidationSource = None
-        self.bAlertNonValidation = True
+        self.ValidationSource = None  # FIX: use
+        self.bAlertNonValidation = True  # FIX: use
 
     def IsOverride(self):
         return self.amount_stream.value == 0
@@ -137,12 +146,16 @@ class Transaction():
     def GetSavable(self):
         return {'amount': self.amount,
                 'timestamp': self.timestamp,
-                'description': self.description}
+                'description': self.description,
+                'categoryAmounts': {categoryName: y.amount for (categoryName, y) in self.categoryAmounts.items()}
+                }
 
-    def Load(self, vSavable):
+    def LoadSavable(self, vSavable):
         self.amount = vSavable['amount']
         self.timestamp = vSavable['timestamp']
         self.description = vSavable['description']
+        for categoryName, amount in vSavable['categoryAmounts'].items():
+            self.categoryAmounts.AddCategory(self.vModel.Categories[categoryName], amount)
 
 
 class CategoryAmounts(Misc.Dict_TotalStream):
@@ -173,6 +186,10 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         self[category.name].category = category
         if amount is not None:
             self[category.name].amount = amount
+
+    def RemoveCategory(self, category, amount=None):
+        assert(category != Categories.default_category)
+        del self[category.name]
 
 
 class CategoryAmount():

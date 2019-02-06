@@ -12,6 +12,7 @@ Observables - which algorithm is best for subscribing to stream_streams?
 Make SeparationLabels selectable
 return focuses nothing, and focuses back in with another return
 set read_only default background
+rename Transaction.GetIncome to GetIncomes
 ---------------------------------------------------------- Things I'm currently working on
 Basics
 	Import transactions or manually add income

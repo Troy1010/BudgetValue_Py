@@ -35,41 +35,13 @@ class Table(Misc.BudgetedTable):
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
-        vDropdown.add_command(label="Remove Entry", command=lambda cell=event.widget: self.RemoveCell(cell))
+        vDropdown.add_command(label="Remove", command=lambda cell=event.widget: self.RemoveCell(cell))
         vDropdown.post(event.x_root, event.y_root)
-
-    def RemoveCell(self, cell):
-        iColumn = cell.grid_info()['column'] - self.iFirstDataColumn
-        categoryName = self.GetCell(cell.row, 0).text
-        cell.text = 0
-        self.SaveCellToModel(cell)
-        self.vModel.SplitMoneyHistory.RemoveEntry(iColumn, categoryName)
-        self.Refresh()
-
-    def RemoveColumn(self, iColumn):
-        self.vModel.SplitMoneyHistory.RemoveColumn(iColumn)
-        self.Refresh()
-
-    def GetAddableCategories(self, iColumn):
-        cAddableCategories = list()
-        for category in self.vModel.Categories.values():
-            if category.name not in self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.GetAll().keys():
-                cAddableCategories.append(category)
-        return cAddableCategories
-
-    def AddCategoryToColumn_OLD(self, category, iColumn):
-        self.vModel.SplitMoneyHistory.AddEntry(iColumn, category.name, 0)
-        self.Refresh()
-
-    def AddCategoryToColumn(self, category, iColumn):  # assume iColumn is already adjusted
-        transaction = self.vModel.TransactionHistory.GetIncome()[iColumn]
-        transaction.categoryAmounts.AddCategory(category)
-        self.Refresh()
 
     def ShowHeaderMenu(self, event):
         iColumn = event.widget.grid_info()['column'] - self.iFirstDataColumn
         vDropdown = tk.Menu(tearoff=False)
-        vDropdown.add_command(label="Remove Column", command=lambda iColumn=iColumn: self.RemoveColumn(iColumn))
+        vDropdown.add_command(label="Forget Transaction", command=lambda iColumn=iColumn: self.ForgetTransaction(iColumn))
         vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty(): (
                               BV.View.SelectCategoryPopup(self.parent,
                                                           lambda category, iColumn=iColumn: self.AddCategoryToColumn(category, iColumn),
@@ -79,7 +51,24 @@ class Table(Misc.BudgetedTable):
                               ))
         vDropdown.post(event.x_root, event.y_root)
 
-    def SaveCellToModel(self, cell):
+    def RemoveCell(self, cell):
         iColumn = cell.column - self.iFirstDataColumn
-        categoryName = self.GetCell(cell.row, 0).text
-        self.vModel.SplitMoneyHistory[iColumn][categoryName].amount = cell.text
+        category = self.vModel.Categories[self.GetCell(cell.row, 0).text]
+        self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.RemoveCategory(category)
+        self.Refresh()
+
+    def ForgetTransaction(self, iColumn):  # assume iColumn is already adjusted
+        self.vModel.TransactionHistory.RemoveTransaction(iColumn)
+        self.Refresh()
+
+    def GetAddableCategories(self, iColumn):
+        cAddableCategories = list()
+        for category in self.vModel.Categories.values():
+            if category.name not in self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.GetAll().keys():
+                cAddableCategories.append(category)
+        return cAddableCategories
+
+    def AddCategoryToColumn(self, category, iColumn):  # assume iColumn is already adjusted
+        transaction = self.vModel.TransactionHistory.GetIncome()[iColumn]
+        transaction.categoryAmounts.AddCategory(category)
+        self.Refresh()
