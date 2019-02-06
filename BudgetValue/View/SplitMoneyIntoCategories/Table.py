@@ -29,7 +29,6 @@ class Table(Misc.BudgetedTable):
                                      )
                     if bEditableState:
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
-
         #
         self.FinishRefresh()
 
@@ -42,12 +41,12 @@ class Table(Misc.BudgetedTable):
         iColumn = event.widget.grid_info()['column'] - self.iFirstDataColumn
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Forget Transaction", command=lambda iColumn=iColumn: self.ForgetTransaction(iColumn))
-        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_rootx(), y=event.y_root-self.winfo_rooty(): (
-                              BV.View.SelectCategoryPopup(self.parent,
-                                                          lambda category, iColumn=iColumn: self.AddCategoryToColumn(category, iColumn),
-                                                          self.GetAddableCategories(iColumn),
-                                                          cPos=(x, y)
-                                                          )
+        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                              BV.View.Popup_SelectCategory(self.winfo_toplevel(),
+                                                           lambda category, iColumn=iColumn: self.AddCategoryToColumn(category, iColumn),
+                                                           self.GetAddableCategories(iColumn),
+                                                           cPos=(x, y)
+                                                           )
                               ))
         vDropdown.post(event.x_root, event.y_root)
 

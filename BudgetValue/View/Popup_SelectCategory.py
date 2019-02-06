@@ -3,7 +3,7 @@ import tkinter as tk
 from BudgetValue._Logger import Log  # noqa
 
 
-class SelectCategoryPopup(tk.Frame):
+class Popup_SelectCategory(tk.Frame):
     previous_popup = None
 
     def __init__(self, parent, category_handler, cCategories, cPos=None, vDestroyHandler=None):

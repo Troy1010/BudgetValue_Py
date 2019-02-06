@@ -30,11 +30,11 @@ class Table(tk.Canvas):
                 w.iRow = i
                 if j == 0:  # category row
                     w.bind('<Button-1>', lambda event, w=w, x=w.winfo_width(), y=0: (
-                        BV.View.SelectCategoryPopup(self.winfo_toplevel(),
-                                                    lambda category, w=w: self.SelectCategory(category, w),
-                                                    self.vModel.Categories.values(),
-                                                    vDestroyHandler=lambda w=w: self.DestroyHandler(w)
-                                                    ),
+                        BV.View.Popup_SelectCategory(self.winfo_toplevel(),
+                                                     lambda category, w=w: self.SelectCategory(category, w),
+                                                     self.vModel.Categories.values(),
+                                                     vDestroyHandler=lambda w=w: self.DestroyHandler(w)
+                                                     ),
                         w.config(background="grey")
                     ))
         #

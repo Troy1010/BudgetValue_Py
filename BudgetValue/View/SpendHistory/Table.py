@@ -57,11 +57,11 @@ class Table(Misc.ModelTable):
         def CategoryHandler(spend, category):
             spend.category = category
         w.bind('<Button-1>', lambda event, w=w, x=self.winfo_rootx(), y=self.winfo_rooty(): (
-            BV.View.SelectCategoryPopup(self.winfo_toplevel(),
-                                        lambda category, spend=spend: CategoryHandler(spend, category),
-                                        self.vModel.Categories.values(),
-                                        vDestroyHandler=lambda w=w, background=w['background']: DestroyHandler(w, background)
-                                        ),
+            BV.View.Popup_SelectCategory(self.winfo_toplevel(),
+                                         lambda category, spend=spend: CategoryHandler(spend, category),
+                                         self.vModel.Categories.values(),
+                                         vDestroyHandler=lambda w=w, background=w['background']: DestroyHandler(w, background)
+                                         ),
             w.config(readonlybackground="grey")
         ))
 
