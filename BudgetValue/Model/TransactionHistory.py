@@ -42,6 +42,32 @@ class TransactionHistory(Misc.List_ValueStream):
                 del self.cDisposables[stream_info.stream]
         self._merged_amountStream_stream.subscribe(FeedCategoryTotals)
 
+    def Iter_Spend(self):
+        for transaction in self:
+            if transaction.IsSpend():
+                yield transaction
+
+    def Iter_Income(self):
+        for transaction in self:
+            if transaction.IsIncome() or transaction.IsOverride():
+                yield transaction
+
+    def GetIncome(self):
+        return list(self.Iter_Income())
+
+    def AddTransaction(self, amount=None, timestamp=None, description=None):
+        transaction = Transaction(self.vModel, self)
+        if amount is not None:
+            transaction.amount = amount
+        if timestamp is not None:
+            transaction.timestamp = timestamp
+        if description is not None:
+            transaction.description = description
+        self.append(transaction)
+
+    def RemoveTransaction(self, transaction):
+        self.remove(transaction)
+
     def Save(self):
         data = list()
         for transaction in self:
@@ -68,17 +94,9 @@ class Transaction():
         self.amount_stream = rx.subjects.BehaviorSubject(0)
         self.timestamp_stream = rx.subjects.BehaviorSubject(time.time())
         self.description_stream = rx.subjects.BehaviorSubject("")
-        self.categoryAmounts = CategoryAmounts(vModel, parent)
+        self.categoryAmounts = CategoryAmounts(vModel, self)
         self.ValidationSource = None
         self.bAlertNonValidation = True
-        # derivative data
-        self.balance_stream = rx.subjects.BehaviorSubject(0)
-        # subscribe balance_stream to categories total_stream
-        rx.Observable.combine_latest(
-            self.amount_stream,
-            self.categoryAmounts.total_stream,
-            lambda amount, categories_total: amount - categories_total
-        ).subscribe(self.balance_stream)
 
     def IsOverride(self):
         return self.amount_stream.value == 0
@@ -132,6 +150,29 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         super().__init__()
         self.parent = parent
         self.vModel = vModel
+        # derivative data
+        self.balance_stream = rx.subjects.BehaviorSubject(0)
+        # subscribe balance_stream to categories total_stream and parent's amount_stream
+        rx.Observable.combine_latest(
+            self.parent.amount_stream,
+            self.total_stream,
+            lambda amount, categories_total: amount - categories_total
+        ).subscribe(self.balance_stream)
+
+    def GetAll(self):
+        cAll = dict(self)
+        default_category_amount = CategoryAmount(self)
+        default_category_amount.category = Categories.default_category
+        default_category_amount.amount_stream = self.balance_stream
+        cAll[Categories.default_category.name] = default_category_amount
+        return cAll
+
+    def AddCategory(self, category, amount=None):
+        assert(category != Categories.default_category)
+        self[category.name] = CategoryAmount(self)
+        self[category.name].category = category
+        if amount is not None:
+            self[category.name].amount = amount
 
 
 class CategoryAmount():

@@ -4,39 +4,34 @@ import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
 from BudgetValue.View.Skin import vSkin  # noqa
 from .. import Misc
+from BudgetValue.Model.Categories import Categories
 
 
 class Table(Misc.BudgetedTable):
     def Refresh(self):
         super().Refresh()
         # Column Header
-        for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
-            vColumnHeader = WF.MakeHeader(self, (0, iColumn+self.iFirstDataColumn), text="Column "+str(iColumn+1))
+        for iColumn, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income()):
+            vColumnHeader = WF.MakeLable(self, (0, iColumn+self.iFirstDataColumn), text=income_transaction.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         # Data
-        for row, category in enumerate(self.vModel.Categories.Select()):
-            # SplitMoneyHistory
-            for iColumn, split_money_history_column in enumerate(self.vModel.SplitMoneyHistory):
-                if category.name in split_money_history_column:
-                    background = vSkin.BG_READ_ONLY if category.name == "<Default Category>" else vSkin.BG_DEFAULT
-                    bEditableState = category.name != "<Default Category>"
-                    w = self.MakeEntry((row+self.iFirstDataRow, iColumn+self.iFirstDataColumn),
-                                       text=split_money_history_column[category.name].amount_stream,
-                                       bEditableState=bEditableState,
-                                       background=background
-                                       )
+        for row, category in enumerate(self.vModel.Categories.Select(), self.iFirstDataRow):
+            for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
+                if category.name in income_transaction.categoryAmounts.GetAll().keys():
+                    background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
+                    bEditableState = category != Categories.default_category
+                    w = WF.MakeEntry(self,
+                                     (row, column),
+                                     text=income_transaction.categoryAmounts.GetAll()[category.name].amount_stream,
+                                     bEditableState=bEditableState,
+                                     background=background,
+                                     validation=BV.MakeValid_Money
+                                     )
                     if bEditableState:
-                        w.bind("<FocusOut>", lambda event, w=w: self.SaveCellToModel(w), add="+")
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+
         #
         self.FinishRefresh()
-
-    def MakeEntry(self, *args, **kwargs):
-        w = WF.MakeEntry(self, *args, **kwargs)
-        # Validation
-        w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
-        #
-        return w
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
@@ -58,12 +53,17 @@ class Table(Misc.BudgetedTable):
     def GetAddableCategories(self, iColumn):
         cAddableCategories = list()
         for category in self.vModel.Categories.values():
-            if category.name not in self.vModel.SplitMoneyHistory[iColumn].keys():
+            if category.name not in self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.GetAll().keys():
                 cAddableCategories.append(category)
         return cAddableCategories
 
-    def AddCategoryToColumn(self, category, iColumn):
+    def AddCategoryToColumn_OLD(self, category, iColumn):
         self.vModel.SplitMoneyHistory.AddEntry(iColumn, category.name, 0)
+        self.Refresh()
+
+    def AddCategoryToColumn(self, category, iColumn):  # assume iColumn is already adjusted
+        transaction = self.vModel.TransactionHistory.GetIncome()[iColumn]
+        transaction.categoryAmounts.AddCategory(category)
         self.Refresh()
 
     def ShowHeaderMenu(self, event):

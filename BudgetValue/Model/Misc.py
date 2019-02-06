@@ -23,7 +23,6 @@ class List_ValueStream(list):
         super().__setitem__(key, value)
 
     def append(self, value):
-        print("List_ValueStream. value:"+str(value))
         self._value_stream.on_next(ValueAddPair(True, value))
         super().append(value)
 

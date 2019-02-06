@@ -11,12 +11,12 @@ class Buffer():
         self.value = value - 1  # the -1 lets Buffer(0) do nothing as expected
 
 
-def MakeLable(self, cRowColumnPair, text=None, columnspan=1, width=0):
+def MakeLable(self, cRowColumnPair, text=None, columnspan=1, width=0, display=None, font=vSkin.FONT_LARGE):
     if isinstance(width, Buffer):
         width = len(text) + width.value
     #
-    w = tk.Label(self, font=vSkin.FONT_LARGE, borderwidth=2, width=width, height=1,
-                 relief='ridge', background=vSkin.BG_HEADER, text=text)
+    w = TM.tk.Label_DirectStream(self, font=font, borderwidth=2, width=width, height=1,
+                                 relief='ridge', background=vSkin.BG_HEADER, text=text, display=display)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="ewn")
     return w
 
@@ -63,7 +63,7 @@ def MakeButton(*args, **kwargs):
     return w
 
 
-def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, validation=None, bTextIsTimestamp=False, bFocusNothingOnReturn=False):
+def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True, justify=tk.RIGHT, bBold=False, background=vSkin.BG_DEFAULT, width=0, bTextIsTimestamp=False, bFocusNothingOnReturn=False, validation=None, display=None):
     cDisposables = []
     if isinstance(width, Buffer):
         width = len(text) + width.value
@@ -90,21 +90,14 @@ def MakeEntry(self, cRowColumnPair, text=None, columnspan=1, bEditableState=True
     #
     w = TM.tk.Entry_DirectStream(self, font=font, width=width, justify=justify, text=text,
                                  borderwidth=2, relief='ridge', background=background, disabledbackground=background,
-                                 readonlybackground=background, state=state)
+                                 readonlybackground=background, state=state, validation=validation, display=display)
     w.grid(row=cRowColumnPair[0], column=cRowColumnPair[1], columnspan=columnspan, sticky="nsew")
-    # Validation
-    w.ValidationHandler = validation
-    # return_handler
-    if bFocusNothingOnReturn:
-        w.bind("<Return>", lambda x: w.FocusNothing())
     # Events
-    w.bind('<Escape>', lambda event, w=w: w.FocusNothing())
+    w.bind('<Escape>', lambda event: w.FocusNothing())
+    w.bind("<Return>", lambda event: w.FocusNothing())
     if bEditableState:
         w.bind("<FocusIn>", lambda event, w=w: OnFocusIn_MakeObvious(w))
-        w.bind("<FocusOut>", lambda event, w=w: w.MakeValid(), add="+")
         w.bind("<FocusOut>", lambda event, w=w: OnFocusOut_MakeObvious(w), add="+")
-        if hasattr(self, 'FocusNextWritableCell'):
-            w.bind("<Return>", lambda event, w=w: self.FocusNextWritableCell(w))
     # Remember disposables
     w.cDisposables.extend(cDisposables)
     #

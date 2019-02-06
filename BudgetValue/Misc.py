@@ -3,6 +3,15 @@ from decimal import Decimal
 from ._Logger import BVLog
 from ._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
+from datetime import datetime
+
+
+def DisplayTimestamp(timestamp):
+    if timestamp == 0:
+        return ""
+    dt = datetime.fromtimestamp(timestamp)
+    str_ = dt.strftime('%Y-%m-%d %H:%M')
+    return str_
 
 
 def Hello():

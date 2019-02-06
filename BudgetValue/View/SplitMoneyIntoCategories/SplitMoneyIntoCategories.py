@@ -24,7 +24,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
         vButton_AddRow = ttk.Button(self.vButtonBar, text="Split",
-                                    command=lambda self=self: self.AddSplitMoneyHistoryColumn())
+                                    command=lambda self=self: self.SplitIncomeTransaction())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
                                            command=lambda self=self: self.SplitPaycheck())
@@ -87,4 +87,8 @@ class SplitMoneyIntoCategories(tk.Frame):
 
     def AddSplitMoneyHistoryColumn(self):
         self.vModel.SplitMoneyHistory.AddColumn()
+        self.vTable.Refresh()
+
+    def SplitIncomeTransaction(self):
+        self.vModel.TransactionHistory.AddTransaction(amount=450)
         self.vTable.Refresh()
