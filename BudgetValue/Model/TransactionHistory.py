@@ -85,6 +85,7 @@ class TransactionHistory(Misc.List_ValueStream):
             transaction.timestamp = timestamp
         if description is not None:
             transaction.description = description
+        return transaction
 
     def RemoveTransaction(self, transaction):
         if isinstance(transaction, Transaction):

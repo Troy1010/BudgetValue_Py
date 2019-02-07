@@ -23,12 +23,9 @@ class SplitMoneyIntoCategories(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-        vButton_SplitTransactionPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck from Transactions",
-                                                      command=lambda self=self: self.SplitTransactionPaycheck())
-        vButton_SplitTransactionPaycheck.pack(side=tk.LEFT, anchor='w')
-        vButton_SplitUnverifiedPaycheck = ttk.Button(self.vButtonBar, text="Split unverified Paycheck",
-                                                     command=lambda self=self: self.SplitUnverifiedPaycheck())
-        vButton_SplitUnverifiedPaycheck.pack(side=tk.LEFT, anchor='w')
+        vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
+                                           command=lambda self=self: self.SplitTransactionPaycheck())
+        vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
         vButton_AddRow = ttk.Button(self.vButtonBar, text="Add 500, Split",
                                     command=lambda self=self: self.Split500())
         vButton_AddRow.pack(side=tk.LEFT, anchor='w')
@@ -68,13 +65,10 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def SplitTransaction(self, transaction):
-        pass
+        self.vTable.Refresh()
 
     def SplitTransactionPaycheck(self):
-        Popup_SelectIncome(self, self.SplitTransaction)
-
-    def SplitUnverifiedPaycheck(self):
-        pass
+        Popup_SelectIncome(self, self.vModel, self.SplitTransaction)
 
     def SplitDifference(self):
         self.vModel.SplitMoneyHistory.AddColumn()
