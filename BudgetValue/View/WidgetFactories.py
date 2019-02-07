@@ -52,11 +52,15 @@ def MakeEntry_ReadOnly(*args, **kwargs):
     return MakeEntry(*args, **kwargs)
 
 
-def MakeButton(*args, pos=None, columnspan=None, **kwargs):
+def MakeButton(*args, pos=None, columnspan=None, ** kwargs):
     kwargs['relief'] = "groove"
     if 'width' not in kwargs:
-        text = kwargs['text'] if not isinstance(kwargs['text'], rx.subjects.BehaviorSubject) else kwargs['text'].value
-        if len(text)-1 < 10:
+        str_ = 0
+        if 'text' in kwargs:
+            str_ = kwargs['text']
+        elif 'stream' in kwargs and hasattr(kwargs['stream'], 'value'):
+            str_ = kwargs['stream'].value
+        if len(str_)-1 < 10:
             kwargs['width'] = 10
     w = TM.tk.Button(*args, **kwargs)
     if pos:
