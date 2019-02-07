@@ -25,7 +25,8 @@ class Table(Misc.BudgetedTable):
                                      text=income_transaction.categoryAmounts.GetAll()[category.name].amount_stream,
                                      bEditableState=bEditableState,
                                      background=background,
-                                     validation=BV.MakeValid_Money
+                                     validation=BV.MakeValid_Money,
+                                     display=BV.MakeValid_Money_ZeroIsNone
                                      )
                     if bEditableState:
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
