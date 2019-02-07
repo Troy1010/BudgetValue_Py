@@ -52,7 +52,7 @@ def MakeEntry_ReadOnly(*args, **kwargs):
     return MakeEntry(*args, **kwargs)
 
 
-def MakeButton(*args, pos=None, **kwargs):
+def MakeButton(*args, pos=None, columnspan=None, **kwargs):
     kwargs['relief'] = "groove"
     if 'width' not in kwargs:
         text = kwargs['text'] if not isinstance(kwargs['text'], rx.subjects.BehaviorSubject) else kwargs['text'].value
@@ -60,7 +60,7 @@ def MakeButton(*args, pos=None, **kwargs):
             kwargs['width'] = 10
     w = TM.tk.Button(*args, **kwargs)
     if pos:
-        w.grid(row=pos[0], column=pos[1], columnspan=1000, sticky="nsew")
+        w.grid(row=pos[0], column=pos[1], columnspan=columnspan, sticky="nsew")
     else:
         w.pack(side=tk.LEFT, anchor='w')
     return w

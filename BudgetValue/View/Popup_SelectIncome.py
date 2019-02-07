@@ -4,7 +4,6 @@ from BudgetValue._Logger import Log  # noqa
 import rx  # noqa
 from . import WidgetFactories as WF  # noqa
 import BudgetValue as BV
-from .Popup_InputAmount import Popup_InputAmount
 
 
 class Popup_SelectIncome(tk.Frame):
@@ -33,14 +32,21 @@ class Popup_SelectIncome(tk.Frame):
             x, y = cPos[0], cPos[1]
         self.place(x=x, y=y)
         self.tkraise()
-        # Show Income Transactions
+        # Show Widgets
         self.transaction = None
+        self.createPaycheckAmount_stream = rx.subjects.BehaviorSubject(0)  # FIX: leaking?
+
+        def Accept():
+            handler(self.transaction)
+            self.destroy()
 
         def MakeNewTransaction(amount):
             self.transaction = self.vModel.TransactionHistory.AddTransaction(amount=amount, description="Unverified Paycheck")
-        WF.MakeButton(self, pos=(0, 0), text="Create unverified paycheck",
-                      command=lambda: Popup_InputAmount(self.winfo_toplevel(), self.vModel, MakeNewTransaction)
+            Accept()
+        WF.MakeButton(self, pos=(0, 0), columnspan=2, text="Create unverified paycheck with amount:",
+                      command=lambda: MakeNewTransaction(self.createPaycheckAmount_stream.value)
                       )
+        WF.MakeEntry(self, cRowColumnPair=(0, 2), stream=self.createPaycheckAmount_stream)
         for row, transaction in enumerate(vModel.TransactionHistory.Iter_Income(), 1):
             assert isinstance(transaction, BV.Model.Transaction)
             WF.MakeEntry_ReadOnly(self, (row, 0), transaction.timestamp, display=BV.DisplayTimestamp)
@@ -48,12 +54,5 @@ class Popup_SelectIncome(tk.Frame):
 
             def AssignTransaction(transaction):
                 self.transaction = transaction
+                Accept()
             WF.MakeX(self, (row, 2), lambda transaction=transaction: AssignTransaction(transaction))
-        # Bind Return to accept
-
-        def OnReturn(event):
-            if isinstance(event.widget, tk.Entry):
-                return
-            handler(self.transaction)
-            self.destroy()
-        self.winfo_toplevel().bind("<Return>", OnReturn, add='+')
