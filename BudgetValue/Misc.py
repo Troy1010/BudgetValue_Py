@@ -4,6 +4,14 @@ from ._Logger import BVLog
 from ._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
 from datetime import datetime
+import time
+
+
+def ValidateTimestamp(num):
+    if isinstance(num, str):
+        return time.mktime(datetime.strptime(num, '%Y-%m-%d %H:%M').timetuple())
+    else:
+        return float(num)
 
 
 def DisplayTimestamp(timestamp):
