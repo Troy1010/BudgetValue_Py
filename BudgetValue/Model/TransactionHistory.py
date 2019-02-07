@@ -134,7 +134,8 @@ class Transaction():
     def IsIncome(self):
         return self.amount_stream.value > 0
 
-    def destroy(self):  # FIX: is this necessary
+    def destroy(self):
+        self.categoryAmounts.clear()
         self.amount = 0
 
     @property

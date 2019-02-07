@@ -18,6 +18,8 @@ class List_ValueStream(list):
     def __setitem__(self, key, value):
         # if value isn't old, remove the old and add the new
         if key in self and self[key] != value:
+            if hasattr(self[key], 'destroy'):
+                self[key].destroy()
             self._value_stream.on_next(ValueAddPair(False, self[key]))
         self._value_stream.on_next(ValueAddPair(True, value))
         super().__setitem__(key, value)
@@ -27,6 +29,8 @@ class List_ValueStream(list):
         super().append(value)
 
     def __delitem__(self, key):
+        if hasattr(self[key], 'destroy'):
+            self[key].destroy()
         self._value_stream.on_next(ValueAddPair(False, self[key]))
         super().__delitem__(key)
 
