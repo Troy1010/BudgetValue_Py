@@ -74,3 +74,7 @@ def MakeValid_Money_Negative(value):
 def MakeValid_Money_Negative_ZeroIsNone(value):
     value = MakeValid_Money_Negative(value)
     return None if not value or value == 0 else value
+
+
+def DisplayZeroIsNone(value):
+    return None if not value or value == 0 else value

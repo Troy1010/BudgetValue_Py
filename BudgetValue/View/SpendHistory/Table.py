@@ -18,14 +18,14 @@ class Table(Misc.ModelTable):
         WF.MakeHeader(self, (0, 4), text="Description")
         # Data
         for row, spend in enumerate(self.vModel.TransactionHistory.Iter_Spend(), self.iFirstDataRow):
-            assert(isinstance(spend, BV.Model.Transaction))
-            self.MakeEntry_Timestamp((row, 1), spend=spend, stream=spend.timestamp_stream, justify=tk.LEFT, bTextIsTimestamp=True)
+            assert isinstance(spend, BV.Model.Transaction)
+            self.MakeEntry_Timestamp((row, 1), spend=spend, stream=spend.timestamp_stream, justify=tk.LEFT)
             self.MakeEntry_Category((row, 2), spend=spend, text=spend.GetCategorySummary(), justify=tk.LEFT)
-            self.MakeEntry_Amount((row, 3), spend=spend, text=spend.amount_stream)
-            self.MakeEntry_Description((row, 4), spend=spend, text=spend.description_stream, justify=tk.LEFT)
+            WF.MakeEntry(self, (row, 3), stream=spend.amount_stream, validation=BV.MakeValid_Money_Negative, justify=tk.RIGHT)
+            WF.MakeEntry(self, (row, 4), stream=spend.description_stream, justify=tk.LEFT)
             WF.MakeX(self, (row, 5), lambda spend=spend: (self.vModel.TransactionHistory.RemoveTransaction(spend), self.Refresh())[0])
 
-    def MakeEntry_Timestamp(self, cRowColumnPair, spend, stream, justify=tk.RIGHT, bTextIsTimestamp=True):
+    def MakeEntry_Timestamp(self, cRowColumnPair, spend, stream, justify=tk.RIGHT):
         w = WF.MakeEntry(self, cRowColumnPair, stream=stream, justify=justify, bEditableState=False, validation=BV.ValidateTimestamp, display=BV.DisplayTimestamp)
 
         def DestroyHandler(w, background):
@@ -65,18 +65,3 @@ class Table(Misc.ModelTable):
                                          ),
             w.config(readonlybackground="grey")
         ))
-
-    def MakeEntry_Amount(self, cRowColumnPair, spend, text, justify=tk.RIGHT):
-        w = WF.MakeEntry(self, cRowColumnPair, text=text, validation=BV.MakeValid_Money_Negative_ZeroIsNone, justify=justify)
-
-        def AssignAmount(spend, amount):
-            spend.amount = amount
-        w.bind("<FocusOut>", lambda event, spend=spend: AssignAmount(spend, w.text), add="+")
-
-    def MakeEntry_Description(self, cRowColumnPair, spend, text, justify=tk.RIGHT):
-        w = WF.MakeEntry(self, cRowColumnPair, text=text,
-                         justify=justify)
-
-        def AssignDescription(spend, description):
-            spend.description = description
-        w.bind("<FocusOut>", lambda event, spend=spend: AssignDescription(spend, w.text), add="+")

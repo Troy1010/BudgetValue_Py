@@ -34,7 +34,7 @@ class Popup_InputAmount(tk.Frame):
         # Show Entry box
         self.amount_stream = rx.subjects.BehaviorSubject(0)  # FIX: leaking?
         WF.MakeEntry_ReadOnly(self, (0, 0), text="Input Amount:")
-        WF.MakeEntry(self, (0, 1), stream=self.amount_stream, width=10)
+        WF.MakeEntry(self, (0, 1), stream=self.amount_stream, width=10, validation=BV.MakeValid_Money)
         # Bind Return to accept
 
         def OnReturn(event):
