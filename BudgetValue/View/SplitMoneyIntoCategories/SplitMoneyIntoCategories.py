@@ -3,13 +3,12 @@ from tkinter import ttk
 import tkinter.filedialog  # noqa
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
-import tkinter.messagebox  # noqa
 from .Table import Table
 import BudgetValue as BV
 import rx
 from .. import WidgetFactories as WF
 from ..Skin import vSkin
-from ...Model.Categories import Categories
+from ...Model.Categories import Categories  # noqa
 from ..Popup_InputAmount import Popup_InputAmount
 
 
@@ -35,8 +34,12 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vModel.Balance.balance_stream.map(
             lambda balance: "Add Unverified Income - Difference (" + str(balance) + ")"
         ).subscribe(vSplitDifferenceText_stream)
+
+        def SplitDifference():
+            self.vModel.TransactionHistory.AddTransaction(amount=-self.vModel.Balance.balance_stream.value, bSpend=False)
+            self.vTable.Refresh()
         vButton_SplitDifference = WF.MakeButton(self.vButtonBar, stream=vSplitDifferenceText_stream,
-                                                command=lambda self=self: self.SplitDifference())
+                                                command=lambda self=self: SplitDifference())
 
         def HighlightBalanceButton(balance):
             if balance:
@@ -55,15 +58,3 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
                                      command=lambda self=self: self.vTable.Refresh())
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
-
-    def SplitDifference(self):
-        self.vModel.TransactionHistory.AddTransaction(amount=-self.vModel.Balance.balance_stream.value, bSpend=False)
-        self.vTable.Refresh()
-
-    def SplitPaycheck(self):  # Legacy
-        self.vModel.SplitMoneyHistory.AddColumn()
-        for categoryName, paycheckPlan_row in self.vModel.PaycheckPlan.items():
-            if categoryName == Categories.default_category.name:
-                continue
-            self.vModel.SplitMoneyHistory.AddEntry(-1, categoryName, amount=paycheckPlan_row.amount)
-        self.vTable.Refresh()
