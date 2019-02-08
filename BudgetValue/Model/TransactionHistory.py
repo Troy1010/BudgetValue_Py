@@ -18,6 +18,7 @@ class TransactionHistory(Misc.List_ValueStream):
         self.total_stream = rx.subjects.BehaviorSubject(0)
         # Subscribe CategoryTotals
         self.cDisposables = {}
+        self.cDisposableCount = {}
         self._merged_amountStream_stream = rx.subjects.Subject()
 
         def MergeAmountStreamStreams(vValueAddPair):
@@ -38,10 +39,16 @@ class TransactionHistory(Misc.List_ValueStream):
                             self.cCategoryTotals[stream_info.categoryName].value + diff
                         )
                 )
+                if stream_info.categoryName not in self.cDisposableCount:
+                    self.cDisposableCount[stream_info.categoryName] = 0
+                self.cDisposableCount[stream_info.categoryName] += 1
             else:
-                # FIX: remove empty self.cCategoryTotals[stream_info.categoryName]
                 self.cDisposables[stream_info.stream].dispose()
                 del self.cDisposables[stream_info.stream]
+                # if every subscription of this category has been disposed, delete it.
+                self.cDisposableCount[stream_info.categoryName] -= 1
+                if self.cDisposableCount[stream_info.categoryName] == 0:
+                    del self.cCategoryTotals[stream_info.categoryName]
         self._merged_amountStream_stream.subscribe(FeedCategoryTotals)
         # Subscribe total_stream
         self.cDisposables2 = {}
@@ -253,5 +260,5 @@ class CategoryAmount():
     def category(self, value):
         if isinstance(value, str) and value in Categories:
             value = Categories[value]
-        assert(isinstance(value, BV.Model.Category))
+        assert isinstance(value, BV.Model.Category)
         self.category_stream.on_next(value)
