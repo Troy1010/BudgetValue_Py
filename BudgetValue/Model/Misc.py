@@ -24,6 +24,12 @@ class List_ValueStream(list):
         self._value_stream.on_next(ValueAddPair(True, value))
         super().__setitem__(key, value)
 
+    def remove(self, value):
+        if hasattr(value, 'destroy'):
+            value.destroy()
+        self._value_stream.on_next(ValueAddPair(False, value))
+        super().remove(value)
+
     def append(self, value):
         self._value_stream.on_next(ValueAddPair(True, value))
         super().append(value)
@@ -94,6 +100,12 @@ class List_AmountStreamStream(list):
             if hasattr(value, 'amount_stream') and not isinstance(value, BalanceEntry):
                 self._amountStream_stream.on_next(StreamInfo(True, value.amount_stream))
         super().__setitem__(key, value)
+
+    def remove(self, value):
+        if hasattr(value, 'amount_stream') and not isinstance(value, BalanceEntry):
+            value.amount_stream.on_next(0)
+            self._amountStream_stream.on_next(StreamInfo(False, value.amount_stream))
+        super().remove(value)
 
     def append(self, value):
         if hasattr(value, 'amount_stream') and not isinstance(value, BalanceEntry):
