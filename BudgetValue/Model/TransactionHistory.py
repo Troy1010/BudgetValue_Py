@@ -88,8 +88,8 @@ class TransactionHistory(Misc.List_ValueStream):
     def GetSpends(self):
         return list(self.Iter_Spend())
 
-    def AddTransaction(self, amount=None, timestamp=None, description=None):
-        transaction = Transaction(self.vModel, self)
+    def AddTransaction(self, bSpend, amount=None, timestamp=None, description=None):
+        transaction = Transaction(self.vModel, self, bSpend)
         self.append(transaction)
         if amount is not None:
             transaction.amount = amount
@@ -120,13 +120,13 @@ class TransactionHistory(Misc.List_ValueStream):
         if not data:
             return
         for transaction_savable in data:
-            transaction = Transaction(self.vModel, self)
+            transaction = Transaction(self.vModel, self, False)
             self.append(transaction)
             transaction.LoadSavable(transaction_savable)
 
 
 class Transaction():
-    def __init__(self, vModel, parent):
+    def __init__(self, vModel, parent, bSpend):
         self.parent = parent
         self.vModel = vModel
         # non-derivative data
@@ -134,9 +134,9 @@ class Transaction():
         self.timestamp_stream = rx.subjects.BehaviorSubject(time.time())
         self.description_stream = rx.subjects.BehaviorSubject("")
         self.categoryAmounts = CategoryAmounts(vModel, self)
+        self.bSpend = bSpend
         self.ValidationSource = None  # FIX: use
         self.bAlertNonValidation = True  # FIX: use
-        self.bSpend = False  # FIX: use
 
     def SetOneCategory(self, category):
         self.categoryAmounts.clear()
@@ -154,13 +154,13 @@ class Transaction():
             return "<Multiple Categories>"
 
     def IsOverride(self):
-        return self.amount_stream.value == 0
+        return not self.bSpend
 
     def IsSpend(self):
-        return self.amount_stream.value < 0
+        return self.bSpend
 
     def IsIncome(self):
-        return self.amount_stream.value > 0
+        return not self.bSpend
 
     def destroy(self):
         self.categoryAmounts.clear()
@@ -194,13 +194,16 @@ class Transaction():
         return {'amount': self.amount,
                 'timestamp': self.timestamp,
                 'description': self.description,
-                'categoryAmounts': {categoryName: y.amount for (categoryName, y) in self.categoryAmounts.items()}
+                'categoryAmounts': {categoryName: y.amount for (categoryName, y) in self.categoryAmounts.items()},
+                'bSpend': self.bSpend
                 }
 
     def LoadSavable(self, vSavable):
         self.amount = vSavable['amount']
         self.timestamp = vSavable['timestamp']
         self.description = vSavable['description']
+        if 'bSpend' in vSavable:
+            self.bSpend = vSavable['bSpend']
         for categoryName, amount in vSavable['categoryAmounts'].items():
             self.categoryAmounts.AddCategory(self.vModel.Categories[categoryName], amount)
 

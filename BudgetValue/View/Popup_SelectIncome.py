@@ -7,6 +7,7 @@ import BudgetValue as BV
 
 
 class Popup_SelectIncome(tk.Frame):
+    """legacy"""
     previous_popup = None
 
     def __init__(self, parent, vModel, handler, cPos=None, vDestroyHandler=None):

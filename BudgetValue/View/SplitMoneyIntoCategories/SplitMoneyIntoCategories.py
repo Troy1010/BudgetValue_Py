@@ -10,7 +10,7 @@ import rx
 from .. import WidgetFactories as WF
 from ..Skin import vSkin
 from ...Model.Categories import Categories
-from ..Popup_SelectIncome import Popup_SelectIncome
+from ..Popup_InputAmount import Popup_InputAmount
 
 
 class SplitMoneyIntoCategories(tk.Frame):
@@ -23,8 +23,12 @@ class SplitMoneyIntoCategories(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
+
+        def CreateTransaction(amount):
+            self.vModel.TransactionHistory.AddTransaction(bSpend=False, amount=amount)
+            self.vTable.Refresh()
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Split Paycheck",
-                                           command=lambda: Popup_SelectIncome(self, self.vModel, lambda transaction: self.vTable.Refresh()))
+                                           command=lambda: Popup_InputAmount(self, self.vModel, lambda amount: CreateTransaction(amount)))
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
         vButton_AddRow = ttk.Button(self.vButtonBar, text="Add 500, Split",
                                     command=lambda self=self: self.Split500())
@@ -56,11 +60,11 @@ class SplitMoneyIntoCategories(tk.Frame):
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
 
     def SplitDifference(self):
-        self.vModel.TransactionHistory.AddTransaction(amount=-self.vModel.Balance.balance_stream.value)
+        self.vModel.TransactionHistory.AddTransaction(amount=-self.vModel.Balance.balance_stream.value, bSpend=False)
         self.vTable.Refresh()
 
     def Split500(self):
-        self.vModel.TransactionHistory.AddTransaction(amount=500)
+        self.vModel.TransactionHistory.AddTransaction(amount=500, bSpend=False)
         self.vTable.Refresh()
 
     def SplitPaycheck(self):  # Legacy

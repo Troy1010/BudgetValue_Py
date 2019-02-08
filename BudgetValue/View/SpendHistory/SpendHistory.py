@@ -6,7 +6,7 @@ from .Table import Table
 import BudgetValue as BV
 from .. import WidgetFactories as WF
 from ..BudgetedTable import BudgetedTable  # noqa
-from ..Popup_InputAmount import Popup_InputAmount
+from ..Popup_InputAmount import Popup_InputAmount  # noqa
 
 
 class SpendHistory(tk.Frame):
@@ -42,11 +42,11 @@ class SpendHistory(tk.Frame):
         # ButtonBar Buttons
 
         def AddSpend(amount):
-            self.vModel.TransactionHistory.AddTransaction(amount=-amount, description="nonverified spend")
+            self.vModel.TransactionHistory.AddTransaction(amount=-amount, bSpend=True, description="nonverified spend")
             self.vTable.Refresh()
-        WF.MakeButton(self.vButtonBar, text="Add Spend", command=lambda: Popup_InputAmount(self, self.vModel, AddSpend))
+        WF.MakeButton(self.vButtonBar, text="Add Spend", command=lambda: AddSpend(0))
         WF.MakeButton(self.vButtonBar, text="Add Spend 20",
-                      command=lambda: (self.vModel.TransactionHistory.AddTransaction(amount=-20, description="nonverified spend"), self.vTable.Refresh())[0])
+                      command=lambda: (self.vModel.TransactionHistory.AddTransaction(amount=-20, bSpend=True, description="nonverified spend"), self.vTable.Refresh())[0])
         vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
                                      command=lambda self=self: self.vTable.Refresh())
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
