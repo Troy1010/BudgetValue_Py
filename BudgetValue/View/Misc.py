@@ -94,6 +94,12 @@ class CategoryTable(ModelTable):
 class BudgetedTable(CategoryTable):
     iFirstDataColumn = 2
 
+    def __init__(self, parent, vModel):
+        super().__init__(parent, vModel)
+        assert isinstance(vModel, BV.Model.Model)
+        # Refresh when new values come in
+        vModel.TransactionHistory._merged_amountStream_stream.subscribe(lambda x: self.Refresh())
+
     def Refresh(self):
         super().Refresh()
         #

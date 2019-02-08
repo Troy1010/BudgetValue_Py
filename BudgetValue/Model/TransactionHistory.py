@@ -31,18 +31,22 @@ class TransactionHistory(Misc.List_ValueStream):
 
         def FeedCategoryTotals(stream_info):
             if stream_info.bAdd:
+                # add category to cCategoryTotals if it's absent
                 if stream_info.categoryName not in self.cCategoryTotals:
                     self.cCategoryTotals[stream_info.categoryName] = rx.subjects.BehaviorSubject(0)
+                # subscribe cCategoryTotals
                 self.cDisposables[stream_info.stream] = stream_info.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).subscribe(
                     lambda diff:
                         self.cCategoryTotals[stream_info.categoryName].on_next(
                             self.cCategoryTotals[stream_info.categoryName].value + diff
                         )
                 )
+                # keep track of how many subscriptions this category has
                 if stream_info.categoryName not in self.cDisposableCount:
                     self.cDisposableCount[stream_info.categoryName] = 0
                 self.cDisposableCount[stream_info.categoryName] += 1
             else:
+                # dispose of cCategoryTotals subscription
                 self.cDisposables[stream_info.stream].dispose()
                 del self.cDisposables[stream_info.stream]
                 # if every subscription of this category has been disposed, delete it.
