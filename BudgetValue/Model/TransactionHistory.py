@@ -5,6 +5,7 @@ import rx
 from . import Misc  # noqa
 from .Categories import Categories  # noqa
 import time
+import TM_CommonPy as TM  # noqa
 
 
 class TransactionHistory(Misc.List_ValueStream):
@@ -126,9 +127,9 @@ class Transaction():
         self.bAlertNonValidation = True  # FIX: use
         self.bSpend = False  # FIX: use
 
-    def SetOneCategory(self, category, amount=None):
+    def SetOneCategory(self, category):
         self.categoryAmounts.clear()
-        self.categoryAmounts.AddCategory(category, amount=amount)
+        self.categoryAmounts.AddCategory(category, amount=self.amount)
 
     def AddCategory(self, category, amount=None):
         self.categoryAmounts.AddCategory(category, amount=amount)
@@ -225,7 +226,7 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         if amount is not None:
             self[category.name].amount = amount
 
-    def RemoveCategory(self, category, amount=None):
+    def RemoveCategory(self, category):
         assert(category != Categories.default_category)
         del self[category.name]
 
