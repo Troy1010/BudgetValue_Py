@@ -13,6 +13,7 @@ class Table(Misc.BudgetedTable):
         # Column Header
         for iColumn, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income()):
             vColumnHeader = WF.MakeLable(self, (0, iColumn+self.iFirstDataColumn), text=income_transaction.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
+            vColumnHeader.transaction = income_transaction  # for GetTransactionOfColumn
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         # Data
         for row, category in enumerate(self.vModel.Categories.Select(), self.iFirstDataRow):
@@ -39,13 +40,12 @@ class Table(Misc.BudgetedTable):
         vDropdown.post(event.x_root, event.y_root)
 
     def ShowHeaderMenu(self, event):
-        iColumn = event.widget.grid_info()['column'] - self.iFirstDataColumn
         vDropdown = tk.Menu(tearoff=False)
-        vDropdown.add_command(label="Forget Transaction", command=lambda iColumn=iColumn: self.ForgetTransaction(iColumn))
-        vDropdown.add_command(label="Add Category", command=lambda iColumn=iColumn, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+        vDropdown.add_command(label="Forget Transaction", command=lambda: self.ForgetTransaction(event.widget.transaction))
+        vDropdown.add_command(label="Add Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
                               BV.View.Popup_SelectCategory(self.winfo_toplevel(),
-                                                           lambda category, iColumn=iColumn: self.AddCategoryToColumn(category, iColumn),
-                                                           self.GetAddableCategories(iColumn),
+                                                           lambda category: self.AddCategoryToColumn(category, event.widget.transaction),
+                                                           self.GetAddableCategories(event.widget.column),
                                                            cPos=(x, y)
                                                            )
                               ))
@@ -57,18 +57,23 @@ class Table(Misc.BudgetedTable):
         self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.RemoveCategory(category)
         self.Refresh()
 
-    def ForgetTransaction(self, iColumn):  # assume iColumn is already adjusted
-        self.vModel.TransactionHistory.RemoveTransaction(iColumn)
+    def GetTransactionOfColumn(self, iColumn):
+        header = self.GetCell(0, iColumn)
+        assert hasattr(header, 'transaction')
+        return header.transaction
+
+    def ForgetTransaction(self, transaction):
+        self.vModel.TransactionHistory.RemoveTransaction(transaction)
         self.Refresh()
 
     def GetAddableCategories(self, iColumn):
+        iColumn -= self.iFirstDataColumn
         cAddableCategories = list()
         for category in self.vModel.Categories.values():
             if category.name not in self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.GetAll().keys():
                 cAddableCategories.append(category)
         return cAddableCategories
 
-    def AddCategoryToColumn(self, category, iColumn):  # assume iColumn is already adjusted
-        transaction = self.vModel.TransactionHistory.GetIncome()[iColumn]
+    def AddCategoryToColumn(self, category, transaction):
         transaction.categoryAmounts.AddCategory(category)
         self.Refresh()

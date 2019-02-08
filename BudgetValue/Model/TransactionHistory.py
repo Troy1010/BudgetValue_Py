@@ -47,15 +47,15 @@ class TransactionHistory(Misc.List_ValueStream):
 
         def FeedTotal(stream_info):
             if stream_info.bAdd:
-                self.cDisposables2[stream_info.categoryName] = stream_info.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).subscribe(
+                self.cDisposables2[stream_info.stream] = stream_info.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).subscribe(
                     lambda diff:
                         self.total_stream.on_next(
                             self.total_stream.value + diff
                         )
                 )
             else:
-                self.cDisposables2[stream_info.categoryName].dispose()
-                del self.cDisposables2[stream_info.categoryName]
+                self.cDisposables2[stream_info.stream].dispose()
+                del self.cDisposables2[stream_info.stream]
         self._merged_amountStream_stream.subscribe(FeedTotal)
         # Load
         self.Load()
@@ -124,6 +124,7 @@ class Transaction():
         self.categoryAmounts = CategoryAmounts(vModel, self)
         self.ValidationSource = None  # FIX: use
         self.bAlertNonValidation = True  # FIX: use
+        self.bSpend = False  # FIX: use
 
     def SetOneCategory(self, category, amount=None):
         self.categoryAmounts.clear()
