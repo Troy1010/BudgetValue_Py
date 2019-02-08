@@ -10,6 +10,7 @@ from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 from BudgetValue.View.SpendHistory import SpendHistory
+from BudgetValue.View.VerifyTransactions import VerifyTransactions  # noqa
 import os
 import pickle
 
@@ -104,6 +105,8 @@ class TabBar(tk.Frame):
             vButton.configure(background=color)
 
     def ShowTab(self, frame):
+        if frame not in self.cTabButtons:
+            frame = list(self.cTabButtons.keys())[0]
         self.HighlightButton(self.cTabButtons[frame])
         self.cTabPageFrames[frame].tkraise()
         self.parent.vLastShownTab = frame
