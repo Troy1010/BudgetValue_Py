@@ -125,6 +125,21 @@ class Transaction():
         self.ValidationSource = None  # FIX: use
         self.bAlertNonValidation = True  # FIX: use
 
+    def SetOneCategory(self, category, amount=None):
+        self.categoryAmounts.clear()
+        self.categoryAmounts.AddCategory(category, amount=amount)
+
+    def AddCategory(self, category, amount=None):
+        self.categoryAmounts.AddCategory(category, amount=amount)
+
+    def GetCategorySummary(self):
+        if len(self.categoryAmounts) == 0:
+            return Categories.default_category.name
+        elif len(self.categoryAmounts) == 1:
+            return list(self.categoryAmounts.values())[0].category.name
+        else:
+            return "<Multiple Categories>"
+
     def IsOverride(self):
         return self.amount_stream.value == 0
 
@@ -202,7 +217,8 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         return cAll
 
     def AddCategory(self, category, amount=None):
-        assert(category != Categories.default_category)
+        if category == Categories.default_category:
+            return
         self[category.name] = CategoryAmount(self)
         self[category.name].category = category
         if amount is not None:
