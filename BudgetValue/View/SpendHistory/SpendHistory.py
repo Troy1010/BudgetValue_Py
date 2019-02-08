@@ -44,9 +44,11 @@ class SpendHistory(tk.Frame):
         def AddSpend(amount):
             self.vModel.TransactionHistory.AddTransaction(amount=-amount, bSpend=True, description="nonverified spend")
             self.vTable.Refresh()
-        WF.MakeButton(self.vButtonBar, text="Add Spend", command=lambda: AddSpend(0))
-        WF.MakeButton(self.vButtonBar, text="Add Spend 20",
-                      command=lambda: (self.vModel.TransactionHistory.AddTransaction(amount=-20, bSpend=True, description="nonverified spend"), self.vTable.Refresh())[0])
+        WF.MakeButton(self.vButtonBar, text="Add Unverified Spend", command=lambda: AddSpend(0))
         vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
-                                     command=lambda self=self: self.vTable.Refresh())
+                                     command=lambda self=self: self.Refresh())
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
+
+    def Refresh(self):
+        self.vBTTable.Refresh()
+        self.vTable.Refresh()
