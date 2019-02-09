@@ -55,6 +55,5 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vTable.pack(anchor='nw')
         self.vTable.Refresh()
         # ButtonBar More
-        vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
-                                     command=lambda self=self: self.vTable.Refresh())
-        vButton_Refresh.pack(side=tk.LEFT, anchor='w')
+        WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.vTable.Refresh())
+        WF.MakeButton(self.vButtonBar, text="Import Transactions", command=lambda: 1)
