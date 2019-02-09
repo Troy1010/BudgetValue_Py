@@ -13,12 +13,8 @@ class TransactionHistory(Misc.List_ValueStream):
         super().__init__()
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "TransactionHistory.pickle")
-        #
-        self.cCategoryTotals = {}
-        self.total_stream = rx.subjects.BehaviorSubject(0)
-        # Subscribe CategoryTotals
+        # subscribe _merged_amountStream_stream
         self.cDisposables = {}
-        self.cDisposableCount = {}
         self._merged_amountStream_stream = rx.subjects.Subject()
 
         def MergeAmountStreamStreams(vValueAddPair):
@@ -28,49 +24,6 @@ class TransactionHistory(Misc.List_ValueStream):
                 self.cDisposables[vValueAddPair.value].dispose()
                 del self.cDisposables[vValueAddPair.value]
         self._value_stream.subscribe(MergeAmountStreamStreams)
-
-        def FeedCategoryTotals(stream_info):
-            if stream_info.bAdd:
-                # add category to cCategoryTotals if it's absent
-                if stream_info.categoryName not in self.cCategoryTotals:
-                    self.cCategoryTotals[stream_info.categoryName] = rx.subjects.BehaviorSubject(0)
-                # subscribe cCategoryTotals
-                self.cDisposables[stream_info.stream] = stream_info.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).subscribe(
-                    lambda diff:
-                        self.cCategoryTotals[stream_info.categoryName].on_next(
-                            self.cCategoryTotals[stream_info.categoryName].value + diff
-                        )
-                )
-                # keep track of how many subscriptions this category has
-                if stream_info.categoryName not in self.cDisposableCount:
-                    self.cDisposableCount[stream_info.categoryName] = 0
-                self.cDisposableCount[stream_info.categoryName] += 1
-            else:
-                # dispose of cCategoryTotals subscription
-                self.cDisposables[stream_info.stream].dispose()
-                del self.cDisposables[stream_info.stream]
-                # if every subscription of this category has been disposed, delete it.
-                self.cDisposableCount[stream_info.categoryName] -= 1
-                if self.cDisposableCount[stream_info.categoryName] == 0:
-                    del self.cCategoryTotals[stream_info.categoryName]
-        self._merged_amountStream_stream.subscribe(FeedCategoryTotals)
-        # Subscribe total_stream
-        self.cDisposables2 = {}
-
-        def FeedTotal(stream_info):
-            if stream_info.bAdd:
-                self.cDisposables2[stream_info.stream] = stream_info.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).subscribe(
-                    lambda diff:
-                        self.total_stream.on_next(
-                            self.total_stream.value + diff
-                        )
-                )
-            else:
-                self.cDisposables2[stream_info.stream].dispose()
-                del self.cDisposables2[stream_info.stream]
-        self._merged_amountStream_stream.subscribe(FeedTotal)
-        # Load
-        self.Load()
 
     def Iter_Spend(self):
         for transaction in self:

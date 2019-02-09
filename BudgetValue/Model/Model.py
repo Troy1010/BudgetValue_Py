@@ -22,3 +22,5 @@ class Model():
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
         self.Balance = BV.Model.Balance(self)
+        # Load
+        self.TransactionHistory.Load()
