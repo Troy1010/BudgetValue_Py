@@ -6,6 +6,9 @@ from . import Misc  # noqa
 from .Categories import Categories  # noqa
 import time
 import TM_CommonPy as TM  # noqa
+import pandas as pd
+from BudgetValue._Logger import Log  # noqa
+import time  # noqa
 
 
 class TransactionHistory(Misc.List_ValueStream):
@@ -24,6 +27,18 @@ class TransactionHistory(Misc.List_ValueStream):
                 self.cDisposables[vValueAddPair.value].dispose()
                 del self.cDisposables[vValueAddPair.value]
         self._value_stream.subscribe(MergeAmountStreamStreams)
+
+    def Import(self, sFilePath):
+        extension = os.path.splitext(sFilePath)[1][1:]
+        assert extension == 'csv'
+        for index, row in pd.read_csv(sFilePath).iterrows():
+            if not pd.isnull(row[3]):
+                amount = row[3]
+                bSpend = True
+            else:
+                amount = row[4]
+                bSpend = False
+            self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[5])
 
     def Iter_Spend(self):
         for transaction in self:

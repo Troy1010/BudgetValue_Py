@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.filedialog
 from tkinter import ttk
 import tkinter.filedialog  # noqa
 from BudgetValue._Logger import BVLog  # noqa
@@ -56,4 +57,11 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vTable.Refresh()
         # ButtonBar More
         WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.vTable.Refresh())
-        WF.MakeButton(self.vButtonBar, text="Import Transactions", command=lambda: 1)
+
+        def Import():
+            # Prompt which file
+            vFile = tk.filedialog.askopenfile()
+            # Import
+            if vFile is not None:
+                self.vModel.TransactionHistory.Import(vFile.name)
+        WF.MakeButton(self.vButtonBar, text="Import Transactions", command=lambda: Import())
