@@ -17,5 +17,5 @@ class BudgetedTable(Misc.BudgetedTable):
         row += 1
         # Budgeted Total
         WF.MakeLable(self, (row, 0), text="Total", width=WF.Buffer(1))
-        WF.MakeEntry(self, (row, 1), text=self.vModel.Budgeted.total_stream, justify=tk.CENTER, bEditableState=False, background=vSkin.BG_ENTRY)
+        WF.MakeEntry(self, (row, 1), text=self.vModel.Budgeted.total_stream, justify=tk.CENTER, bEditableState=False, background=vSkin.BG_ENTRY, display=BV.MakeValid_Money)
         row += 1
