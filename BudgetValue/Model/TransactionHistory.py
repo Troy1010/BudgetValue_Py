@@ -9,6 +9,8 @@ import TM_CommonPy as TM  # noqa
 import pandas as pd
 from BudgetValue._Logger import Log  # noqa
 import time  # noqa
+from datetime import datetime  # noqa
+from datetime import date  # noqa
 
 
 class TransactionHistory(Misc.List_ValueStream):
@@ -38,7 +40,8 @@ class TransactionHistory(Misc.List_ValueStream):
             else:
                 amount = row[4]
                 bSpend = False
-            self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[5])
+            if not self.IsAlreadyHere_ByProperties(BV.ValidateTimestamp(time.time()), amount, row[5]):
+                self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[5])
 
     def Iter_Spend(self):
         for transaction in self:
@@ -55,6 +58,21 @@ class TransactionHistory(Misc.List_ValueStream):
 
     def GetSpends(self):
         return list(self.Iter_Spend())
+
+    def IsAlreadyHere_ByProperties(self, timestamp, amount, description):
+        for transaction_iter in self:
+            if self.IsSame_ByProperties(transaction_iter, timestamp, amount, description):
+                return True
+        return False
+
+    def IsSame_ByProperties(self, transaction, timestamp, amount, description):
+        if date.fromtimestamp(transaction.timestamp) != date.fromtimestamp(timestamp):
+            return False
+        if transaction.amount != BV.MakeValid_Money(amount):
+            return False
+        if str(transaction.description) != str(description):
+            return False
+        return True
 
     def AddTransaction(self, bSpend, amount=None, timestamp=None, description=None):
         transaction = Transaction(self.vModel, self, bSpend)
@@ -103,7 +121,7 @@ class Transaction():
         self.description_stream = rx.subjects.BehaviorSubject("")
         self.categoryAmounts = CategoryAmounts(vModel, self)
         self.bSpend = bSpend
-        self.ValidationSource = None  # FIX: use
+        self.cValidationSources = None  # FIX: use
         self.bAlertNonValidation = True  # FIX: use
 
     def SetOneCategory(self, category):
