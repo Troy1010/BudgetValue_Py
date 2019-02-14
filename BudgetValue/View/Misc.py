@@ -11,8 +11,8 @@ class ModelTable(TM.tk.TableFrame):
     iFirstDataRow = 1
 
     def __init__(self, parent, vModel):
+        super().__init__(parent)
         assert isinstance(vModel, BV.Model.Model)
-        tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
         self.cDisposables = []
