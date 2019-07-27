@@ -36,26 +36,79 @@ class SpendHistory(tk.Frame):
         self.vVerticleSeparator.pack(side=tk.LEFT, anchor='nw', fill='both')
         # Scrollbar Frame
         self.vScrollbarFrame = tk.Frame(self.vFrameOfTables, background='lightgrey')
-        self.vScrollbarFrame.grid_rowconfigure(0, weight=1)
-        self.vScrollbarFrame.grid_columnconfigure(0, weight=1)
+        self.vScrollbarFrame.grid_rowconfigure(1, weight=1)  # allows expansion
+        self.vScrollbarFrame.grid_columnconfigure(0, weight=1)  # allows expansion
         self.vScrollbarFrame.pack(side=tk.LEFT, anchor='nw', fill='both', expand=True)
         # Table
         self.vCanvas = tk.Canvas(self.vScrollbarFrame, highlightthickness=0)
-        self.vCanvas.grid(row=0, column=0, sticky="NSEW")
+        self.vCanvas.grid(row=1, column=0, sticky="NSEW")
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.Refresh()
+        # Column Headers
+        self.vHeaderCanvas = tk.Canvas(self.vScrollbarFrame)
+        self.vHeaderCanvas.grid(row=0, column=0, sticky="nsew")
+        self.vHeaderFrame = tk.Frame(self.vHeaderCanvas, height=25)
+        self.vHeaderFrame.grid_propagate(False)
+        self.vHeaderFrame.grid(row=0, column=0, sticky="nw")
+        # resize frame on data frame resize
+        self.vTable.bind('<Configure>', lambda event: (
+            self.vHeaderFrame.config(width=self.vTable.winfo_width())
+        ))
+        self.vTable.update_idletasks()
+        self.vHeaderFrame.config(width=self.vTable.winfo_width())
+        # resize canvas height on frame resize
+        self.vHeaderFrame.bind('<Configure>', lambda event: (
+            self.vHeaderCanvas.config(height=self.vHeaderFrame.winfo_height())
+        ))
+        # resize header canvas width on data canvas resize
+        self.vTable.update_idletasks()
+        self.vTable.bind('<Configure>', lambda event: (
+            self.vHeaderCanvas.config(width=self.vTable.winfo_width()+500)
+        ))
+        self.vHeaderCanvas.config(width=self.vTable.winfo_width()+500)
+        #
+        self.vHeaderCanvas.create_window((0, 0), window=self.vHeaderFrame, anchor='nw')
+        WF.MakeHeader(self.vHeaderFrame, (1, 0), text="Timestamp")
+        w = tk.Frame(self.vHeaderFrame)
+        w.grid(row=0, column=0, sticky='ew')
+        self.LinkWidths(w, self.vTable.GetCell(0, 0))
+        WF.MakeHeader(self.vHeaderFrame, (1, 1), text="Category")
+        w = tk.Frame(self.vHeaderFrame)
+        w.grid(row=0, column=1, sticky='ew')
+        self.LinkWidths(w, self.vTable.GetCell(0, 1))
+        WF.MakeHeader(self.vHeaderFrame, (1, 2), text="Amount")
+        w = tk.Frame(self.vHeaderFrame)
+        w.grid(row=0, column=2, sticky='ew')
+        self.LinkWidths(w, self.vTable.GetCell(0, 2))
+        WF.MakeHeader(self.vHeaderFrame, (1, 3), text="Description")
+        w = tk.Frame(self.vHeaderFrame)
+        w.grid(row=0, column=3, sticky='ew')
+        self.LinkWidths(w, self.vTable.GetCell(0, 3))
+        self.vHeaderCanvas.update_idletasks()
+        self.vHeaderFrame.update_idletasks()
+        self.vHeaderCanvas.update_idletasks()
+
         # Scrollbars
         vScrollbar_Y = tk.Scrollbar(self.vScrollbarFrame)
-        vScrollbar_Y.grid(row=0, column=1, sticky="ns")
+        vScrollbar_Y.grid(row=0, column=1, rowspan=2, sticky="ns")
         self.vCanvas.config(yscrollcommand=vScrollbar_Y.set)
         vScrollbar_Y.config(command=self.vCanvas.yview)
         vScrollbar_X = tk.Scrollbar(self.vScrollbarFrame, orient=tk.HORIZONTAL)
-        vScrollbar_X.grid(row=1, column=0, sticky="ew")
+        vScrollbar_X.grid(row=2, column=0, sticky="ew")
         self.vCanvas.config(xscrollcommand=vScrollbar_X.set)
-        vScrollbar_X.config(command=self.vCanvas.xview)
+        #
+        self.vTable.update_idletasks()
+        self.vHeaderFrame.config(width=self.vTable.winfo_width())
+
+        def ScrollHeaderAndData(*args):
+            # print("ScrollHeaderAndData:"+str(args))
+            self.vCanvas.xview(*args)
+            self.vHeaderCanvas.xview(*args)
+        vScrollbar_X.config(command=ScrollHeaderAndData)
         # Scroll Events
-        self.vScrollbarFrame.bind('<Configure>', lambda event: self.vCanvas.config(scrollregion=self.vCanvas.bbox("all")))
+        self.vScrollbarFrame.bind('<Configure>', lambda event: self.vCanvas.config(scrollregion=self.vCanvas.bbox("all")), add='+')
+        self.vScrollbarFrame.bind('<Configure>', lambda event: self.vHeaderCanvas.config(scrollregion=self.vHeaderCanvas.bbox("all")), add='+')
 
         def onMousewheel(event):
             self.vCanvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
@@ -71,6 +124,20 @@ class SpendHistory(tk.Frame):
         WF.MakeButton(self.vButtonBar, text="Update", command=lambda: self.Update_())
         WF.MakeButton(self.vButtonBar, text="Try YView", command=lambda: self.try_yview())
         WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
+
+    def LinkWidths(self, widget1, widget2):
+        widget1.update_idletasks()  # makes winfo_width give correct results
+        widget2.update_idletasks()  # makes winfo_width give correct results
+        assert isinstance(widget1, tk.Frame)
+        assert isinstance(widget2, tk.Frame)
+
+        def forward_width_change(widget_from, widget_to):
+            if widget_from.winfo_width() > widget_to.winfo_width():
+                widget_to["width"] = widget_from.winfo_width()
+        widget1.bind("<Configure>", lambda event, widget_from=widget1, widget_to=widget2: forward_width_change(widget_from, widget_to))
+        widget2.bind("<Configure>", lambda event, widget_from=widget2, widget_to=widget1: forward_width_change(widget_from, widget_to))
+        forward_width_change(widget1, widget2)
+        forward_width_change(widget2, widget1)
 
     def PrintBBox(self):
         print("table bbox('all'):"+str(self.vTable.bbox("all")))

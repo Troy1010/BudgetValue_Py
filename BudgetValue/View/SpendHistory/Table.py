@@ -11,19 +11,18 @@ class Table(Misc.ModelTable):
 
     def Refresh(self):
         super().Refresh()
-        # Header
-        WF.MakeHeader(self, (0, 1), text="Timestamp")
-        WF.MakeHeader(self, (0, 2), text="Category")
-        WF.MakeHeader(self, (0, 3), text="Amount")
-        WF.MakeHeader(self, (0, 4), text="Description")
         # Data
         for row, spend in enumerate(self.vModel.TransactionHistory.Iter_Spend(), self.iFirstDataRow):
             assert isinstance(spend, BV.Model.Transaction)
-            self.MakeEntry_Timestamp((row, 1), spend=spend, stream=spend.timestamp_stream, justify=tk.LEFT)
-            self.MakeEntry_Category((row, 2), spend=spend, text=spend.GetCategorySummary(), justify=tk.LEFT)
-            WF.MakeEntry(self, (row, 3), stream=spend.amount_stream, validation=BV.MakeValid_Money_Negative, justify=tk.RIGHT)
-            WF.MakeEntry(self, (row, 4), stream=spend.description_stream, justify=tk.LEFT)
-            WF.MakeX(self, (row, 5), lambda spend=spend: (self.vModel.TransactionHistory.RemoveTransaction(spend), self.Refresh())[0])
+            self.MakeEntry_Timestamp((row, 0), spend=spend, stream=spend.timestamp_stream, justify=tk.LEFT)
+            self.MakeEntry_Category((row, 1), spend=spend, text=spend.GetCategorySummary(), justify=tk.LEFT)
+            WF.MakeEntry(self, (row, 2), stream=spend.amount_stream, validation=BV.MakeValid_Money_Negative, justify=tk.RIGHT)
+            WF.MakeEntry(self, (row, 3), stream=spend.description_stream, justify=tk.LEFT)
+            WF.MakeX(self, (row, 4), lambda spend=spend: (self.vModel.TransactionHistory.RemoveTransaction(spend), self.Refresh())[0])
+        # Header Spacers
+        for i in range(self.GetMaxColumn()):
+            w = tk.Frame(self)
+            w.grid(row=0, column=i, sticky='ew')
 
     def MakeEntry_Timestamp(self, cRowColumnPair, spend, stream, justify=tk.RIGHT):
         w = WF.MakeEntry(self, cRowColumnPair, stream=stream, justify=justify, bEditableState=False, validation=BV.ValidateTimestamp, display=BV.DisplayTimestamp)
