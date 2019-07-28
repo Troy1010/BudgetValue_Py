@@ -8,6 +8,13 @@ from BudgetValue._Logger import Log  # noqa
 
 
 class Table(Misc.ModelTable):
+    def __init__(self, *args):
+        super().__init__(*args)
+        # Permanent Header Spacers
+        for i in range(4):
+            w = tk.Frame(self)
+            w.bPerminent = True
+            w.grid(row=0, column=i, sticky='ew')
 
     def Refresh(self):
         super().Refresh()
@@ -19,10 +26,6 @@ class Table(Misc.ModelTable):
             WF.MakeEntry(self, (row, 2), stream=spend.amount_stream, validation=BV.MakeValid_Money_Negative, justify=tk.RIGHT)
             WF.MakeEntry(self, (row, 3), stream=spend.description_stream, justify=tk.LEFT)
             WF.MakeX(self, (row, 4), lambda spend=spend: (self.vModel.TransactionHistory.RemoveTransaction(spend), self.Refresh())[0])
-        # Header Spacers
-        for i in range(self.GetMaxColumn()):
-            w = tk.Frame(self)
-            w.grid(row=0, column=i, sticky='ew')
 
     def MakeEntry_Timestamp(self, cRowColumnPair, spend, stream, justify=tk.RIGHT):
         w = WF.MakeEntry(self, cRowColumnPair, stream=stream, justify=justify, bEditableState=False, validation=BV.ValidateTimestamp, display=BV.DisplayTimestamp)
