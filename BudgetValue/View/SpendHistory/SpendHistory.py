@@ -100,8 +100,6 @@ class SpendHistory(tk.Frame):
         #
         self.vTable.update_idletasks()
         self.vHeaderFrame.config(width=self.vTable.winfo_width())
-        print("self.vTable:"+str(self.vTable.winfo_width()))
-        print("self.vHeaderFrame:"+str(self.vHeaderFrame.winfo_width()))
 
         def ScrollHeaderAndData(*args):
             # print("ScrollHeaderAndData:"+str(args))

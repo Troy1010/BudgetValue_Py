@@ -59,7 +59,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vCanvas.config(scrollregion=self.vCanvas.bbox("all"))
-        # self.vTable.pack(anchor='nw') # this line causes vCanvas bbox to not match
+        # self.vTable.pack(anchor='nw') # this line causes vCanvas bbox not to match
         self.vTable.Refresh()
         # Scrollbars
         vScrollbar_Y = tk.Scrollbar(self.vScrollbarFrame)
