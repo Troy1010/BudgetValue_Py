@@ -37,7 +37,6 @@ class TransactionHistory(Misc.List_ValueStream):
         extension = os.path.splitext(sFilePath)[1][1:]
         assert extension == 'csv'
         data_frame = pd.read_csv(sFilePath)
-        description_column = -1
         for i, column_name in enumerate(data_frame.columns):
             if "Description" in column_name:
                 description_column = i
