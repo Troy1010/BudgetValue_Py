@@ -48,14 +48,46 @@ class SplitMoneyIntoCategories(tk.Frame):
             else:
                 vButton_SplitDifference.config(background=vSkin.BG_DEFAULT)
         self.vModel.Balance.balance_stream.subscribe(HighlightBalanceButton)
+        # Scrollbar Frame
+        self.vScrollbarFrame = tk.Frame(self, background='lightgrey')
+        self.vScrollbarFrame.grid_rowconfigure(0, weight=1)  # allows expansion
+        self.vScrollbarFrame.grid_columnconfigure(0, weight=1)  # allows expansion
+        self.vScrollbarFrame.pack(side=tk.LEFT, anchor='nw', fill='both', expand=True)
         # Table
-        self.vCanvas = tk.Canvas(self, highlightthickness=0)
-        self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
+        self.vCanvas = tk.Canvas(self.vScrollbarFrame, highlightthickness=0)
+        self.vCanvas.grid(row=0, column=0, sticky="NSEW")
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
-        self.vTable.pack(anchor='nw')
+        # self.vTable.pack(anchor='nw') # this line causes vCanvas bbox to not match
         self.vTable.Refresh()
+        self.vTable.update_idletasks()
+        self.vCanvas.update_idletasks()
+        # Scrollbars
+        vScrollbar_Y = tk.Scrollbar(self.vScrollbarFrame)
+        vScrollbar_Y.grid(row=0, column=1, rowspan=2, sticky="ns")
+        self.vCanvas.config(yscrollcommand=vScrollbar_Y.set)
+        vScrollbar_Y.config(command=self.vCanvas.yview)
+        vScrollbar_X = tk.Scrollbar(self.vScrollbarFrame, orient=tk.HORIZONTAL)
+        vScrollbar_X.grid(row=2, column=0, sticky="ew")
+        self.vCanvas.config(xscrollcommand=vScrollbar_X.set)
+        # ?
+        self.vCanvas.update_idletasks()
+        self.vTable.update_idletasks()
+        self.vCanvas.update_idletasks()
+
+        def ScrollHeaderAndData(*args):
+            self.vCanvas.xview(*args)
+        vScrollbar_X.config(command=ScrollHeaderAndData)
+        # Scroll Events
+        self.vScrollbarFrame.bind('<Configure>', lambda event: self.vCanvas.config(scrollregion=self.vCanvas.bbox("all")), add='+')
+        # ?
+        self.vCanvas.config(scrollregion=self.vCanvas.bbox("all"))
+        # ?
+        self.vCanvas.update_idletasks()
+        self.vTable.update_idletasks()
+        self.vCanvas.update_idletasks()
         # ButtonBar More
+        WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
         WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.vTable.Refresh())
 
         def Import():
@@ -65,3 +97,7 @@ class SplitMoneyIntoCategories(tk.Frame):
             if vFile is not None:
                 self.vModel.TransactionHistory.Import(vFile.name)
         WF.MakeButton(self.vButtonBar, text="Import Transactions", command=lambda: Import())
+
+    def PrintBBox(self):
+        print("table bbox('all'):"+str(self.vTable.bbox("all")))
+        print("canvas bbox('all'):"+str(self.vCanvas.bbox("all")))

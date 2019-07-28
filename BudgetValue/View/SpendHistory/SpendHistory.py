@@ -118,10 +118,10 @@ class SpendHistory(tk.Frame):
         self.vScrollbarFrame.bind('<Leave>', lambda event: self.unbind_all("<MouseWheel>"))
         # ButtonBar Buttons
 
-        def AddSpend(amount):
+        def AddUnverifiedSpend(amount):
             self.vModel.TransactionHistory.AddTransaction(amount=-amount, bSpend=True, description="nonverified spend")
             self.vTable.Refresh()
-        WF.MakeButton(self.vButtonBar, text="Add Unverified Spend", command=lambda: AddSpend(0))
+        WF.MakeButton(self.vButtonBar, text="Add Unverified Spend", command=lambda: AddUnverifiedSpend(0))
         WF.MakeButton(self.vButtonBar, text="Refresh", command=self.Refresh)
         WF.MakeButton(self.vButtonBar, text="Update", command=lambda: self.Update_())
         WF.MakeButton(self.vButtonBar, text="Try YView", command=lambda: self.try_yview())
@@ -129,7 +129,7 @@ class SpendHistory(tk.Frame):
         WF.MakeButton(self.vButtonBar, text="Clear!", command=lambda: (self.vModel.TransactionHistory.ClearAllTransactions(), self.Refresh()))
 
     def LinkWidths(self, widget1, widget2):
-        if widget2 is None:  # fix
+        if widget2 is None:  # fix: should never have to be used
             return
         assert isinstance(widget1, tk.Frame)
         assert isinstance(widget2, tk.Frame)

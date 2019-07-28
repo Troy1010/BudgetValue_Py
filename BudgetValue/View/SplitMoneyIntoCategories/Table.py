@@ -32,7 +32,7 @@ class Table(Misc.BudgetedTable):
                     if bEditableState:
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
-        self.FinishRefresh()
+        self.FinishRefresh()  # fix: refactor
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
