@@ -126,12 +126,15 @@ class SpendHistory(tk.Frame):
         WF.MakeButton(self.vButtonBar, text="Update", command=lambda: self.Update_())
         WF.MakeButton(self.vButtonBar, text="Try YView", command=lambda: self.try_yview())
         WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
+        WF.MakeButton(self.vButtonBar, text="Clear!", command=lambda: (self.vModel.TransactionHistory.ClearAllTransactions(), self.Refresh()))
 
     def LinkWidths(self, widget1, widget2):
-        widget1.update_idletasks()  # makes winfo_width give correct results
-        widget2.update_idletasks()  # makes winfo_width give correct results
+        if widget2 is None:  # fix
+            return
         assert isinstance(widget1, tk.Frame)
         assert isinstance(widget2, tk.Frame)
+        widget1.update_idletasks()  # makes winfo_width give correct results
+        widget2.update_idletasks()  # makes winfo_width give correct results
 
         def forward_width_change(widget_from, widget_to):
             if widget_from.winfo_width() > widget_to.winfo_width():

@@ -30,18 +30,40 @@ class TransactionHistory(Misc.List_ValueStream):
                 del self.cDisposables[vValueAddPair.value]
         self._value_stream.subscribe(MergeAmountStreamStreams)
 
+    def ClearAllTransactions(self):
+        self.clear()
+
     def Import(self, sFilePath):
         extension = os.path.splitext(sFilePath)[1][1:]
         assert extension == 'csv'
-        for index, row in pd.read_csv(sFilePath).iterrows():
-            if not pd.isnull(row[3]):
-                amount = row[3]
-                bSpend = True
+        data_frame = pd.read_csv(sFilePath)
+        description_column = -1
+        for i, column_name in enumerate(data_frame.columns):
+            if "Description" in column_name:
+                description_column = i
+            if "Amount" == column_name:
+                withdrawal_column = i
+                deposit_column = i
+            if "Withdrawal" in column_name:
+                withdrawal_column = i
+            if "Deposit" in column_name:
+                deposit_column = i
+        assert description_column
+        assert withdrawal_column
+        assert deposit_column
+        for index, row in data_frame.iterrows():
+            if withdrawal_column != deposit_column:
+                if not pd.isnull(row[withdrawal_column]):
+                    amount = row[withdrawal_column]
+                    bSpend = True
+                else:
+                    amount = row[deposit_column]
+                    bSpend = False
             else:
-                amount = row[4]
-                bSpend = False
-            if not self.IsAlreadyHere_ByProperties(BV.ValidateTimestamp(time.time()), amount, row[5]):
-                self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[5])
+                amount = row[withdrawal_column]
+                bSpend = amount <= 0
+            if not self.IsAlreadyHere_ByProperties(BV.ValidateTimestamp(time.time()), amount, row[description_column]):
+                self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[description_column])
 
     def Iter_Spend(self):
         for transaction in self:
