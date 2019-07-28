@@ -19,7 +19,15 @@ class ModelTable(TM.tk.TableFrame):
 
     def Refresh(self):
         # remove old
-        self.ClearTable()
+        for child in self.winfo_children():
+            try:
+                if not child.bPerminent:
+                    child.grid_forget()
+                    child.destroy()
+            except AttributeError:
+                child.grid_forget()
+                child.destroy()
+        # self.ClearTable()
         if hasattr(self, 'cDisposables'):
             for disposable in self.cDisposables:
                 disposable.dispose()
