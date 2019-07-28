@@ -58,10 +58,9 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vCanvas.grid(row=0, column=0, sticky="NSEW")
         self.vTable = Table(self.vCanvas, vModel)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
+        self.vCanvas.config(scrollregion=self.vCanvas.bbox("all"))
         # self.vTable.pack(anchor='nw') # this line causes vCanvas bbox to not match
         self.vTable.Refresh()
-        self.vTable.update_idletasks()
-        self.vCanvas.update_idletasks()
         # Scrollbars
         vScrollbar_Y = tk.Scrollbar(self.vScrollbarFrame)
         vScrollbar_Y.grid(row=0, column=1, rowspan=2, sticky="ns")
@@ -70,22 +69,12 @@ class SplitMoneyIntoCategories(tk.Frame):
         vScrollbar_X = tk.Scrollbar(self.vScrollbarFrame, orient=tk.HORIZONTAL)
         vScrollbar_X.grid(row=2, column=0, sticky="ew")
         self.vCanvas.config(xscrollcommand=vScrollbar_X.set)
-        # ?
-        self.vCanvas.update_idletasks()
-        self.vTable.update_idletasks()
-        self.vCanvas.update_idletasks()
 
         def ScrollHeaderAndData(*args):
             self.vCanvas.xview(*args)
         vScrollbar_X.config(command=ScrollHeaderAndData)
-        # Scroll Events
+        # If scrollbar frame is resized, match the canvas's scroll region
         self.vScrollbarFrame.bind('<Configure>', lambda event: self.vCanvas.config(scrollregion=self.vCanvas.bbox("all")), add='+')
-        # ?
-        self.vCanvas.config(scrollregion=self.vCanvas.bbox("all"))
-        # ?
-        self.vCanvas.update_idletasks()
-        self.vTable.update_idletasks()
-        self.vCanvas.update_idletasks()
         # ButtonBar More
         WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
         WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.vTable.Refresh())
