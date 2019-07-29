@@ -55,10 +55,10 @@ class Table(Misc.CategoryTable):
         def ImplementPlan(self):
             for category_name, paycheck_plan_row in self.vModel.PaycheckPlan.items():
                 if self.vModel.Categories[category_name].type == CategoryType.income or self.vModel.Categories[category_name].type == CategoryType.excess:
-                    pass  # -event.widget.transaction.amount
+                    pass
                 else:
                     event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories[category_name], amount=paycheck_plan_row.amount)
-            event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories.savings, amount=-event.widget.transaction.amount)  # -event.widget.transaction.categoryAmounts[category_name].amount)
+            event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories.savings, amount=event.widget.transaction.categoryAmounts.GetAll()[self.vModel.Categories.default_category.name].amount)
             self.Refresh()
         vDropdown.add_command(label="Implement Paycheck Plan", command=lambda: ImplementPlan(self))
         vDropdown.post(event.x_root, event.y_root)
