@@ -7,9 +7,10 @@ from .. import Misc
 from BudgetValue.Model.Categories import Categories
 
 
-class Table(Misc.BudgetedTable):
+class Table(Misc.CategoryTable):
     def Refresh(self):
         super().Refresh()
+        # self.AddSpacersForBudgeted()
         # Column Header
         for iColumn, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income()):
             vColumnHeader = WF.MakeLable(self, (0, iColumn+self.iFirstDataColumn), text=income_transaction.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
@@ -32,7 +33,7 @@ class Table(Misc.BudgetedTable):
                     if bEditableState:
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
-        self.FinishRefresh()  # fix: refactor
+        self.AddSeparationLables()
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)

@@ -15,6 +15,7 @@ class Table(Misc.CategoryTable):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
+        self.iFirstDataColumn += 1  # Make space for AddRowHeaderColumn
 
     def Refresh(self):
         super().Refresh()
@@ -36,7 +37,8 @@ class Table(Misc.CategoryTable):
             else:
                 bEditableState = category != Categories.default_category
                 self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
-        super().FinishRefresh()
+        super().AddRowHeaderColumn()
+        super().AddSeparationLables()
 
     def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True):
         w = WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState)

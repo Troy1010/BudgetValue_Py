@@ -11,7 +11,7 @@ from .. import WidgetFactories as WF
 from ..Skin import vSkin
 from ...Model.Categories import Categories  # noqa
 from ..Popup_InputAmount import Popup_InputAmount
-from .. import Misc
+from .. import BudgetedTable
 
 
 class SplitMoneyIntoCategories(tk.Frame):
@@ -57,7 +57,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         # Row Header Canvas
         self.vRowHeaderCanvas = tk.Canvas(self.vScrollbarFrame, highlightthickness=0)
         self.vRowHeaderCanvas.grid(row=1, column=0, sticky="NSEW")
-        self.vRowHeaderTable = Misc.BudgetedTable(self.vRowHeaderCanvas, vModel)
+        self.vRowHeaderTable = BudgetedTable.BudgetedTable(self.vRowHeaderCanvas, vModel)
         self.vRowHeaderCanvas.create_window((0, 0), window=self.vRowHeaderTable, anchor='nw')
         self.vRowHeaderTable.Refresh()
         # resize RowHeaderCanvas width on RowHeaderFrame resize
