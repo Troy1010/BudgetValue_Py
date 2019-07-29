@@ -5,12 +5,13 @@ from BudgetValue.View import WidgetFactories as WF
 from BudgetValue.View.Skin import vSkin  # noqa
 from .. import Misc
 from BudgetValue.Model.Categories import Categories
+from BudgetValue.Model.Categories import CategoryType
 
 
 class Table(Misc.CategoryTable):
     def Refresh(self):
         super().Refresh()
-        # self.AddSpacersForBudgeted()
+        self.AddSpacersForBudgeted()
         # Column Header
         for iColumn, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income()):
             vColumnHeader = WF.MakeLable(self, (0, iColumn+self.iFirstDataColumn), text=income_transaction.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
@@ -33,7 +34,7 @@ class Table(Misc.CategoryTable):
                     if bEditableState:
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
-        self.AddSeparationLables()
+        self.AddSeparationLables(no_text=True)
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)
@@ -50,6 +51,16 @@ class Table(Misc.CategoryTable):
                                                            cPos=(x, y)
                                                            )
                               ))
+
+        def ImplementPlan(self):
+            for category_name, paycheck_plan_row in self.vModel.PaycheckPlan.items():
+                if self.vModel.Categories[category_name].type == CategoryType.income or self.vModel.Categories[category_name].type == CategoryType.excess:
+                    pass  # -event.widget.transaction.amount
+                else:
+                    event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories[category_name], amount=paycheck_plan_row.amount)
+            event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories.savings, amount=-event.widget.transaction.amount)  # -event.widget.transaction.categoryAmounts[category_name].amount)
+            self.Refresh()
+        vDropdown.add_command(label="Implement Paycheck Plan", command=lambda: ImplementPlan(self))
         vDropdown.post(event.x_root, event.y_root)
 
     def RemoveCell(self, cell):

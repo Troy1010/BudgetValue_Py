@@ -27,7 +27,6 @@ class ModelTable(TM.tk.TableFrame):
             except AttributeError:
                 child.grid_forget()
                 child.destroy()
-        # self.ClearTable()
         if hasattr(self, 'cDisposables'):
             for disposable in self.cDisposables:
                 disposable.dispose()
@@ -46,45 +45,54 @@ class CategoryTable(ModelTable):
 
     def AddSpacersForBudgeted(self):
         row = self.iFirstDataRow
+        # Get height
+        # fix: There must be a better way..
+        height_widget = WF.MakeEntry_ReadOnly(self, (row, self.iFirstDataColumn), text="z", validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
+        height_widget.update_idletasks()
+        height = height_widget.winfo_height()
+        height_widget.grid_forget()
+        height_widget.destroy()
         # Data
         for category in self.vModel.Categories.Select():
             # Budgeted
             if category.name in self.vModel.Budgeted.cCategoryTotalStreams:
                 w = tk.Frame(self)
                 w.grid(row=row, column=self.iFirstDataColumn)
+                w.config(height=height)
             row += 1
         #
         self.iFirstDataColumn += 1
 
-    def AddSeparationLables(self):
-        print("***AddSeparationLabels called on:"+str(self))
+    def AddSeparationLables(self, no_text=False):
         prev_type = None
         row = self.GetMaxRow()
         while row >= self.iFirstDataRow:
             category = self.GetCategoryOfRow(row)
-            if category is None:
+            if category is None or self.IsRowEmpty(row):
                 row -= 1
                 continue
             if prev_type != category.type:
+                if prev_type is None:
+                    row -= 1
+                    prev_type = category.type
+                    continue
+                self.InsertRow(row+1)
+                if no_text:
+                    WF.MakeSeparationLable(self, row+1, " ")
+                else:
+                    WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
                 prev_type = category.type
-                self.InsertRow(row)
-                WF.MakeSeparationLable(self, row, "  " + category.type.name.capitalize())
-                print("Creating SeparationLable:"+category.type.name.capitalize()+" from category:"+category.name+" at row:"+str(row))
             row -= 1
+        self.InsertRow(row+1)
+        if no_text:
+            WF.MakeSeparationLable(self, row+1, " ")
+        else:
+            WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
 
     def GetCategoryOfRow(self, row):
-        # if not self.IsRowEmpty(row):
-        #     for cell in self.grid_slaves(row):
-        #         # try:
-        #         return cell.spend
-        #         # except
         # Only works before SeparationLables are added
         # fix: There must be a better way..
         for i, category in enumerate(self.vModel.Categories.values()):
-            if i == row - self.iFirstDataRow:
-                return category
-        return None
-        for i, category in enumerate(self.vModel.Categories.Select()):
             if i == row - self.iFirstDataRow:
                 return category
         return None

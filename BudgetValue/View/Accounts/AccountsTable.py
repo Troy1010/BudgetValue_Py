@@ -32,7 +32,8 @@ class AccountsTable(TM.tk.TableFrame):
             assert isinstance(net_worth_row, BV.Model.AccountsRow)
             self.MakeEntry((row, 0), text=net_worth_row.name)
             w = self.MakeEntry((row, 1), text=net_worth_row.amount_stream)
-            w.ValidationHandler = BV.MakeValid_Money_ZeroIsNone
+            w.ValidationHandler = BV.MakeValid_Money
+            w.DisplayHandler = BV.MakeValid_Money_ZeroIsNone
             WF.MakeX(self, (row, 2), command=lambda row=row: self.RemoveRow(row))
             row += 1
         # Black bar

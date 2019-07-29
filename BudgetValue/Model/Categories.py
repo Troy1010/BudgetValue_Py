@@ -38,10 +38,12 @@ class Categories(dict):
     default_income = Category("<Default Income>", CategoryType.income)
     rent = Category("Rent", CategoryType.always)
     commute = Category("Commute", CategoryType.always)
+    paycheck = Category("Paycheck", CategoryType.income)
+    savings = Category("Savings", CategoryType.excess)
     __default_catagories = [
         default_category,
         default_income,
-        Category("Paycheck", CategoryType.income),
+        paycheck,
         Category("Bonus", CategoryType.income),
         rent,
         Category("Hair", CategoryType.always),
@@ -53,7 +55,7 @@ class Categories(dict):
         Category("Emergency", CategoryType.always),
         Category("Improvements", CategoryType.always),
         Category("Activities", CategoryType.always),
-        Category("Savings", CategoryType.excess)
+        savings
     ]
 
     def __init__(self):
