@@ -5,12 +5,10 @@ import tkinter.filedialog  # noqa
 from tkinter import ttk
 import BudgetValue as BV
 from BudgetValue.View.Skin import vSkin
-from BudgetValue.View.ImportTransactionHistory import ImportTransactionHistory
 from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 from BudgetValue.View.SpendHistory import SpendHistory
-from BudgetValue.View.VerifyTransactions import VerifyTransactions  # noqa
 import os
 import pickle
 
@@ -29,7 +27,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SpendHistory, SplitMoneyIntoCategories, Accounts, Reports, PaycheckPlan, ImportTransactionHistory)
+        cTabPages = (SpendHistory, SplitMoneyIntoCategories, Accounts, Reports, PaycheckPlan)
         # MenuBar
         self.config(menu=MenuBar(vModel))
         # TabBar

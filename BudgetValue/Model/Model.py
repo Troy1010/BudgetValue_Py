@@ -14,11 +14,8 @@ class Model():
         self.connection.row_factory = sqlite3.Row
         #
         self.Categories = BV.Model.Categories()
-        self.ImportTransactionHistory = BV.Model.ImportTransactionHistory(self)
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.Accounts = BV.Model.Accounts(self)
-        self.SplitMoneyHistory = BV.Model.SplitMoneyHistory(self)
-        self.SpendHistory = BV.Model.SpendHistory(self)
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
         self.Balance = BV.Model.Balance(self)
