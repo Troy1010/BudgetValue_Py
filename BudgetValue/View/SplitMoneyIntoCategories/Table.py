@@ -25,12 +25,13 @@ class Table(Misc.CategoryTable):
                     bEditableState = category != Categories.default_category
                     w = WF.MakeEntry(self,
                                      (row, column),
-                                     text=income_transaction.categoryAmounts.GetAll()[category.name].amount_stream,
+                                     text=income_transaction.categoryAmounts.GetAll()[category.name].amount_stream,  # fix: is GetAll necessary?
                                      bEditableState=bEditableState,
                                      background=background,
                                      validation=BV.MakeValid_Money,
                                      display=BV.MakeValid_Money_ZeroIsNone
                                      )
+                    w.category_name = category.name
                     if bEditableState:
                         w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
@@ -65,8 +66,7 @@ class Table(Misc.CategoryTable):
 
     def RemoveCell(self, cell):
         iColumn = cell.column - self.iFirstDataColumn
-        category = self.vModel.Categories[self.GetCell(cell.row, 0).text]
-        self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.RemoveCategory(category)
+        self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.RemoveCategory(cell.category_name)
         self.Refresh()
 
     def GetTransactionOfColumn(self, iColumn):

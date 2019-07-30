@@ -268,7 +268,10 @@ class CategoryAmounts(Misc.Dict_TotalStream):
 
     def RemoveCategory(self, category):
         assert(category != Categories.default_category)
-        del self[category.name]
+        if isinstance(category, str):
+            del self[category]
+        else:
+            del self[category.name]
 
 
 class CategoryAmount():
