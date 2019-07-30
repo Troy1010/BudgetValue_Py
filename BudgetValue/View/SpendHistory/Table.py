@@ -22,7 +22,7 @@ class Table(Misc.ModelTable):
         for row, spend in enumerate(self.vModel.TransactionHistory.Iter_Spend(), self.iFirstDataRow):
             assert isinstance(spend, BV.Model.Transaction)
             self.MakeEntry_Timestamp((row, 0), spend=spend, stream=spend.timestamp_stream, justify=tk.LEFT)
-            self.MakeEntry_Category((row, 1), spend=spend, text=spend.GetCategorySummary(), justify=tk.LEFT)
+            self.MakeEntry_Category((row, 1), spend=spend, stream=spend.categoryAmounts.category_summary_stream, justify=tk.LEFT)
             WF.MakeEntry(self, (row, 2), stream=spend.amount_stream, validation=BV.MakeValid_Money_Negative, justify=tk.RIGHT)
             WF.MakeEntry(self, (row, 3), stream=spend.description_stream, justify=tk.LEFT)
             WF.MakeX(self, (row, 4), lambda spend=spend: (self.vModel.TransactionHistory.RemoveTransaction(spend), self.Refresh())[0])
@@ -47,8 +47,8 @@ class Table(Misc.ModelTable):
             w.config(readonlybackground="grey")
         ))
 
-    def MakeEntry_Category(self, cRowColumnPair, spend, text, justify=tk.RIGHT):
-        w = WF.MakeEntry(self, cRowColumnPair, text=text, justify=justify, bEditableState=False)
+    def MakeEntry_Category(self, cRowColumnPair, spend, stream, justify=tk.RIGHT):
+        w = WF.MakeEntry(self, cRowColumnPair, stream, justify=justify, bEditableState=False)
 
         def DestroyHandler(w, background):
             try:
@@ -56,12 +56,9 @@ class Table(Misc.ModelTable):
             except tk.TclError:  # w does not exist
                 pass
 
-        def CategoryHandler(spend, category):
-            spend.SetOneCategory(category)
-            self.Refresh()
         w.bind('<Button-1>', lambda event, w=w, x=self.winfo_rootx(), y=self.winfo_rooty(): (
             BV.View.Popup_SelectCategory(self.winfo_toplevel(),
-                                         lambda category, spend=spend: CategoryHandler(spend, category),
+                                         lambda category, spend=spend: spend.SetOneCategory(category),
                                          self.vModel.Categories.values(),
                                          vDestroyHandler=lambda w=w, background=w['background']: DestroyHandler(w, background)
                                          ),

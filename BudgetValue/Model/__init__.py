@@ -16,5 +16,6 @@ from .TransactionHistory import TransactionHistory
 from .TransactionHistory import Transaction
 from .TransactionHistory import CategoryAmounts
 from .TransactionHistory import CategoryAmount
+from .Misc import StreamInfo
 
-__all__ = ['Categories', 'Category', 'Model', 'ImportTransactionHistory', 'PaycheckPlan', 'CategoryType', 'Accounts', 'AccountsRow', 'SplitMoneyHistory', 'PaycheckPlanRow', 'Budgeted', 'Balance', 'SpendHistory', 'Spend', 'TransactionHistory', 'Transaction', 'CategoryAmounts', 'CategoryAmount']
+__all__ = ['Categories', 'Category', 'Model', 'ImportTransactionHistory', 'PaycheckPlan', 'CategoryType', 'Accounts', 'AccountsRow', 'SplitMoneyHistory', 'PaycheckPlanRow', 'Budgeted', 'Balance', 'SpendHistory', 'Spend', 'TransactionHistory', 'Transaction', 'CategoryAmounts', 'CategoryAmount', 'StreamInfo']

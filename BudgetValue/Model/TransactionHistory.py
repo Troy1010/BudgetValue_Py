@@ -230,6 +230,25 @@ class CategoryAmounts(Misc.Dict_TotalStream):
             self.total_stream,
             lambda amount, categories_total: amount - categories_total
         ).subscribe(self.balance_stream)
+        # category_summary_stream
+        self.category_summary_stream = rx.subjects.BehaviorSubject(Categories.default_category.name)
+        # subscribe category_summary_stream
+
+        def OnNewAmountStream(amountStreamInfo):
+            # fix: self.parent.GetCategorySummary() does not work here, but there should be an easier way
+            assert isinstance(amountStreamInfo, BV.Model.StreamInfo)
+            length_adjustment = -1 + 2*(amountStreamInfo.bAdd)
+            if len(self) + length_adjustment == 0:
+                category_summary = Categories.default_category.name
+            elif len(self) + length_adjustment == 1:
+                if length_adjustment == 1:
+                    category_summary = amountStreamInfo.categoryName
+                else:
+                    category_summary = list(self.values())[0].category.name
+            else:
+                category_summary = "<Multiple Categories>"
+            self.category_summary_stream.on_next(category_summary)
+        self._amountStream_stream.subscribe(OnNewAmountStream)
 
     def GetAll(self):
         cAll = dict(self)
