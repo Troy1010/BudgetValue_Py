@@ -55,7 +55,7 @@ class Table(Misc.CategoryTable):
 
         def ImplementPlan(self):
             for category_name, paycheck_plan_row in self.vModel.PaycheckPlan.items():
-                if self.vModel.Categories[category_name].type == CategoryType.income or self.vModel.Categories[category_name].type == CategoryType.excess:
+                if self.vModel.Categories[category_name].type == CategoryType.excess:
                     pass
                 else:
                     event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories[category_name], amount=paycheck_plan_row.amount)
