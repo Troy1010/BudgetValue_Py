@@ -43,6 +43,7 @@ class Table(Misc.CategoryTable):
         vDropdown.post(event.x_root, event.y_root)
 
     def ShowHeaderMenu(self, event):
+        assert isinstance(event.widget.transaction, BV.Model.Transaction)
         vDropdown = tk.Menu(tearoff=False)
         vDropdown.add_command(label="Forget Transaction", command=lambda: self.ForgetTransaction(event.widget.transaction))
         vDropdown.add_command(label="Add Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
@@ -59,7 +60,10 @@ class Table(Misc.CategoryTable):
                     pass
                 else:
                     event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories[category_name], amount=paycheck_plan_row.amount)
-            event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories.savings, amount=event.widget.transaction.categoryAmounts.GetAll()[self.vModel.Categories.default_category.name].amount)
+            balance_amount = event.widget.transaction.categoryAmounts.balance_stream.value
+            if self.vModel.Categories.savings.name in event.widget.transaction.categoryAmounts.keys():
+                balance_amount += event.widget.transaction.categoryAmounts[self.vModel.Categories.savings.name].amount
+            event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories.savings, amount=balance_amount)
             self.Refresh()
         vDropdown.add_command(label="Implement Paycheck Plan", command=lambda: ImplementPlan(self))
         vDropdown.post(event.x_root, event.y_root)
