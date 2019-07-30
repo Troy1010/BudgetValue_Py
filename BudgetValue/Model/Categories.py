@@ -11,7 +11,6 @@ class AutoName(Enum):
 
 class CategoryType(AutoName):
     extra = enum.auto()
-    income = enum.auto()
     always = enum.auto()
     reservoir = enum.auto()
     once = enum.auto()
@@ -35,16 +34,11 @@ class Category():
 
 class Categories(dict):
     default_category = Category("<Default Category>", CategoryType.extra)
-    default_income = Category("<Default Income>", CategoryType.income)
     rent = Category("Rent", CategoryType.always)
     commute = Category("Commute", CategoryType.always)
-    paycheck = Category("Paycheck", CategoryType.income)
     savings = Category("Savings", CategoryType.excess)
     __default_catagories = [
         default_category,
-        default_income,
-        paycheck,
-        Category("Bonus", CategoryType.income),
         rent,
         Category("Hair", CategoryType.always),
         commute,
