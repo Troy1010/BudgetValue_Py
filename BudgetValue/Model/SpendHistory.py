@@ -122,6 +122,6 @@ class Spend():
         if vSavable['categoryName'] in self.parent.vModel.Categories:
             self.category = self.parent.vModel.Categories[vSavable['categoryName']]
         else:
-            print("WARNING: SpendEntry`Load could not retrieve category")
+            print("WARNING: SpendHistory- loading an unknown categoryName:"+vSavable['categoryName'])
         self.timestamp = vSavable['timestamp']
         self.description = vSavable['description']
