@@ -6,6 +6,7 @@ from BudgetValue.Model import CategoryType  # noqa
 from BudgetValue.View import WidgetFactories as WF
 from ...Model.Categories import Categories
 from .. import Misc
+from ..Skin import vSkin
 
 
 class Table(Misc.CategoryTable):
@@ -24,7 +25,6 @@ class Table(Misc.CategoryTable):
             WF.MakeHeader(self, (0, j+self.iFirstDataColumn), text=header_name)
         # Data
         for row, category in enumerate(self.vModel.Categories.Select(), self.iFirstDataRow):
-            # generate row
             amount_stream = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount_stream
             try:
                 period = self.vModel.PaycheckPlan[category.name].period
@@ -41,7 +41,8 @@ class Table(Misc.CategoryTable):
         super().AddSeparationLables()
 
     def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True):
-        w = WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState)
+        background = vSkin.BG_READ_ONLY if not bEditableState else vSkin.BG_DEFAULT
+        w = WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState, background=background)
         if bEditableState:
             w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
             w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
