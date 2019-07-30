@@ -73,6 +73,8 @@ class Table(Misc.CategoryTable):
         # Retrieve text
         if self.GetCell(row, 2):
             periodText = self.GetCell(row, 2).text
+        else:
+            periodText = None
         amountText = self.GetCell(row, 3).text
         # Remove or add CategoryPlan
         if not (periodText or amountText):
