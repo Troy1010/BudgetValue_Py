@@ -4,6 +4,7 @@ from enum import Enum
 import enum
 import pickle
 import os
+import atexit
 
 
 class AutoName(Enum):
@@ -38,13 +39,13 @@ class Category():
 
     def GetSavable(self):
         return {'name': self.name,
-                'type': self.type_,
+                'type': self.type,
                 'bFavorite': self.bFavorite,
                 }
 
     def LoadSavable(self, vSavable):
         self.name = vSavable['name']
-        self.type_ = vSavable['type']
+        self.type = vSavable['type']
         self.bFavorite = vSavable['bFavorite']
 
 
@@ -70,9 +71,12 @@ class Categories(dict):
 
     def __init__(self, vModel):
         self.vModel = vModel
+        # Load and hook save on exit
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Categories.pickle")
         for category in self.__default_catagories:
             self[category.name] = category
+        self.Load()
+        atexit.register(self.Save)
 
     def Select(self, types=None, types_exclude=None):
         if types is not None and not isinstance(types, list):
