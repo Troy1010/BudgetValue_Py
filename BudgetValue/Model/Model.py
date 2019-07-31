@@ -2,6 +2,7 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import os
+import atexit
 
 
 class Model():
@@ -15,5 +16,6 @@ class Model():
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
         self.Balance = BV.Model.Balance(self)
-        # Load
+        # Load and hook Save
         self.TransactionHistory.Load()
+        atexit.register(self.TransactionHistory.Save)

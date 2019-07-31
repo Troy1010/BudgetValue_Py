@@ -46,8 +46,6 @@ class View(tk.Tk):
         vTabBar.ShowTab(self.vLastShownTab)
 
     def Save(self):
-        self.vModel.TransactionHistory.Save()
-        #
         data = [self.vLastShownTab]
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
