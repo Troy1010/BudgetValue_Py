@@ -14,7 +14,6 @@ class PaycheckPlan(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        self.bind("<Destroy>", lambda event, self=self: self._destroy(event))
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
@@ -38,6 +37,3 @@ class PaycheckPlan(tk.Frame):
         vButton_Refresh = ttk.Button(self.vButtonBar, text="Refresh",
                                      command=lambda self=self: self.vTable.Refresh())
         vButton_Refresh.pack(side=tk.LEFT, anchor='w')
-
-    def _destroy(self, event):
-        self.vModel.PaycheckPlan.Save()
