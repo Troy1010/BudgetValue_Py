@@ -13,7 +13,7 @@ class Model():
         self.connection = sqlite3.connect(self.sSpendingHistoryFile)
         self.connection.row_factory = sqlite3.Row
         #
-        self.Categories = BV.Model.Categories()
+        self.Categories = BV.Model.Categories(self)
         self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.Accounts = BV.Model.Accounts(self)
         self.TransactionHistory = BV.Model.TransactionHistory(self)

@@ -2,6 +2,8 @@ from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 from enum import Enum
 import enum
+import pickle
+import os
 
 
 class AutoName(Enum):
@@ -21,15 +23,26 @@ class CategoryType(AutoName):
 
 
 class Category():
-    def __init__(self, name, type_):
+    def __init__(self, name, type_=None, bFavorite=False):
         assert isinstance(name, str)
         assert isinstance(type_, CategoryType)
         self.name = name
         self.type = type_
-        self.bFavorite = False
+        self.bFavorite = bFavorite
 
     def IsSpendable(self):
         return self.type.IsSpendable()
+
+    def GetSavable(self):
+        return {'name': self.name,
+                'type': self.type_,
+                'bFavorite': self.bFavorite,
+                }
+
+    def LoadSavable(self, vSavable):
+        self.name = vSavable['name']
+        self.type_ = vSavable['type']
+        self.bFavorite = vSavable['bFavorite']
 
 
 class Categories(dict):
@@ -52,7 +65,9 @@ class Categories(dict):
         savings
     ]
 
-    def __init__(self):
+    def __init__(self, vModel):
+        self.vModel = vModel
+        self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Categories.pickle")
         for category in self.__default_catagories:
             self[category.name] = category
 
@@ -67,3 +82,22 @@ class Categories(dict):
         if types_exclude:
             returning = [category for category in returning if category.type not in types_exclude]
         return returning
+
+    def Save(self):
+        data = list()
+        for category in self.values():
+            data.append(category.GetSavable())
+        with open(self.sSaveFile, 'wb') as f:
+            pickle.dump(data, f)
+
+    def Load(self):
+        if not os.path.exists(self.sSaveFile):
+            return
+        with open(self.sSaveFile, 'rb') as f:
+            data = pickle.load(f)
+        if not data:
+            return
+        for category_savable in data:
+            category = Category(category_savable['name'])
+            self[category_savable['name']] = category
+            category.LoadSavable(category_savable)
