@@ -12,6 +12,7 @@ class AutoName(Enum):
 
 
 class CategoryType(AutoName):
+    default_type = enum.auto()
     extra = enum.auto()
     always = enum.auto()
     reservoir = enum.auto()
@@ -25,6 +26,8 @@ class CategoryType(AutoName):
 class Category():
     def __init__(self, name, type_=None, bFavorite=False):
         assert isinstance(name, str)
+        if type_ is None:
+            type_ = CategoryType.default_type
         assert isinstance(type_, CategoryType)
         self.name = name
         self.type = type_
@@ -101,3 +104,9 @@ class Categories(dict):
             category = Category(category_savable['name'])
             self[category_savable['name']] = category
             category.LoadSavable(category_savable)
+
+    def AddCategory(self, name, type_=None, bFavorite=False):
+        if name in self.keys():
+            print("WARNING: category name:"+name+" already exists")
+            return
+        self[name] = Category(name, type_=type_, bFavorite=bFavorite)

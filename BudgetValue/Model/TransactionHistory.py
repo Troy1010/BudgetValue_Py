@@ -212,6 +212,8 @@ class Transaction():
         if 'bSpend' in vSavable:
             self.bSpend = vSavable['bSpend']
         for categoryName, amount in vSavable['categoryAmounts'].items():
+            if categoryName not in self.vModel.Categories:  # fix: should not exist
+                continue
             self.categoryAmounts.AddCategory(self.vModel.Categories[categoryName], amount)
 
 

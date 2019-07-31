@@ -102,7 +102,12 @@ class CategoryTable(ModelTable):
 
         def ShowCategoryColHeaderMenu(event):
             vDropdown = tk.Menu(tearoff=False)
-            vDropdown.add_command(label="Add Category", command=lambda cell=event.widget: 1)
+            vDropdown.add_command(label="Add Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                BV.View.Popup_AddCategory(self.winfo_toplevel(),
+                                          lambda text: self.vModel.Categories.AddCategory(text),
+                                          cPos=(x, y)
+                                          )
+            ))
             vDropdown.post(event.x_root, event.y_root)
         w.bind("<Button-3>", lambda event: ShowCategoryColHeaderMenu(event), add="+")
         for row, category in enumerate(self.vModel.Categories.Select()):
