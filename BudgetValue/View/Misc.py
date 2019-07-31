@@ -98,9 +98,19 @@ class CategoryTable(ModelTable):
         return None
 
     def AddRowHeaderColumn(self):
-        # Column Header
-        WF.MakeHeader(self, (0, 0), text="Category")
+        w = WF.MakeHeader(self, (0, 0), text="Category")
+
+        def ShowCategoryColHeaderMenu(event):
+            vDropdown = tk.Menu(tearoff=False)
+            vDropdown.add_command(label="Add Category", command=lambda cell=event.widget: 1)
+            vDropdown.post(event.x_root, event.y_root)
+        w.bind("<Button-3>", lambda event: ShowCategoryColHeaderMenu(event), add="+")
         for row, category in enumerate(self.vModel.Categories.Select()):
-            # Row Header
-            if not self.GetCell(row+self.iFirstDataRow, 0) and not self.IsRowEmpty(row+self.iFirstDataRow):
-                WF.MakeEntry(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
+            if not self.IsRowEmpty(row+self.iFirstDataRow):
+                w = WF.MakeEntry(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
+
+                def ShowCategoryCellMenu(event):
+                    vDropdown = tk.Menu(tearoff=False)
+                    vDropdown.add_command(label="hi", command=lambda cell=event.widget: 1)
+                    vDropdown.post(event.x_root, event.y_root)
+                w.bind("<Button-3>", lambda event: ShowCategoryCellMenu(event), add="+")
