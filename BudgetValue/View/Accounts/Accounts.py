@@ -13,7 +13,6 @@ class Accounts(tk.Frame):
         tk.Frame.__init__(self, parent)
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
-        self.bind("<Destroy>", lambda event: self._destroy())
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
@@ -54,6 +53,3 @@ class Accounts(tk.Frame):
     def AddRow(self):
         self.vModel.Accounts.AddRow()
         self.vAccountsTable.Refresh()
-
-    def _destroy(self):
-        self.vModel.Accounts.Save()

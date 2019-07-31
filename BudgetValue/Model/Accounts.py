@@ -4,6 +4,7 @@ import pickle
 import rx
 import TM_CommonPy as TM  # noqa
 from .Misc import List_TotalStream
+import atexit
 
 
 class Accounts(List_TotalStream):
@@ -14,6 +15,8 @@ class Accounts(List_TotalStream):
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Accounts.pickle")
         # Load
         self.Load()
+        # Hook Save on exit
+        atexit.register(self.Save)
 
     def AddRow(self):
         self.append(AccountsRow())
