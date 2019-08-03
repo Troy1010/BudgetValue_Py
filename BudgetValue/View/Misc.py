@@ -114,8 +114,18 @@ class CategoryTable(ModelTable):
             if not self.IsRowEmpty(row+self.iFirstDataRow):
                 w = WF.MakeEntry(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
 
+                def AssignCategoryType(category_type_name, category):
+                    category.type = BV.Model.CategoryType.GetByName(category_type_name)
+                    self.Refresh()
+
                 def ShowCategoryCellMenu(event):
                     vDropdown = tk.Menu(tearoff=False)
-                    vDropdown.add_command(label="hi", command=lambda cell=event.widget: 1)
+                    vDropdown.add_command(label="Remove Category", command=lambda category=category: self.vModel.Categories.RemoveCategory(category.name))  # fix: refreshes improperly
+                    vDropdown.add_command(label="Assign Type", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                        BV.View.Popup_SelectCategoryType(self.winfo_toplevel(),
+                                                         lambda category_type_name, category=category: AssignCategoryType(category_type_name, category),
+                                                         cPos=(x, y)
+                                                         )
+                    ))
                     vDropdown.post(event.x_root, event.y_root)
                 w.bind("<Button-3>", lambda event: ShowCategoryCellMenu(event), add="+")

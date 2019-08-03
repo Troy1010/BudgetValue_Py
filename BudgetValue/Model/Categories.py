@@ -20,6 +20,12 @@ class CategoryType(AutoName):
     once = enum.auto()
     excess = enum.auto()
 
+    def GetByName(name):
+        for category_type in CategoryType:
+            if category_type.name.lower() == name.lower():
+                return category_type
+        return None
+
     def IsSpendable(self):
         return self in [self.always, self.reservoir, self.once]
 
@@ -35,6 +41,8 @@ class Category():
         self.bFavorite = bFavorite
 
     def IsSpendable(self):
+        if self.type is None:
+            return False
         return self.type.IsSpendable()
 
     def GetSavable(self):
@@ -51,11 +59,14 @@ class Category():
 
 class Categories(dict):
     default_category = Category("<Default Category>", CategoryType.extra)
+    savings = Category("Savings", CategoryType.excess)
+    __mandatory_catagories = [
+        default_category,
+        savings
+    ]
     rent = Category("Rent", CategoryType.always)
     commute = Category("Commute", CategoryType.always)
-    savings = Category("Savings", CategoryType.excess)
     __default_catagories = [
-        default_category,
         rent,
         Category("Hair", CategoryType.always),
         commute,
@@ -65,17 +76,16 @@ class Categories(dict):
         Category("Food-Vanity", CategoryType.always),
         Category("Emergency", CategoryType.always),
         Category("Improvements", CategoryType.always),
-        Category("Activities", CategoryType.always),
-        savings
+        Category("Activities", CategoryType.always)
     ]
 
     def __init__(self, vModel):
         self.vModel = vModel
         # Load and hook save on exit
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Categories.pickle")
-        for category in self.__default_catagories:
-            self[category.name] = category
         self.Load()
+        for category in self.__mandatory_catagories:
+            self[category.name] = category
         atexit.register(self.Save)
 
     def Select(self, types=None, types_exclude=None):
@@ -103,6 +113,8 @@ class Categories(dict):
         with open(self.sSaveFile, 'rb') as f:
             data = pickle.load(f)
         if not data:
+            for category in self.__default_catagories:
+                self[category.name] = category
             return
         for category_savable in data:
             category = Category(category_savable['name'])
@@ -114,3 +126,12 @@ class Categories(dict):
             print("WARNING: category name:"+name+" already exists")
             return
         self[name] = Category(name, type_=type_, bFavorite=bFavorite)
+
+    def RemoveCategory(self, name):
+        if name in self.__mandatory_catagories:
+            print("WARNING: tried to remove mandatory category name:"+name)
+            return
+        del self[name]
+
+    def AssignCategoryType(self, name, type_):
+        self[name].type = type_
