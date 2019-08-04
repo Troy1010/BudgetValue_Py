@@ -96,14 +96,6 @@ class SplitMoneyIntoCategories(tk.Frame):
         WF.MakeButton(self.vButtonBar, text="Print Categories", command=lambda: PrintCategories())
         WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.Refresh())
 
-        def Import():
-            # Prompt which file
-            vFile = tk.filedialog.askopenfile()
-            # Import
-            if vFile is not None:
-                self.vModel.TransactionHistory.Import(vFile.name)
-        WF.MakeButton(self.vButtonBar, text="Import Transactions", command=lambda: Import())
-
     def Refresh(self):
         self.vRowHeaderTable.Refresh()
         self.vTable.Refresh()

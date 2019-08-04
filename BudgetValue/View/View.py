@@ -68,8 +68,14 @@ class MenuBar(tk.Menu):
     def __init__(self, vModel):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
-        vFileMenu.add_command(label="Import Spend History",
-                              command=lambda vModel=vModel: BV.View.ImportTransactionHistory.ImportHistory(vModel))
+
+        def ImportTransactionHistory():
+            # Prompt which file
+            vFile = tk.filedialog.askopenfile()
+            # Import
+            if vFile is not None:
+                self.vModel.TransactionHistory.Import(vFile.name)
+        vFileMenu.add_command(label="Import Spend History", command=ImportTransactionHistory)
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)
