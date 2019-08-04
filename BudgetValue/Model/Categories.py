@@ -13,12 +13,18 @@ class AutoName(Enum):
 
 
 class CategoryType(AutoName):
-    default_type = enum.auto()
     extra = enum.auto()
     always = enum.auto()
     reservoir = enum.auto()
     once = enum.auto()
+    default_type = enum.auto()
     excess = enum.auto()
+
+    def GetIndex(type_):
+        for i, category_type in enumerate(CategoryType):
+            if type_ == category_type:
+                return i
+        return -1
 
     def GetByName(name):
         for category_type in CategoryType:
@@ -98,6 +104,7 @@ class Categories(dict):
             returning = [category for category in returning if category.type in types]
         if types_exclude:
             returning = [category for category in returning if category.type not in types_exclude]
+        returning = sorted(returning, key=lambda category: CategoryType.GetIndex(category.type))  # self should be a sorted dict to avoid this..
         return returning
 
     def Save(self):

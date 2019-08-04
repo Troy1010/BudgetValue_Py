@@ -60,6 +60,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         self.vRowHeaderTable = BudgetedTable.BudgetedTable(self.vRowHeaderCanvas, vModel)
         self.vRowHeaderCanvas.create_window((0, 0), window=self.vRowHeaderTable, anchor='nw')
         self.vRowHeaderTable.Refresh()
+        self.vRowHeaderTable.RefreshParent = self.Refresh
         # resize RowHeaderCanvas width on RowHeaderFrame resize
         self.vRowHeaderTable.bind('<Configure>', lambda event: (
             self.vRowHeaderCanvas.config(width=self.vRowHeaderTable.winfo_width())
@@ -88,7 +89,12 @@ class SplitMoneyIntoCategories(tk.Frame):
         # ButtonBar More
         WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
         WF.MakeButton(self.vButtonBar, text="Print Rowheader bbox", command=lambda: self.PrintRowHeaderBBox())
-        WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.vTable.Refresh())
+
+        def PrintCategories():
+            for var in self.vModel.Categories.Select():
+                print(str(var.type.name) + " " + var.name)
+        WF.MakeButton(self.vButtonBar, text="Print Categories", command=lambda: PrintCategories())
+        WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.Refresh())
 
         def Import():
             # Prompt which file
@@ -97,6 +103,10 @@ class SplitMoneyIntoCategories(tk.Frame):
             if vFile is not None:
                 self.vModel.TransactionHistory.Import(vFile.name)
         WF.MakeButton(self.vButtonBar, text="Import Transactions", command=lambda: Import())
+
+    def Refresh(self):
+        self.vRowHeaderTable.Refresh()
+        self.vTable.Refresh()
 
     def PrintRowHeaderBBox(self):
         print("table bbox('all'):"+str(self.vRowHeaderTable.bbox("all")))

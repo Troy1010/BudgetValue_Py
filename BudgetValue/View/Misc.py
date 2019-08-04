@@ -92,7 +92,7 @@ class CategoryTable(ModelTable):
     def GetCategoryOfRow(self, row):
         # Only works before SeparationLables are added
         # fix: There must be a better way..
-        for i, category in enumerate(self.vModel.Categories.values()):
+        for i, category in enumerate(self.vModel.Categories.Select()):
             if i == row - self.iFirstDataRow:
                 return category
         return None
@@ -114,18 +114,28 @@ class CategoryTable(ModelTable):
             if not self.IsRowEmpty(row+self.iFirstDataRow):
                 w = WF.MakeEntry(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
 
-                def AssignCategoryType(category_type_name, category):
-                    category.type = BV.Model.CategoryType.GetByName(category_type_name)
-                    self.Refresh()
+                def AssignCategoryType(category_type_name, category_):
+                    category_.type = BV.Model.CategoryType.GetByName(category_type_name)
+                    if hasattr(self, "RefreshParent"):
+                        self.RefreshParent()
+                    else:
+                        self.Refresh()
 
-                def ShowCategoryCellMenu(event):
+                def RemoveCategory(category_name):
+                    self.vModel.Categories.RemoveCategory(category_name)
+                    if hasattr(self, "RefreshParent"):
+                        self.RefreshParent()
+                    else:
+                        self.Refresh()
+
+                def ShowCategoryCellMenu(event, category_):
                     vDropdown = tk.Menu(tearoff=False)
-                    vDropdown.add_command(label="Remove Category", command=lambda category=category: self.vModel.Categories.RemoveCategory(category.name))  # fix: refreshes improperly
-                    vDropdown.add_command(label="Assign Type", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                    vDropdown.add_command(label="Remove Category", command=lambda category=category_: RemoveCategory(category_.name))
+                    vDropdown.add_command(label="Assign Type", command=lambda category=category_, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
                         BV.View.Popup_SelectCategoryType(self.winfo_toplevel(),
-                                                         lambda category_type_name, category=category: AssignCategoryType(category_type_name, category),
+                                                         lambda category_type_name: AssignCategoryType(category_type_name, category_),
                                                          cPos=(x, y)
                                                          )
                     ))
                     vDropdown.post(event.x_root, event.y_root)
-                w.bind("<Button-3>", lambda event: ShowCategoryCellMenu(event), add="+")
+                w.bind("<Button-3>", lambda event, category=category: ShowCategoryCellMenu(event, category), add="+")
