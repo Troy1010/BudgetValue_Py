@@ -4,9 +4,10 @@ import BudgetValue as BV  # noqa
 from BudgetValue.View import WidgetFactories as WF  # noqa
 from . import Misc  # noqa
 from .Skin import vSkin
+from .CategoryTable import CategoryTable
 
 
-class BudgetedTable(Misc.CategoryTable):
+class BudgetedTable(CategoryTable):
     iFirstDataColumn = 2
 
     def __init__(self, parent, vModel):

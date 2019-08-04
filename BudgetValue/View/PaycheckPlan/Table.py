@@ -5,11 +5,11 @@ from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
 from BudgetValue.View import WidgetFactories as WF
 from ...Model.Categories import Categories
-from .. import Misc
+from ..CategoryTable import CategoryTable
 from ..Skin import vSkin
 
 
-class Table(Misc.CategoryTable):
+class Table(CategoryTable):
     def __init__(self, parent, vModel):
         super().__init__(parent, vModel)
         assert isinstance(vModel, BV.Model.Model)

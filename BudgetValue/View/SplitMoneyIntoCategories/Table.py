@@ -3,12 +3,12 @@ import tkinter as tk
 import BudgetValue as BV
 from BudgetValue.View import WidgetFactories as WF
 from BudgetValue.View.Skin import vSkin  # noqa
-from .. import Misc
 from BudgetValue.Model.Categories import Categories
 from BudgetValue.Model.Categories import CategoryType
+from ..CategoryTable import CategoryTable
 
 
-class Table(Misc.CategoryTable):
+class Table(CategoryTable):
     def Refresh(self):
         super().Refresh()
         self.AddSpacersForBudgeted()
