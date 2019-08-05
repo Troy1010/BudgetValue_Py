@@ -9,7 +9,7 @@ class Budgeted():
         # Determine cCategoryTotalStreams, total_stream
         self.total_stream = rx.subjects.BehaviorSubject(0)
         self.cCategoryTotalStreams = {}
-        # Subscribe CategoryTotals
+        #
         self.cDisposables_CT = {}
         self.cDisposableCount_CT = {}
 
