@@ -85,8 +85,8 @@ class MenuBar(tk.Menu):
             if vFile is not None:
                 self.vModel.TransactionHistory.Import(vFile.name)
         vFileMenu.add_command(label="Import Transaction History", command=ImportTransactionHistory)
-        vFileMenu.add_command(label="Revert To Previous Transaction History", command=lambda parent=self.parent: self.LoadOldTransactionHistory(parent))
-        vFileMenu.add_command(label="Clear!", command=lambda: (self.vModel.TransactionHistory.ClearAllTransactions(), self.parent.Refresh()))
+        vFileMenu.add_command(label="Load Transaction History", command=lambda parent=self.parent: self.LoadOldTransactionHistory(parent))
+        vFileMenu.add_command(label="Clear Transaction History", command=lambda: (self.vModel.TransactionHistory.ClearAllTransactions(), self.parent.Refresh()))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)
