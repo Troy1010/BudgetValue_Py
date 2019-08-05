@@ -31,8 +31,8 @@ class View(tk.Tk):
         # MenuBar
         self.config(menu=MenuBar(vModel, self))
         # TabBar
-        vTabBar = TabBar(self, vModel, cTabPages)
-        vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
+        self.vTabBar = TabBar(self, vModel, cTabPages)
+        self.vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
         # TabPageContainer
         vTabPageContainer = tk.Frame(self, borderwidth=2)
         vTabPageContainer.pack(side=tk.TOP, anchor='nw', expand=True, fill="both")
@@ -40,10 +40,10 @@ class View(tk.Tk):
         vTabPageContainer.grid_columnconfigure(0, weight=1)
         for vPage in cTabPages:
             frame = vPage(vTabPageContainer, vModel)
-            vTabBar.cTabPageFrames[vPage] = frame
+            self.vTabBar.cTabPageFrames[vPage] = frame
             frame.grid(row=0, sticky="nsew")
 
-        vTabBar.ShowTab(self.vLastShownTab)
+        self.vTabBar.ShowTab(self.vLastShownTab)
 
     def Save(self):
         data = {"LastShownTab": self.vLastShownTab}
@@ -63,6 +63,12 @@ class View(tk.Tk):
             return
         self.vLastShownTab = data["LastShownTab"]
 
+    def Refresh(self):
+        for frame in self.vTabBar.cTabPageFrames.values():
+            if hasattr(frame, "Refresh"):
+                frame.Refresh()
+                Log("Calling Refresh for:"+str(frame), bPrint=True)
+
 
 class MenuBar(tk.Menu):
     def __init__(self, vModel, parent):
@@ -80,6 +86,7 @@ class MenuBar(tk.Menu):
                 self.vModel.TransactionHistory.Import(vFile.name)
         vFileMenu.add_command(label="Import Transaction History", command=ImportTransactionHistory)
         vFileMenu.add_command(label="Revert To Previous Transaction History", command=lambda parent=self.parent: self.LoadOldTransactionHistory(parent))
+        vFileMenu.add_command(label="Clear!", command=lambda: (self.vModel.TransactionHistory.ClearAllTransactions(), self.parent.Refresh()))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)
@@ -90,8 +97,7 @@ class MenuBar(tk.Menu):
     def LoadOldTransactionHistory(self, parent):
         BV.View.Popup_SelectFromList(
             parent.winfo_toplevel(),
-            #lambda transaction_history_file: self.vModel.TransactionHistory.Load(transaction_history_file),
-            lambda transaction_history_file: print("transaction_history_file:"+transaction_history_file),
+            lambda transaction_history_file: (self.vModel.TransactionHistory.Load(transaction_history_file), parent.Refresh()),
             self.vModel.TransactionHistory.GetArchivedTransactionHistories()
         )
 

@@ -124,7 +124,6 @@ class SpendHistory(tk.Frame):
         WF.MakeButton(self.vButtonBar, text="Update", command=lambda: self.Update_())
         WF.MakeButton(self.vButtonBar, text="Try YView", command=lambda: self.try_yview())
         WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
-        WF.MakeButton(self.vButtonBar, text="Clear!", command=lambda: (self.vModel.TransactionHistory.ClearAllTransactions(), self.Refresh()))
         WF.MakeButton(self.vButtonBar, text="Print categories", command=lambda: self.PrintCategorySummaries())
 
     def PrintCategorySummaries(self):

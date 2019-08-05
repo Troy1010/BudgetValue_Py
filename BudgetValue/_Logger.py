@@ -14,6 +14,7 @@ if bWriteLog:
     BVLog.addHandler(logging.FileHandler(sLogFile))
 
 
-def Log(*args, **kwargs):
+def Log(*args, bPrint=False, **kwargs):
     BVLog.debug(*args, **kwargs)
-    print(args[0])
+    if bPrint:
+        print(args[0])

@@ -31,6 +31,9 @@ class TransactionHistory(Misc.List_ValueStream):
         self._value_stream.subscribe(MergeAmountStreamStreams)
 
     def ClearAllTransactions(self):
+        # save old record
+        self.SaveArchive()
+        #
         self.clear()
 
     def Import(self, sFilePath):
@@ -168,7 +171,12 @@ class TransactionHistory(Misc.List_ValueStream):
     def Load(self, save_name=None):
         if save_name is None:
             save_name = self.sSaveFile
-        if not os.path.exists(save_name):
+        if os.path.exists(save_name):
+            pass
+        elif os.path.exists(os.path.join(self.vModel.sWorkspace, save_name)):
+            save_name = os.path.join(self.vModel.sWorkspace, save_name)
+        else:
+            Log("Load`Could not find file:"+save_name, bPrint=True)
             return
         with open(save_name, 'rb') as f:
             data = pickle.load(f)

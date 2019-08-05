@@ -61,7 +61,10 @@ class CategoryTable(ModelTable):
         if no_text:
             WF.MakeSeparationLable(self, row+1, " ")
         else:
-            WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
+            if hasattr(prev_type, 'name'):
+                WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
+            else:
+                WF.MakeSeparationLable(self, row+1, "  None")
 
     def GetCategoryOfRow(self, row):
         # Only works before SeparationLables are added
