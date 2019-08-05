@@ -34,6 +34,9 @@ class TransactionHistory(Misc.List_ValueStream):
         self.clear()
 
     def Import(self, sFilePath):
+        # save old record
+        self.SaveArchive()
+        #
         extension = os.path.splitext(sFilePath)[1][1:]
         assert extension == 'csv'
         data_frame = pd.read_csv(sFilePath)
@@ -112,11 +115,50 @@ class TransactionHistory(Misc.List_ValueStream):
         elif isinstance(transaction, int):
             del self[transaction]
 
-    def Save(self):
+    def SaveArchive(self):
+        # determine save_name
+        save_name = self.sSaveFile[0:self.sSaveFile.index('.pickle')] + " " + datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H.%M')
+        if os.path.exists(save_name+'.pickle'):
+            relevant_save_files = list(f for f in os.listdir(self.vModel.sWorkspace) if f.startswith(os.path.basename(save_name)))
+            if relevant_save_files == []:
+                Log("relevant_save_files is empty")
+            file_dictated_index = 2
+            for file_name in relevant_save_files:
+                if '(' in file_name:
+                    position_of_start_parenthesis = file_name.index('(')
+                    position_of_end_parenthesis = file_name.index(')', position_of_start_parenthesis)
+                    file_dictated_index = max(file_dictated_index, 1 + int(file_name[position_of_start_parenthesis+1:position_of_end_parenthesis]))
+            save_name = save_name + " ("+str(file_dictated_index)+")"
+        save_name += '.pickle'
+        # if over 20 archives, delete oldest one
+        relevant_save_files = list(f for f in os.listdir(self.vModel.sWorkspace) if f.startswith(os.path.basename(self.sSaveFile)[0:os.path.basename(self.sSaveFile).index('.pickle')]))
+        value_to_remove = None
+        for x in relevant_save_files:
+            if os.path.basename(x) == os.path.basename(self.sSaveFile):
+                value_to_remove = x
+                break
+        if value_to_remove is not None:
+            relevant_save_files.remove(value_to_remove)
+        while len(relevant_save_files) >= 20:
+            oldCWD = os.getcwd()
+            os.chdir(self.vModel.sWorkspace)
+            file_to_delete = min(relevant_save_files, key=os.path.getctime)
+            TM.Delete(file_to_delete)
+            relevant_save_files.remove(file_to_delete)
+            os.chdir(oldCWD)
+        # save
+        self.Save(save_name=save_name)
+
+    def Save(self, save_name=None):
+        if save_name is None:
+            save_name = self.sSaveFile
+        # construct data
         data = list()
         for transaction in self:
             data.append(transaction.GetSavable())
-        with open(self.sSaveFile, 'wb') as f:
+        # dump save
+        Log("Saving file:"+save_name)
+        with open(save_name, 'wb') as f:
             pickle.dump(data, f)
 
     def Load(self):

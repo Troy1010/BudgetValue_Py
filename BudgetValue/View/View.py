@@ -46,7 +46,7 @@ class View(tk.Tk):
         vTabBar.ShowTab(self.vLastShownTab)
 
     def Save(self):
-        data = [self.vLastShownTab]
+        data = {"LastShownTab": self.vLastShownTab}
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -61,13 +61,14 @@ class View(tk.Tk):
                 pass
         if data is None:
             return
-        self.vLastShownTab = data[0]
+        self.vLastShownTab = data["LastShownTab"]
 
 
 class MenuBar(tk.Menu):
     def __init__(self, vModel):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
+        self.vModel = vModel
 
         def ImportTransactionHistory():
             # Prompt which file
@@ -75,7 +76,8 @@ class MenuBar(tk.Menu):
             # Import
             if vFile is not None:
                 self.vModel.TransactionHistory.Import(vFile.name)
-        vFileMenu.add_command(label="Import Spend History", command=ImportTransactionHistory)
+        vFileMenu.add_command(label="Import Transaction History", command=ImportTransactionHistory)
+        #vFileMenu.add_command(label="Revert To Previous Transaction History", command=ImportTransactionHistory)
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)

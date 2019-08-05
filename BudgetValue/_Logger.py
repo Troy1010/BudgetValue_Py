@@ -16,3 +16,4 @@ if bWriteLog:
 
 def Log(*args, **kwargs):
     BVLog.debug(*args, **kwargs)
+    print(args[0])
