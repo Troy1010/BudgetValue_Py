@@ -21,13 +21,17 @@ class CategoryTable(ModelTable):
 
     def AddSpacersForBudgeted(self):
         row = self.iFirstDataRow
-        # Get height
+        # Determine height
         # fix: There must be a better way..
         height_widget = WF.MakeEntry_ReadOnly(self, (row, self.iFirstDataColumn), text="z", validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
         height_widget.update_idletasks()
         height = height_widget.winfo_height()
         height_widget.grid_forget()
         height_widget.destroy()
+        # Header Spacer
+        w = tk.Frame(self)
+        w.grid(row=row-1, column=self.iFirstDataColumn)
+        w.config(height=height)
         # Data
         for category in self.vModel.Categories.Select():
             # Budgeted
