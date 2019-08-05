@@ -9,7 +9,6 @@ from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 from BudgetValue.View.SpendHistory import SpendHistory
-from BudgetValue.View.Popup_SelectFromList import Popup_SelectFromList  # noqa
 import os
 import pickle
 
@@ -30,7 +29,7 @@ class View(tk.Tk):
 
         cTabPages = (SpendHistory, SplitMoneyIntoCategories, Accounts, Reports, PaycheckPlan)
         # MenuBar
-        self.config(menu=MenuBar(vModel))
+        self.config(menu=MenuBar(vModel, self))
         # TabBar
         vTabBar = TabBar(self, vModel, cTabPages)
         vTabBar.pack(side=tk.TOP, anchor='w', expand=False)
@@ -66,8 +65,9 @@ class View(tk.Tk):
 
 
 class MenuBar(tk.Menu):
-    def __init__(self, vModel):
+    def __init__(self, vModel, parent):
         tk.Menu.__init__(self)
+        self.parent = parent
         vFileMenu = tk.Menu(self, tearoff=False)
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
@@ -79,21 +79,21 @@ class MenuBar(tk.Menu):
             if vFile is not None:
                 self.vModel.TransactionHistory.Import(vFile.name)
         vFileMenu.add_command(label="Import Transaction History", command=ImportTransactionHistory)
-
-        # def LoadOldTransactionHistory():
-        #     Popup_SelectTransactionHistory(
-        #         self.winfo_toplevel(),
-        #         #lambda transaction_history_file: self.vModel.TransactionHistory.Load(transaction_history_file),
-        #         lambda transaction_history_file: print("transaction_history_file:"+transaction_history_file),
-        #         vModel
-        #     )
-        # vFileMenu.add_command(label="Revert To Previous Transaction History", command=LoadOldTransactionHistory)
+        vFileMenu.add_command(label="Revert To Previous Transaction History", command=lambda parent=self.parent: self.LoadOldTransactionHistory(parent))
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)
         vSettingsMenu = tk.Menu(self, tearoff=False)
         vSettingsMenu.add_command(label="Preferences..")
         self.add_cascade(label="Settings", menu=vSettingsMenu)
+
+    def LoadOldTransactionHistory(self, parent):
+        BV.View.Popup_SelectFromList(
+            parent.winfo_toplevel(),
+            #lambda transaction_history_file: self.vModel.TransactionHistory.Load(transaction_history_file),
+            lambda transaction_history_file: print("transaction_history_file:"+transaction_history_file),
+            self.vModel.TransactionHistory.GetArchivedTransactionHistories()
+        )
 
 
 class TabBar(tk.Frame):

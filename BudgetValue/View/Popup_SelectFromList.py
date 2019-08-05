@@ -30,7 +30,7 @@ class Popup_SelectFromList(tk.Frame):
         combobox_value = tk.StringVar()
         combo_box = ttk.Combobox(self)
         combo_box.config(textvariable=combobox_value, state="readonly")
-        combo_box.config(values=selection_list)
+        combo_box.config(values=selection_list, width=max([len(x) for x in selection_list]))
         combo_box.pack()
         # Bind Escape to exit
         self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy(), add='+')
