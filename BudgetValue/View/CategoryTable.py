@@ -85,11 +85,12 @@ class CategoryTable(ModelTable):
 
         def ShowCategoryColHeaderMenu(event):
             vDropdown = tk.Menu(tearoff=False)
-            vDropdown.add_command(label="Add Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
-                BV.View.Popup_AddCategory(self.winfo_toplevel(),
-                                          lambda text: self.vModel.Categories.AddCategory(text),
-                                          cPos=(x, y)
-                                          )
+            vDropdown.add_command(label="Create New Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                BV.View.Popup_InputText(self.winfo_toplevel(),
+                                        lambda text: self.vModel.Categories.AddCategory(text),
+                                        cPos=(x, y),
+                                        sPrompt="Input category name:"
+                                        )
             ))
             vDropdown.post(event.x_root, event.y_root)
         w.bind("<Button-3>", lambda event: ShowCategoryColHeaderMenu(event), add="+")
@@ -114,7 +115,7 @@ class CategoryTable(ModelTable):
                 def ShowCategoryCellMenu(event, category_):
                     vDropdown = tk.Menu(tearoff=False)
                     vDropdown.add_command(label="Remove Category", command=lambda category=category_: RemoveCategory(category_.name))
-                    vDropdown.add_command(label="Assign Type", command=lambda category=category_, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                    vDropdown.add_command(label="Assign Category Type", command=lambda category=category_, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
                         BV.View.Popup_SelectFromList(self.winfo_toplevel(),
                                                      lambda category_type_name: AssignCategoryType(category_type_name, category_),
                                                      [x.name.capitalize() for x in BV.Model.CategoryType],

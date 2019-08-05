@@ -8,7 +8,7 @@ from . import WidgetFactories as WF  # noqa
 class Popup_InputText(tk.Frame):
     previous_popup = None
 
-    def __init__(self, parent, handler, cPos=None, vDestroyHandler=None):
+    def __init__(self, parent, handler, cPos=None, vDestroyHandler=None, sPrompt=None):
         #
         tk.Frame.__init__(self, parent, borderwidth=2, background="black")
         # Hook DestroyHandler
@@ -30,7 +30,8 @@ class Popup_InputText(tk.Frame):
         self.place(x=x, y=y)
         self.tkraise()
         # Show Entry box
-        WF.MakeEntry_ReadOnly(self, (0, 0), text="Input Text:")
+        if sPrompt is not None:
+            WF.MakeEntry_ReadOnly(self, (0, 0), text=sPrompt)
         self.text_stream = rx.subjects.BehaviorSubject("")  # FIX: leaking?
         WF.MakeEntry(self, (0, 1), stream=self.text_stream, width=10)
         # Bind Return to accept
