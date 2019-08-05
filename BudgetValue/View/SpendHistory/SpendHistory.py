@@ -18,7 +18,6 @@ class SpendHistory(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-        WF.MakeButton(self.vButtonBar, text="zoop")
         # Frame of tables
         self.vFrameOfTables = tk.Frame(self)
         self.vFrameOfTables.pack(side=tk.TOP, expand=True, fill="both")
@@ -121,8 +120,6 @@ class SpendHistory(tk.Frame):
             self.vTable.Refresh()
         WF.MakeButton(self.vButtonBar, text="Add Unverified Spend", command=lambda: AddUnverifiedSpend(0))
         WF.MakeButton(self.vButtonBar, text="Refresh", command=self.Refresh)
-        WF.MakeButton(self.vButtonBar, text="Update", command=lambda: self.Update_())
-        WF.MakeButton(self.vButtonBar, text="Try YView", command=lambda: self.try_yview())
         WF.MakeButton(self.vButtonBar, text="Print bbox", command=lambda: self.PrintBBox())
         WF.MakeButton(self.vButtonBar, text="Print categories", command=lambda: self.PrintCategorySummaries())
 
@@ -150,12 +147,6 @@ class SpendHistory(tk.Frame):
     def PrintBBox(self):
         print("table bbox('all'):"+str(self.vTable.bbox("all")))
         print("canvas bbox('all'):"+str(self.vCanvas.bbox("all")))
-
-    def Update_(self):
-        self.update()
-
-    def try_yview(self):
-        self.vCanvas.yview("moveto", 0.1)
 
     def Refresh(self):
         self.vBTTable.Refresh()
