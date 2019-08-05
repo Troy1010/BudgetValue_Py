@@ -9,10 +9,12 @@ from .Misc import ModelTable
 
 class CategoryTable(ModelTable):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent, vModel, *args, **kwargs):
+        super().__init__(parent, vModel, *args, **kwargs)
         self.iFirstDataColumn = 0
         self.iFirstDataRow = 1
+        # Refresh when new values come in
+        vModel.TransactionHistory._merged_amountStream_stream.subscribe(lambda x: self.Refresh())
 
     def FinishRefresh(self):
         self.AddSeparationLables()
