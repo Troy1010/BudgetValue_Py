@@ -40,6 +40,13 @@ class List_ValueStream(list):
         self._value_stream.on_next(ValueAddPair(False, self[key]))
         super().__delitem__(key)
 
+    def clear(self):
+        # make sure __delitem__ is triggered
+        while(len(self)):
+            del self[-1]
+        #
+        super().clear()
+
 
 def GetDiffStream(stream):
     temp_stream = rx.subjects.BehaviorSubject(0)
