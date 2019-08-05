@@ -115,6 +115,17 @@ class TransactionHistory(Misc.List_ValueStream):
         elif isinstance(transaction, int):
             del self[transaction]
 
+    def GetArchivedTransactionHistories(self):
+        archived_transaction_histories = list(f for f in os.listdir(self.vModel.sWorkspace) if f.startswith(os.path.basename(self.sSaveFile)[0:os.path.basename(self.sSaveFile).index('.pickle')]))
+        value_to_remove = None
+        for x in archived_transaction_histories:
+            if os.path.basename(x) == os.path.basename(self.sSaveFile):
+                value_to_remove = x
+                break
+        if value_to_remove is not None:
+            archived_transaction_histories.remove(value_to_remove)
+        return archived_transaction_histories
+
     def SaveArchive(self):
         # determine save_name
         save_name = self.sSaveFile[0:self.sSaveFile.index('.pickle')] + " " + datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H.%M')
@@ -131,20 +142,13 @@ class TransactionHistory(Misc.List_ValueStream):
             save_name = save_name + " ("+str(file_dictated_index)+")"
         save_name += '.pickle'
         # if over 20 archives, delete oldest one
-        relevant_save_files = list(f for f in os.listdir(self.vModel.sWorkspace) if f.startswith(os.path.basename(self.sSaveFile)[0:os.path.basename(self.sSaveFile).index('.pickle')]))
-        value_to_remove = None
-        for x in relevant_save_files:
-            if os.path.basename(x) == os.path.basename(self.sSaveFile):
-                value_to_remove = x
-                break
-        if value_to_remove is not None:
-            relevant_save_files.remove(value_to_remove)
-        while len(relevant_save_files) >= 20:
+        archived_transaction_histories = self.GetArchivedTransactionHistories()
+        while len(archived_transaction_histories) >= 20:
             oldCWD = os.getcwd()
             os.chdir(self.vModel.sWorkspace)
-            file_to_delete = min(relevant_save_files, key=os.path.getctime)
+            file_to_delete = min(archived_transaction_histories, key=os.path.getctime)
             TM.Delete(file_to_delete)
-            relevant_save_files.remove(file_to_delete)
+            archived_transaction_histories.remove(file_to_delete)
             os.chdir(oldCWD)
         # save
         self.Save(save_name=save_name)
@@ -161,10 +165,12 @@ class TransactionHistory(Misc.List_ValueStream):
         with open(save_name, 'wb') as f:
             pickle.dump(data, f)
 
-    def Load(self):
-        if not os.path.exists(self.sSaveFile):
+    def Load(self, save_name=None):
+        if save_name is None:
+            save_name = self.sSaveFile
+        if not os.path.exists(save_name):
             return
-        with open(self.sSaveFile, 'rb') as f:
+        with open(save_name, 'rb') as f:
             data = pickle.load(f)
         if not data:
             return

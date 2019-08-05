@@ -1,4 +1,4 @@
-from BudgetValue._Logger import BVLog  # noqa
+from BudgetValue._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
 import tkinter.filedialog  # noqa
@@ -9,6 +9,7 @@ from BudgetValue.View.PaycheckPlan import PaycheckPlan
 from BudgetValue.View.Accounts import Accounts
 from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 from BudgetValue.View.SpendHistory import SpendHistory
+from BudgetValue.View.Popup_SelectFromList import Popup_SelectFromList  # noqa
 import os
 import pickle
 
@@ -68,6 +69,7 @@ class MenuBar(tk.Menu):
     def __init__(self, vModel):
         tk.Menu.__init__(self)
         vFileMenu = tk.Menu(self, tearoff=False)
+        assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
 
         def ImportTransactionHistory():
@@ -77,7 +79,15 @@ class MenuBar(tk.Menu):
             if vFile is not None:
                 self.vModel.TransactionHistory.Import(vFile.name)
         vFileMenu.add_command(label="Import Transaction History", command=ImportTransactionHistory)
-        #vFileMenu.add_command(label="Revert To Previous Transaction History", command=ImportTransactionHistory)
+
+        # def LoadOldTransactionHistory():
+        #     Popup_SelectTransactionHistory(
+        #         self.winfo_toplevel(),
+        #         #lambda transaction_history_file: self.vModel.TransactionHistory.Load(transaction_history_file),
+        #         lambda transaction_history_file: print("transaction_history_file:"+transaction_history_file),
+        #         vModel
+        #     )
+        # vFileMenu.add_command(label="Revert To Previous Transaction History", command=LoadOldTransactionHistory)
         self.add_cascade(label="File", menu=vFileMenu)
         vEditMenu = tk.Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=vEditMenu)

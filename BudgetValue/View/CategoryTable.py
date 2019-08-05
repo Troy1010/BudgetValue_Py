@@ -106,10 +106,11 @@ class CategoryTable(ModelTable):
                     vDropdown = tk.Menu(tearoff=False)
                     vDropdown.add_command(label="Remove Category", command=lambda category=category_: RemoveCategory(category_.name))
                     vDropdown.add_command(label="Assign Type", command=lambda category=category_, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
-                        BV.View.Popup_SelectCategoryType(self.winfo_toplevel(),
-                                                         lambda category_type_name: AssignCategoryType(category_type_name, category_),
-                                                         cPos=(x, y)
-                                                         )
+                        BV.View.Popup_SelectFromList(self.winfo_toplevel(),
+                                                     lambda category_type_name: AssignCategoryType(category_type_name, category_),
+                                                     [x.name.capitalize() for x in BV.Model.CategoryType],
+                                                     cPos=(x, y)
+                                                     )
                     ))
                     vDropdown.post(event.x_root, event.y_root)
                 w.bind("<Button-3>", lambda event, category=category: ShowCategoryCellMenu(event, category), add="+")
