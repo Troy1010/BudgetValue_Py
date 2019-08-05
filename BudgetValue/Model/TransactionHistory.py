@@ -43,6 +43,7 @@ class TransactionHistory(Misc.List_ValueStream):
         extension = os.path.splitext(sFilePath)[1][1:]
         assert extension == 'csv'
         data_frame = pd.read_csv(sFilePath)
+        type_column = -1
         for i, column_name in enumerate(data_frame.columns):
             if "Description" in column_name:
                 description_column = i
@@ -53,6 +54,8 @@ class TransactionHistory(Misc.List_ValueStream):
                 withdrawal_column = i
             if "Deposit" in column_name:
                 deposit_column = i
+            if "Type" == column_name:
+                type_column = i
         assert description_column
         assert withdrawal_column
         assert deposit_column
@@ -66,6 +69,8 @@ class TransactionHistory(Misc.List_ValueStream):
                     bSpend = False
             else:
                 amount = row[withdrawal_column]
+                if type_column != -1 and 'deposit' not in row[type_column].lower():
+                    amount *= -1
                 bSpend = amount <= 0
             if not self.IsAlreadyHere_ByProperties(BV.ValidateTimestamp(time.time()), amount, row[description_column]):
                 self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[description_column])
