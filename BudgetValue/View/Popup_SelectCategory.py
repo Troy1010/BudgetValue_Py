@@ -8,7 +8,7 @@ class Popup_SelectCategory(Popup_Inheritable):
     previous_popup = None
 
     def __init__(self, parent, handler, cCategories, cPos=None, vDestroyHandler=None):
-        super().__init__(parent, handler, cPos=None, vDestroyHandler=None)
+        super().__init__(parent, handler, cPos=cPos, vDestroyHandler=vDestroyHandler)
         # Show categories
         if cCategories is not None and len(cCategories):
             for category in cCategories:

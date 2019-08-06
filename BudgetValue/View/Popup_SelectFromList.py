@@ -10,7 +10,7 @@ class Popup_SelectFromList(Popup_Inheritable):
     previous_popup = None
 
     def __init__(self, parent, handler, selection_list, cPos=None, vDestroyHandler=None):
-        super().__init__(parent, handler, cPos=None, vDestroyHandler=None)
+        super().__init__(parent, handler, cPos=cPos, vDestroyHandler=vDestroyHandler)
         # Show combobox
         self.combobox_value = tk.StringVar()
         combo_box = ttk.Combobox(self)

@@ -11,7 +11,7 @@ class Popup_InputAmount(Popup_Inheritable):
     previous_popup = None
 
     def __init__(self, parent, handler, cPos=None, vDestroyHandler=None):
-        super().__init__(parent, handler, cPos=None, vDestroyHandler=None)
+        super().__init__(parent, handler, cPos=cPos, vDestroyHandler=vDestroyHandler)
         # Show Entry box
         self.amount_stream = rx.subjects.BehaviorSubject(0)  # FIX: leaking?
         WF.MakeEntry_ReadOnly(self, (0, 0), text="Input Amount:")

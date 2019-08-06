@@ -10,7 +10,7 @@ class Popup_InputText(Popup_Inheritable):
     previous_popup = None
 
     def __init__(self, parent, handler, cPos=None, vDestroyHandler=None, sPrompt=None):
-        super().__init__(parent, handler, cPos=None, vDestroyHandler=None)
+        super().__init__(parent, handler, cPos=cPos, vDestroyHandler=vDestroyHandler)
         # Show Entry box
         if sPrompt is not None:
             WF.MakeEntry_ReadOnly(self, (0, 0), text=sPrompt)
