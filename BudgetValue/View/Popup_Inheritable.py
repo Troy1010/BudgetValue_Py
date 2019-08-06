@@ -37,14 +37,12 @@ class Popup_Inheritable(tk.Frame):
             x, y = cPos[0], cPos[1]
         self.place(x=x, y=y)
         self.tkraise()
-        # Bind Return to accept
+        # Bind Return to OnReturn
+        self.disposable_binds.append(DisposableTkBind(self.winfo_toplevel(), "<Return>", self.winfo_toplevel().bind("<Return>", self.OnReturn, add='+')))
 
-        def OnReturn(event):
-            if isinstance(event.widget, tk.Entry):
-                return
-            self.handler(self.GetInputValue())
-            self.destroy()
-        self.disposable_binds.append(DisposableTkBind(self.winfo_toplevel(), "<Return>", self.winfo_toplevel().bind("<Return>", OnReturn, add='+')))
+    def OnReturn(self, event):
+        self.handler(self.GetInputValue())
+        self.destroy()
 
     def GetInputValue(self):
         return None
