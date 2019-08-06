@@ -6,6 +6,7 @@ import enum
 import pickle
 import os
 import atexit
+import BudgetValue as BV
 
 
 class AutoName(Enum):
@@ -135,11 +136,21 @@ class Categories(dict):
             return
         self[name] = Category(name, type_=type_, bFavorite=bFavorite)
 
-    def RemoveCategory(self, name):
-        if name in self.__mandatory_catagories:
-            BVLog.warning("WARNING: tried to remove mandatory category name:"+name)
+    def RemoveCategory(self, category):
+        if isinstance(category, str):
+            category_name = category
+            if category_name in self.vModel.Categories.keys():
+                category = self.vModel.Categories[category_name]
+            else:
+                BVLog.warning("WARNING: name:"+category_name+" is not a category")
+        elif isinstance(category, BV.Model.Category):
+            category_name = category.name
+        else:
+            BVLog.warning("WARNING: could not interpret:"+str(category)+" as category")
+        if category in self.__mandatory_catagories:
+            BVLog.warning("WARNING: tried to remove mandatory category name:"+category_name)
             return
-        del self[name]
+        del self[category_name]
 
     def AssignCategoryType(self, name, type_):
         self[name].type = type_
