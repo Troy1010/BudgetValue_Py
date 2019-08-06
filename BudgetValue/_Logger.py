@@ -2,6 +2,7 @@ import logging
 import os
 # Settings
 bWriteLog = True
+bPrint = True
 sLogFile = os.path.join(__file__, '..', 'BVLog.log')
 
 BVLog = logging.getLogger(__name__)
@@ -12,6 +13,10 @@ except FileNotFoundError:
     pass
 if bWriteLog:
     BVLog.addHandler(logging.FileHandler(sLogFile))
+if bPrint:
+    vConsoleHandler = logging.StreamHandler()
+    vConsoleHandler.setLevel(logging.WARNING)
+    BVLog.addHandler(vConsoleHandler)
 
 
 def Log(*args, bPrint=False, **kwargs):

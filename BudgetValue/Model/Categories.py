@@ -1,3 +1,4 @@
+from BudgetValue._Logger import Log  # noqa
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 from enum import Enum
@@ -130,13 +131,13 @@ class Categories(dict):
 
     def AddCategory(self, name, type_=None, bFavorite=False):
         if name in self.keys():
-            print("WARNING: category name:"+name+" already exists")
+            BVLog.warning("WARNING: categoryName:"+name+" already exists")
             return
         self[name] = Category(name, type_=type_, bFavorite=bFavorite)
 
     def RemoveCategory(self, name):
         if name in self.__mandatory_catagories:
-            print("WARNING: tried to remove mandatory category name:"+name)
+            BVLog.warning("WARNING: tried to remove mandatory category name:"+name)
             return
         del self[name]
 
