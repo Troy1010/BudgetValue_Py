@@ -1,45 +1,20 @@
 import TM_CommonPy as TM  # noqa
-import tkinter as tk
 from BudgetValue._Logger import Log  # noqa
 import rx  # noqa
 from . import WidgetFactories as WF  # noqa
 import BudgetValue as BV
+from .Popup_Inheritable import Popup_Inheritable
 
 
-class Popup_InputAmount(tk.Frame):
+class Popup_InputAmount(Popup_Inheritable):
     previous_popup = None
 
-    def __init__(self, parent, vModel, handler, cPos=None, vDestroyHandler=None):
-        assert isinstance(vModel, BV.Model.Model)
-        #
-        tk.Frame.__init__(self, parent, borderwidth=2, background="black")
-        # Hook DestroyHandler
-
-        def ForgetPrevPopup():
-            self.__class__.previous_popup = None
-        self.destroy = TM.Hook(self.destroy, vDestroyHandler, ForgetPrevPopup, bPrintAndQuitOnError=True)
-        # Bind Escape to exit
-        self.winfo_toplevel().bind("<Escape>", lambda event: self.destroy(), add='+')
-        # Delete old popup
-        if self.__class__.previous_popup is not None:
-            self.__class__.previous_popup.destroy()
-        self.__class__.previous_popup = self
-        # Position myself
-        if not cPos:
-            x, y = parent.winfo_pointerx() - parent.winfo_rootx(), parent.winfo_pointery() - parent.winfo_rooty()
-        else:
-            x, y = cPos[0], cPos[1]
-        self.place(x=x, y=y)
-        self.tkraise()
+    def __init__(self, parent, handler, cPos=None, vDestroyHandler=None):
+        super().__init__(parent, handler, cPos=None, vDestroyHandler=None)
         # Show Entry box
         self.amount_stream = rx.subjects.BehaviorSubject(0)  # FIX: leaking?
         WF.MakeEntry_ReadOnly(self, (0, 0), text="Input Amount:")
         WF.MakeEntry(self, (0, 1), stream=self.amount_stream, width=10, validation=BV.MakeValid_Money)
-        # Bind Return to accept
 
-        def OnReturn(event):
-            if isinstance(event.widget, tk.Entry):
-                return
-            handler(self.amount_stream.value)
-            self.destroy()
-        self.winfo_toplevel().bind("<Return>", OnReturn, add='+')
+    def GetInputValue(self):
+        return self.amount_stream.value

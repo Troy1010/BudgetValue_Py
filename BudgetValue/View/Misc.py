@@ -31,3 +31,13 @@ class ModelTable(TM.tk.TableFrame):
             for disposable in self.cDisposables:
                 disposable.dispose()
         self.cDisposables = []
+
+
+class DisposableTkBind():
+    def __init__(self, widget, key, bind_id):
+        self.widget = widget
+        self.key = key
+        self.bind_id = bind_id
+
+    def Dispose(self):
+        self.widget.unbind(self.key, self.bind_id)

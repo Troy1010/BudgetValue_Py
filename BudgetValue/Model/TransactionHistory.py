@@ -322,6 +322,7 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         return cAll
 
     def AddCategory(self, category, amount=None):
+        assert isinstance(category, BV.Model.Category)
         if category == Categories.default_category:
             return
         self[category.name] = CategoryAmount(self)

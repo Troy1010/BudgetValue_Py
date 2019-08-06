@@ -29,7 +29,7 @@ class SplitMoneyIntoCategories(tk.Frame):
             self.vModel.TransactionHistory.AddTransaction(bSpend=False, amount=amount)
             self.vTable.Refresh()
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Add Unverified Income",
-                                           command=lambda: Popup_InputAmount(self, self.vModel, lambda amount: CreateTransaction(amount)))
+                                           command=lambda: Popup_InputAmount(self, lambda amount: CreateTransaction(amount)))
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
         # Button_SplitDifference
         vSplitDifferenceText_stream = rx.subjects.BehaviorSubject("")
