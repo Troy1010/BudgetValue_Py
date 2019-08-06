@@ -22,7 +22,7 @@ class CategoryTable(ModelTable):
     def AddSpacersForBudgeted(self):
         row = self.iFirstDataRow
         # Determine height
-        # fix: There must be a better way..
+        # fix: There must be a better way to determine the right height..
         height_widget = WF.MakeEntry_ReadOnly(self, (row, self.iFirstDataColumn), text="z", validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
         height_widget.update_idletasks()
         height = height_widget.winfo_height()
@@ -92,6 +92,20 @@ class CategoryTable(ModelTable):
                                         sPrompt="Input category name:"
                                         )
             ))
+
+            def RemoveCategory(category):  # fix: I should rx this
+                self.vModel.Categories.RemoveCategory(category)
+                if hasattr(self, "RefreshParent"):
+                    self.RefreshParent()
+                else:
+                    self.Refresh()
+            vDropdown.add_command(label="Remove Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                BV.View.Popup_SelectFromList(self.winfo_toplevel(),
+                                             RemoveCategory,
+                                             [category_name for category_name in self.vModel.Categories],
+                                             cPos=(x, y)
+                                             )
+            ))
             vDropdown.post(event.x_root, event.y_root)
         w.bind("<Button-3>", lambda event: ShowCategoryColHeaderMenu(event), add="+")
         for row, category in enumerate(self.vModel.Categories.Select()):
@@ -105,7 +119,7 @@ class CategoryTable(ModelTable):
                     else:
                         self.Refresh()
 
-                def RemoveCategory(category_name):
+                def RemoveCategory(category_name):  # fix: I should rx this
                     self.vModel.Categories.RemoveCategory(category_name)
                     if hasattr(self, "RefreshParent"):
                         self.RefreshParent()
