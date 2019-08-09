@@ -208,8 +208,6 @@ class Transaction():
         self.description_stream = rx.subjects.BehaviorSubject("")
         self.categoryAmounts = CategoryAmounts(vModel, self)
         self.bSpend = bSpend
-        self.cValidationSources = None  # FIX: use
-        self.bAlertNonValidation = True  # FIX: use
 
     def SetOneCategory(self, category):
         self.categoryAmounts.clear()
