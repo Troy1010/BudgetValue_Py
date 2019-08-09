@@ -4,23 +4,22 @@ from ._Logger import BVLog
 from ._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
 from datetime import datetime
-import time
+import time  # noqa
 
 
-def ValidateTimestamp(num):
-    if isinstance(num, str):
-        return time.mktime(datetime.strptime(num, '%Y-%m-%d %H:%M').timetuple())
-    elif isinstance(num, datetime):
-        return time.mktime(num.timetuple())
+def ValidateTimestamp(timestamp):
+    if isinstance(timestamp, str):
+        return datetime.strptime(timestamp, '%Y-%m-%d %H:%M')
+    elif isinstance(timestamp, datetime):
+        return timestamp
     else:
-        return float(num)
+        return datetime.fromtimestamp(timestamp)
 
 
 def DisplayTimestamp(timestamp):
-    if timestamp == 0:
-        return ""
-    dt = datetime.fromtimestamp(timestamp)
-    str_ = dt.strftime('%Y-%m-%d %H:%M')
+    if not isinstance(timestamp, datetime):
+        timestamp = datetime.fromtimestamp(timestamp)
+    str_ = timestamp.strftime('%Y-%m-%d %H:%M')
     return str_
 
 

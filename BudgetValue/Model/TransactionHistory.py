@@ -102,8 +102,8 @@ class TransactionHistory(Misc.List_ValueStream):
                 return True
         return False
 
-    def IsSame_ByProperties(self, transaction, timestamp, amount, description):
-        if date.fromtimestamp(transaction.timestamp) != date.fromtimestamp(timestamp):
+    def IsSame_ByProperties(self, transaction, datetime_, amount, description):
+        if transaction.timestamp != datetime_:
             return False
         if transaction.amount != BV.MakeValid_Money(amount):
             return False
