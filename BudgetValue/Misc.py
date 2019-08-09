@@ -17,10 +17,7 @@ def ValidateTimestamp(timestamp):
 
 
 def DisplayTimestamp(timestamp):
-    if not isinstance(timestamp, datetime):
-        timestamp = datetime.fromtimestamp(timestamp)
-    str_ = timestamp.strftime('%Y-%m-%d %H:%M')
-    return str_
+    return timestamp.strftime('%Y-%m-%d %H:%M')
 
 
 def Hello():
