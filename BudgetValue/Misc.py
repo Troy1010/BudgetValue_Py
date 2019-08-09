@@ -10,6 +10,8 @@ import time
 def ValidateTimestamp(num):
     if isinstance(num, str):
         return time.mktime(datetime.strptime(num, '%Y-%m-%d %H:%M').timetuple())
+    elif isinstance(num, datetime):
+        return time.mktime(num.timetuple())
     else:
         return float(num)
 

@@ -11,6 +11,7 @@ from BudgetValue._Logger import Log  # noqa
 import time  # noqa
 from datetime import datetime  # noqa
 from datetime import date  # noqa
+import dateutil
 
 
 class TransactionHistory(Misc.List_ValueStream):
@@ -56,9 +57,12 @@ class TransactionHistory(Misc.List_ValueStream):
                 deposit_column = i
             if "Type" == column_name:
                 type_column = i
-        assert description_column
-        assert withdrawal_column
-        assert deposit_column
+            if "Date" in column_name:
+                date_column = i
+        assert description_column is not None
+        assert withdrawal_column is not None
+        assert deposit_column is not None
+        assert date_column is not None
         for index, row in data_frame.iterrows():
             if withdrawal_column != deposit_column:
                 if not pd.isnull(row[withdrawal_column]):
@@ -72,8 +76,9 @@ class TransactionHistory(Misc.List_ValueStream):
                 if type_column != -1 and 'deposit' not in row[type_column].lower():
                     amount *= -1
                 bSpend = amount <= 0
-            if not self.IsAlreadyHere_ByProperties(BV.ValidateTimestamp(time.time()), amount, row[description_column]):
-                self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time.time()), description=row[description_column])
+            time_ = dateutil.parser.parse(row[date_column], tzinfos={"CDT": "UTC-5"})
+            if not self.IsAlreadyHere_ByProperties(BV.ValidateTimestamp(time_), amount, row[description_column]):
+                self.AddTransaction(bSpend, amount, timestamp=BV.ValidateTimestamp(time_), description=row[description_column])
 
     def Iter_Spend(self):
         for transaction in self:
