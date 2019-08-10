@@ -17,6 +17,7 @@ import dateutil
 class TransactionHistory(Misc.List_ValueStream):
     def __init__(self, vModel):
         super().__init__()
+        assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "TransactionHistory.pickle")
         # subscribe _merged_amountStream_stream
@@ -30,6 +31,14 @@ class TransactionHistory(Misc.List_ValueStream):
                 self.cDisposables[vValueAddPair.value].dispose()
                 del self.cDisposables[vValueAddPair.value]
         self._value_stream.subscribe(MergeAmountStreamStreams)
+        # If a category is deleted, remove that category from all Transactions
+
+        def OnCategoryCreationOrDeletion(ValueAddPair_):
+            assert isinstance(ValueAddPair_, BV.Model.Misc.ValueAddPair)
+            if not ValueAddPair_.bAdd:
+                for transaction in self:
+                    transaction.categoryAmounts.RemoveCategory(ValueAddPair_.value)
+        self.vModel.Categories._value_stream.subscribe(OnCategoryCreationOrDeletion)
 
     def ClearAllTransactions(self):
         # save old record
@@ -336,9 +345,11 @@ class CategoryAmounts(Misc.Dict_TotalStream):
     def RemoveCategory(self, category):
         assert(category != Categories.default_category)
         if isinstance(category, str):
-            del self[category]
+            if category in self:
+                del self[category]
         else:
-            del self[category.name]
+            if category.name in self:
+                del self[category.name]
 
 
 class CategoryAmount():
