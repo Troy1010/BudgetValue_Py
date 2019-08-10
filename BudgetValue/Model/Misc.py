@@ -1,13 +1,40 @@
 import BudgetValue as BV
 import rx
 import TM_CommonPy as TM  # noqa
-from .Categories import Categories
 
 
 class ValueAddPair():
     def __init__(self, bAdd, value):
         self.value = value
         self.bAdd = bAdd
+
+
+class Dict_ValueStream(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self._value_stream = rx.subjects.Subject()
+
+    def __setitem__(self, key, value):
+        # if we have an old value and it isn't the new value, remove old value
+        if key in self and self[key] != value:
+            self._value_stream.on_next(ValueAddPair(False, self[key]))
+        # if new value isn't the old value, add that new value
+        if (key not in self or self[key] != value):
+            self._value_stream.on_next(ValueAddPair(True, value))
+        #
+        super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        if key in self:
+            self._value_stream.on_next(ValueAddPair(False, self[key]))
+        super().__delitem__(key)
+
+    def clear(self):
+        # make sure __delitem__ is triggered
+        for key in self.keys():
+            del self[key]
+        #
+        super().clear()
 
 
 class List_ValueStream(list):
@@ -213,7 +240,7 @@ class Dict_TotalStream(TotalStream_Inheritable, DiffStreams_Inheritable, Dict_Am
 class BalanceEntry():
     def __init__(self, parent, total_stream):
         self.parent = parent
-        self._category = self.parent.vModel.Categories[Categories.default_category.name]
+        self._category = BV.Model.Categories.default_category
         self.amount_stream = rx.subjects.BehaviorSubject(0)
         total_stream.map(
             lambda total: -total

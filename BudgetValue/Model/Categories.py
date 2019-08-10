@@ -7,6 +7,7 @@ import pickle
 import os
 import atexit
 import BudgetValue as BV
+from .Misc import Dict_ValueStream
 
 
 class AutoName(Enum):
@@ -65,7 +66,7 @@ class Category():
         self.bFavorite = vSavable['bFavorite']
 
 
-class Categories(dict):
+class Categories(Dict_ValueStream):
     default_category = Category("<Default Category>", CategoryType.extra)
     savings = Category("Savings", CategoryType.excess)
     __mandatory_catagories = [
@@ -88,6 +89,8 @@ class Categories(dict):
     ]
 
     def __init__(self, vModel):
+        super().__init__()
+        #
         self.vModel = vModel
         # Load and hook save on exit
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Categories.pickle")
