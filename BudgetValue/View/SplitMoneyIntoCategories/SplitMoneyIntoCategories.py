@@ -94,6 +94,11 @@ class SplitMoneyIntoCategories(tk.Frame):
             for var in self.vModel.Categories.Select():
                 print(str(var.type.name) + " " + var.name)
         WF.MakeButton(self.vButtonBar, text="Print Categories", command=lambda: PrintCategories())
+
+        def PrintActiveCategories():
+            for x in self.vModel.Budgeted.cCategoryTotalStreams:
+                print(str(x))
+        WF.MakeButton(self.vButtonBar, text="Print Active Categories", command=lambda: PrintActiveCategories())
         WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.Refresh())
 
     def Refresh(self):
