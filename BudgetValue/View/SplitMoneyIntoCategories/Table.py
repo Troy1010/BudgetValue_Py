@@ -18,22 +18,23 @@ class Table(CategoryTable):
             vColumnHeader.transaction = income_transaction  # for GetTransactionOfColumn
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         # Data
-        for row, category in enumerate(self.vModel.Categories.Select(), self.iFirstDataRow):
-            for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
-                if category.name in income_transaction.categoryAmounts.GetAll().keys():
-                    background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
-                    bEditableState = category != Categories.default_category
-                    w = WF.MakeEntry(self,
-                                     (row, column),
-                                     text=income_transaction.categoryAmounts.GetAll()[category.name].amount_stream,  # fix: is GetAll necessary?
-                                     bEditableState=bEditableState,
-                                     background=background,
-                                     validation=BV.MakeValid_Money,
-                                     display=BV.MakeValid_Money_ZeroIsNone
-                                     )
-                    w.category_name = category.name
-                    if bEditableState:
-                        w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+        for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
+            for category_name in income_transaction.categoryAmounts.GetAll():
+                category = self.vModel.Categories[category_name]
+                row = self.GetRowOfCategory(category_name)
+                background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
+                bEditableState = category != Categories.default_category
+                w = WF.MakeEntry(self,
+                                 (row, column),
+                                 text=income_transaction.categoryAmounts.GetAll()[category_name].amount_stream,  # fix: is GetAll necessary?
+                                 bEditableState=bEditableState,
+                                 background=background,
+                                 validation=BV.MakeValid_Money,
+                                 display=BV.MakeValid_Money_ZeroIsNone
+                                 )
+                w.category_name = category_name
+                if bEditableState:
+                    w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
         #
         self.AddSeparationLables(no_text=True)
 

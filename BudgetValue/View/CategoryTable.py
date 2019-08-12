@@ -29,18 +29,11 @@ class CategoryTable(ModelTable):
         height = height_widget.winfo_height()
         height_widget.grid_forget()
         height_widget.destroy()
-        # Header Spacer
-        w = tk.Frame(self)
-        w.grid(row=row-1, column=self.iFirstDataColumn)
-        w.config(height=height)
         # Data
-        for category in self.vModel.Categories.Select():
-            # Budgeted
-            if category.name in self.vModel.Budgeted.cCategoryTotalStreams:
-                w = tk.Frame(self)
-                w.grid(row=row, column=self.iFirstDataColumn)
-                w.config(height=height)
-            row += 2
+        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
+            w = tk.Frame(self)
+            w.grid(row=self.GetRowOfCategory(category_name), column=self.iFirstDataColumn)
+            w.config(height=height)
         #
 
         def OnCategoryTotalStreamsAddOrRemove(value_add_pair):
@@ -99,10 +92,16 @@ class CategoryTable(ModelTable):
     def GetCategoryOfRow(self, row):
         dv = list(self.vModel.Categories.values())
         dv[(row-self.iFirstDataRow)/2]
-        print(TM.FnName()+" row:"+str(row)+" categoryName:"+self.vModel.Categories.values()[(row-self.iFirstDataRow)/2].name)
         return self.vModel.Categories.values()[(row-self.iFirstDataRow)/2]
 
+    def GetRowOfCategory(self, category):
+        if isinstance(category, BV.Model.Category):
+            category = category.name
+        returning = self.iFirstDataRow + list(self.vModel.Categories.keys()).index(category)*2
+        return returning
+
     def AddRowHeaderColumn(self):
+        # ColumnHeader
         w = WF.MakeHeader(self, (0, 0), text="Category")
 
         def ShowCategoryColHeaderMenu(event):
@@ -130,33 +129,35 @@ class CategoryTable(ModelTable):
             ))
             vDropdown.post(event.x_root, event.y_root)
         w.bind("<Button-3>", lambda event: ShowCategoryColHeaderMenu(event), add="+")
-        for row, category in enumerate(self.vModel.Categories.Select()):
-            if not self.IsRowEmpty(row+self.iFirstDataRow):
-                w = WF.MakeEntry(self, (row+self.iFirstDataRow, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
+        # RowHeaders
+        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
+            category = self.vModel.Categories[category_name]
+            row = self.GetRowOfCategory(category_name)
+            w = WF.MakeEntry(self, (row, 0), text=category_name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
 
-                def AssignCategoryType(category_type_name, category_):
-                    category_.type = BV.Model.CategoryType.GetByName(category_type_name)
-                    if hasattr(self, "RefreshParent"):
-                        self.RefreshParent()
-                    else:
-                        self.Refresh()
+            def AssignCategoryType(category_type_name, category_):
+                category_.type = BV.Model.CategoryType.GetByName(category_type_name)
+                if hasattr(self, "RefreshParent"):
+                    self.RefreshParent()
+                else:
+                    self.Refresh()
 
-                def RemoveCategory(category_name):  # fix: I should rx this
-                    self.vModel.Categories.RemoveCategory(category_name)
-                    if hasattr(self, "RefreshParent"):
-                        self.RefreshParent()
-                    else:
-                        self.Refresh()
+            def RemoveCategory(category_name):  # fix: I should rx this
+                self.vModel.Categories.RemoveCategory(category_name)
+                if hasattr(self, "RefreshParent"):
+                    self.RefreshParent()
+                else:
+                    self.Refresh()
 
-                def ShowCategoryCellMenu(event, category_):
-                    vDropdown = tk.Menu(tearoff=False)
-                    vDropdown.add_command(label="Remove Category", command=lambda category=category_: RemoveCategory(category_.name))
-                    vDropdown.add_command(label="Assign Category Type", command=lambda category=category_, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
-                        BV.View.Popup_SelectFromList(self.winfo_toplevel(),
-                                                     lambda category_type_name: AssignCategoryType(category_type_name, category_),
-                                                     [x.name.capitalize() for x in BV.Model.CategoryType],
-                                                     cPos=(x, y)
-                                                     )
-                    ))
-                    vDropdown.post(event.x_root, event.y_root)
-                w.bind("<Button-3>", lambda event, category=category: ShowCategoryCellMenu(event, category), add="+")
+            def ShowCategoryCellMenu(event, category_):
+                vDropdown = tk.Menu(tearoff=False)
+                vDropdown.add_command(label="Remove Category", command=lambda category=category_: RemoveCategory(category_.name))
+                vDropdown.add_command(label="Assign Category Type", command=lambda category=category_, x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
+                    BV.View.Popup_SelectFromList(self.winfo_toplevel(),
+                                                 lambda category_type_name: AssignCategoryType(category_type_name, category_),
+                                                 [x.name.capitalize() for x in BV.Model.CategoryType],
+                                                 cPos=(x, y)
+                                                 )
+                ))
+                vDropdown.post(event.x_root, event.y_root)
+            w.bind("<Button-3>", lambda event, category=category: ShowCategoryCellMenu(event, category), add="+")

@@ -34,19 +34,18 @@ class BudgetedTable(CategoryTable):
         WF.MakeHeader(self, (row, 1), text="Budgeted", background=vSkin.BG_BUDGETED)
         row += 1
         # Data
-        for category in self.vModel.Categories.Select():
-            # Budgeted
-            if category.name in self.vModel.Budgeted.cCategoryTotalStreams:
-                w = WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Budgeted.cCategoryTotalStreams[category.name], validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
-                # Highlight
+        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
+            row = self.GetRowOfCategory(category_name)
+            category = self.vModel.Categories[category_name]
+            w = WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Budgeted.cCategoryTotalStreams[category.name], validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
+            # Highlight
 
-                def HighlightBudgeted(budgeted_amount, w):
-                    if budgeted_amount < 0:
-                        w.configure(readonlybackground=vSkin.BG_BUDGETED_BAD)
-                    else:
-                        w.configure(readonlybackground=vSkin.BG_BUDGETED)
-                disposable = self.vModel.Budgeted.cCategoryTotalStreams[category.name].subscribe(
-                    lambda budgeted_amount, w=w: HighlightBudgeted(budgeted_amount, w)
-                )
-                self.cDisposables.append(disposable)
-            row += 2
+            def HighlightBudgeted(budgeted_amount, w):
+                if budgeted_amount < 0:
+                    w.configure(readonlybackground=vSkin.BG_BUDGETED_BAD)
+                else:
+                    w.configure(readonlybackground=vSkin.BG_BUDGETED)
+            disposable = self.vModel.Budgeted.cCategoryTotalStreams[category.name].subscribe(
+                lambda budgeted_amount, w=w: HighlightBudgeted(budgeted_amount, w)
+            )
+            self.cDisposables.append(disposable)
