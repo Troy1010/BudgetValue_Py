@@ -19,6 +19,7 @@ class BudgetedTable(CategoryTable):
         self.AddBudgetedColumn()
         self.AddRowHeaderColumn()
         self.AddSeparationLables()
+        return  # fix
         row = self.GetMaxRow() + 1
         # Black bar
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.GetMaxColumn()+1, sticky="ew")
@@ -48,4 +49,4 @@ class BudgetedTable(CategoryTable):
                     lambda budgeted_amount, w=w: HighlightBudgeted(budgeted_amount, w)
                 )
                 self.cDisposables.append(disposable)
-            row += 1
+            row += 2

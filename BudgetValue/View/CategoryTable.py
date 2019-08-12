@@ -12,9 +12,10 @@ class CategoryTable(ModelTable):
     def __init__(self, parent, vModel, *args, **kwargs):
         super().__init__(parent, vModel, *args, **kwargs)
         self.iFirstDataColumn = 0
-        self.iFirstDataRow = 1
-        # Refresh when new values come in
-        #vModel.TransactionHistory._merged_amountStream_stream.subscribe(lambda x: self.Refresh())
+        self.iFirstDataRow = 2
+
+    def Refresh(self):
+        super().Refresh()
 
     def FinishRefresh(self):
         self.AddSeparationLables()
@@ -39,29 +40,40 @@ class CategoryTable(ModelTable):
                 w = tk.Frame(self)
                 w.grid(row=row, column=self.iFirstDataColumn)
                 w.config(height=height)
-            row += 1
+            row += 2
         #
 
         def OnCategoryTotalStreamsAddOrRemove(value_add_pair):
-            print(TM.FnName()+" value_add_pair.value:"+str(value_add_pair.value))
             if value_add_pair.bAdd:
                 w = tk.Frame(self)
                 w.grid(row=1, column=self.iFirstDataColumn)
                 w.config(height=height)
             else:
                 self.grid_remove(row=1, column=self.iFirstDataColumn)
-
-        self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(OnCategoryTotalStreamsAddOrRemove)
+        self.cDisposables.append(self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(OnCategoryTotalStreamsAddOrRemove))
 
         self.iFirstDataColumn += 1
 
     def AddSeparationLables(self, no_text=False):
+        return
+        row = self.iFirstDataRow
+        prev_type = None
+        for category in self.vModel.Categories.values():
+            if prev_type != category.type:
+                if no_text:
+                    WF.MakeSeparationLable(self, row+1, " ")
+                else:
+                    WF.MakeSeparationLable(self, row+1, "  " + category.type.name.capitalize())
+                prev_type = category.type
+            row += 2
+
+        return
         prev_type = None
         row = self.GetMaxRow()
         while row >= self.iFirstDataRow:
             category = self.GetCategoryOfRow(row)
             if category is None or self.IsRowEmpty(row):
-                row -= 1
+                row -= 2
                 continue
             if prev_type != category.type:
                 if prev_type is None:
@@ -74,7 +86,7 @@ class CategoryTable(ModelTable):
                 else:
                     WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
                 prev_type = category.type
-            row -= 1
+            row -= 2
         self.InsertRow(row+1)
         if no_text:
             WF.MakeSeparationLable(self, row+1, " ")
@@ -85,12 +97,10 @@ class CategoryTable(ModelTable):
                 WF.MakeSeparationLable(self, row+1, "  None")
 
     def GetCategoryOfRow(self, row):
-        # Only works before SeparationLables are added
-        # fix: There must be a better way..
-        for i, category in enumerate(self.vModel.Categories.Select()):
-            if i == row - self.iFirstDataRow:
-                return category
-        return None
+        dv = list(self.vModel.Categories.values())
+        dv[(row-self.iFirstDataRow)/2]
+        print(TM.FnName()+" row:"+str(row)+" categoryName:"+self.vModel.Categories.values()[(row-self.iFirstDataRow)/2].name)
+        return self.vModel.Categories.values()[(row-self.iFirstDataRow)/2]
 
     def AddRowHeaderColumn(self):
         w = WF.MakeHeader(self, (0, 0), text="Category")
