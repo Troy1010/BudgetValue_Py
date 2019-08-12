@@ -115,7 +115,7 @@ def MakeEntry(self, cRowColumnPair, text=None, stream=None, columnspan=1, bEdita
     return w
 
 
-def MakeSeparationLable(parent, row, text):
+def MakeSeparationLabel(parent, row, text):
     w = tk.Label(parent, font=vSkin.FONT_SMALL_BOLD, width=15, borderwidth=2, height=1, relief=tk.FLAT,
                  background='lightblue', text=text, anchor="w")
     w.grid(row=row, columnspan=1000, sticky="ew")  # columnspan?

@@ -34,7 +34,6 @@ class TransactionHistory(Misc.List_ValueStream):
         # If a category is deleted, remove that category from all Transactions
 
         def OnCategoryCreationOrDeletion(ValueAddPair_):
-            assert isinstance(ValueAddPair_, BV.Model.Misc.ValueAddPair)
             if not ValueAddPair_.bAdd:
                 for transaction in self:
                     transaction.categoryAmounts.RemoveCategory(ValueAddPair_.value)

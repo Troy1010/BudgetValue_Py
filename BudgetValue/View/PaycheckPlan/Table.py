@@ -38,7 +38,6 @@ class Table(CategoryTable):
                 bEditableState = category != Categories.default_category
                 self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
         super().AddRowHeaderColumn()
-        super().AddSeparationLables()
 
     def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True):
         background = vSkin.BG_READ_ONLY if not bEditableState else vSkin.BG_DEFAULT

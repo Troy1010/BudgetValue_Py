@@ -68,7 +68,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         # Table
         self.vCanvas = tk.Canvas(self.vScrollbarFrame, highlightthickness=0)
         self.vCanvas.grid(row=1, column=1, sticky="NSEW")
-        self.vTable = Table(self.vCanvas, vModel)
+        self.vTable = Table(self.vCanvas, vModel, bNoSeparationLabelText=True)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         # self.vTable.pack(anchor='nw') # this line causes vCanvas bbox not to match
         self.vTable.Refresh()
@@ -99,6 +99,11 @@ class SplitMoneyIntoCategories(tk.Frame):
             for x in self.vModel.Budgeted.cCategoryTotalStreams:
                 print(str(x))
         WF.MakeButton(self.vButtonBar, text="Print Active Categories", command=lambda: PrintActiveCategories())
+
+        def PrintVMCategoryTable():
+            for x in self.vRowHeaderTable.VM_CategoryTable:
+                print(x.name)
+        WF.MakeButton(self.vButtonBar, text="Print VMCategoryTable bbox", command=lambda: PrintVMCategoryTable())
         WF.MakeButton(self.vButtonBar, text="Refresh", command=lambda: self.Refresh())
 
     def Refresh(self):

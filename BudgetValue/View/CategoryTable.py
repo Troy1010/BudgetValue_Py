@@ -5,20 +5,75 @@ from BudgetValue.View import WidgetFactories as WF  # noqa
 from . import Misc  # noqa
 from .Skin import vSkin
 from .Misc import ModelTable
+from Model.Misc import List_ValueStream
+from Model import CategoryType
+from .._Logger import BVLog
+
+
+class SeparationLable():
+    def __init__(self, name):
+        self.name = name
+
+
+class ViewModel_CategoryTable(List_ValueStream):
+
+    def __init__(self, vModel, *args, **kwargs):
+        super().__init__()
+        assert isinstance(vModel, BV.Model.Model)
+        self.vModel = vModel
+        for category_name in vModel.Budgeted.cCategoryTotalStreams.keys():
+            self.append(self.vModel.Categories[category_name])
+        self.Format()
+        # if an item of vModel.Budgeted.cCategoryTotalStreams is created or destroyed, update self
+
+        def OnNewCategoryTotalStreamValueAddPair(self, collection_edit_info):
+            if collection_edit_info.bAdd:
+                self.append(self.vModel.Categories[collection_edit_info.key])
+            else:
+                self.remove(self.vModel.Categories[collection_edit_info.key])
+            self.Format()
+        vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(lambda category_name: OnNewCategoryTotalStreamValueAddPair(self, category_name))
+
+    def Format(self):
+        # remove all SeparationLabels
+        items_to_delete = []
+        for item in self:
+            if not isinstance(item, BV.Model.Category):
+                items_to_delete.append(item)
+        for item in items_to_delete:
+            self.remove(item)
+        # sort
+        self.sort(key=lambda item: CategoryType.GetIndex(item.type))
+        # add SeparationLabels
+        prev_type = None
+        i = 0
+        for category in list(self):
+            if prev_type != category.type:
+                self.insert(i, SeparationLable(category.type.name.capitalize()))
+                prev_type = category.type
+                i += 1
+            i += 1
 
 
 class CategoryTable(ModelTable):
+    VM_CategoryTable = None
 
-    def __init__(self, parent, vModel, *args, **kwargs):
+    def __init__(self, parent, vModel, *args, bNoSeparationLabelText=False, **kwargs):
         super().__init__(parent, vModel, *args, **kwargs)
         self.iFirstDataColumn = 0
         self.iFirstDataRow = 2
+        self.bNoSeparationLabelText = bNoSeparationLabelText
+        #
+        if self.VM_CategoryTable is None:
+            self.VM_CategoryTable = ViewModel_CategoryTable(vModel)
 
     def Refresh(self):
         super().Refresh()
-
-    def FinishRefresh(self):
-        self.AddSeparationLables()
+        # Add Separation Labels
+        for item in self.VM_CategoryTable:
+            if isinstance(item, SeparationLable):
+                text = " " if self.bNoSeparationLabelText else "  " + item.name
+                WF.MakeSeparationLabel(self, self.GetRowOfValue(item), text)
 
     def AddSpacersForBudgeted(self):
         row = self.iFirstDataRow
@@ -30,74 +85,41 @@ class CategoryTable(ModelTable):
         height_widget.grid_forget()
         height_widget.destroy()
         # Data
-        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
+        for category in self.VM_CategoryTable:
+            if not isinstance(category, BV.Model.Category):
+                continue
             w = tk.Frame(self)
-            w.grid(row=self.GetRowOfCategory(category_name), column=self.iFirstDataColumn)
+            w.grid(row=self.GetRowOfValue(category), column=self.iFirstDataColumn)
             w.config(height=height)
         #
 
         def OnCategoryTotalStreamsAddOrRemove(value_add_pair):
-            if value_add_pair.bAdd:
-                w = tk.Frame(self)
-                w.grid(row=1, column=self.iFirstDataColumn)
-                w.config(height=height)
-            else:
-                self.grid_remove(row=1, column=self.iFirstDataColumn)
+            pass
+            # if value_add_pair.bAdd:
+            #     w = tk.Frame(self)
+            #     w.grid(row=self.GetRowOfCategory(value_add_pair.key), column=self.iFirstDataColumn)
+            #     w.config(height=height)
+            # else:
+            #     self.grid_remove(row=1, column=self.iFirstDataColumn)
         self.cDisposables.append(self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(OnCategoryTotalStreamsAddOrRemove))
 
         self.iFirstDataColumn += 1
 
-    def AddSeparationLables(self, no_text=False):
-        return
-        row = self.iFirstDataRow
-        prev_type = None
-        for category in self.vModel.Categories.values():
-            if prev_type != category.type:
-                if no_text:
-                    WF.MakeSeparationLable(self, row+1, " ")
-                else:
-                    WF.MakeSeparationLable(self, row+1, "  " + category.type.name.capitalize())
-                prev_type = category.type
-            row += 2
-
-        return
-        prev_type = None
-        row = self.GetMaxRow()
-        while row >= self.iFirstDataRow:
-            category = self.GetCategoryOfRow(row)
-            if category is None or self.IsRowEmpty(row):
-                row -= 2
-                continue
-            if prev_type != category.type:
-                if prev_type is None:
-                    row -= 1
-                    prev_type = category.type
-                    continue
-                self.InsertRow(row+1)
-                if no_text:
-                    WF.MakeSeparationLable(self, row+1, " ")
-                else:
-                    WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
-                prev_type = category.type
-            row -= 2
-        self.InsertRow(row+1)
-        if no_text:
-            WF.MakeSeparationLable(self, row+1, " ")
-        else:
-            if hasattr(prev_type, 'name'):
-                WF.MakeSeparationLable(self, row+1, "  " + prev_type.name.capitalize())
-            else:
-                WF.MakeSeparationLable(self, row+1, "  None")
-
     def GetCategoryOfRow(self, row):
-        dv = list(self.vModel.Categories.values())
-        dv[(row-self.iFirstDataRow)/2]
-        return self.vModel.Categories.values()[(row-self.iFirstDataRow)/2]
+        return self.VM_CategoryTable[(row-self.iFirstDataRow)]
 
-    def GetRowOfCategory(self, category):
-        if isinstance(category, BV.Model.Category):
-            category = category.name
-        returning = self.iFirstDataRow + list(self.vModel.Categories.keys()).index(category)*2
+    def GetRowOfValue(self, value):
+        if isinstance(value, str):
+            value = self.vModel.Categories[value]
+        elif isinstance(value, BV.Model.Category) or isinstance(value, BV.View.CategoryTable.SeparationLable):
+            pass
+        else:
+            BVLog.error(TM.FnName()+" recieved invalid value argument:"+str(value))
+        try:
+            returning = self.iFirstDataRow + list(self.VM_CategoryTable).index(value)
+        except ValueError:  # could not find value in VM_CategoryTable
+            BVLog.warning(TM.FnName()+" could not find value:"+str(value)+" in VM_CategoryTable")
+            returning = None
         return returning
 
     def AddRowHeaderColumn(self):
@@ -130,10 +152,11 @@ class CategoryTable(ModelTable):
             vDropdown.post(event.x_root, event.y_root)
         w.bind("<Button-3>", lambda event: ShowCategoryColHeaderMenu(event), add="+")
         # RowHeaders
-        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
-            category = self.vModel.Categories[category_name]
-            row = self.GetRowOfCategory(category_name)
-            w = WF.MakeEntry(self, (row, 0), text=category_name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
+        for category in self.VM_CategoryTable:
+            if not isinstance(category, BV.Model.Category):
+                continue
+            row = self.GetRowOfValue(category.name)
+            w = WF.MakeEntry(self, (row, 0), text=category.name, justify=tk.LEFT, bBold=True, bEditableState=False, background=vSkin.BG_ENTRY)
 
             def AssignCategoryType(category_type_name, category_):
                 category_.type = BV.Model.CategoryType.GetByName(category_type_name)

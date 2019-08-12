@@ -18,8 +18,6 @@ class BudgetedTable(CategoryTable):
         super().Refresh()
         self.AddBudgetedColumn()
         self.AddRowHeaderColumn()
-        self.AddSeparationLables()
-        return  # fix
         row = self.GetMaxRow() + 1
         # Black bar
         tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.GetMaxColumn()+1, sticky="ew")
@@ -34,9 +32,10 @@ class BudgetedTable(CategoryTable):
         WF.MakeHeader(self, (row, 1), text="Budgeted", background=vSkin.BG_BUDGETED)
         row += 1
         # Data
-        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
-            row = self.GetRowOfCategory(category_name)
-            category = self.vModel.Categories[category_name]
+        for category in self.VM_CategoryTable:
+            if not isinstance(category, BV.Model.Category):
+                continue
+            row = self.GetRowOfValue(category.name)
             w = WF.MakeEntry_ReadOnly(self, (row, 1), text=self.vModel.Budgeted.cCategoryTotalStreams[category.name], validation=BV.MakeValid_Money, display=BV.MakeValid_Money_ZeroIsNone)
             # Highlight
 

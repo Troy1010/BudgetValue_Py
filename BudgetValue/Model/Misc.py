@@ -3,6 +3,13 @@ import rx
 import TM_CommonPy as TM  # noqa
 
 
+class CollectionEditInfo():
+    def __init__(self, bAdd, key, value):
+        self.key = key
+        self.value = value
+        self.bAdd = bAdd
+
+
 class ValueAddPair():
     def __init__(self, bAdd, value):
         self.value = value
@@ -17,16 +24,16 @@ class Dict_ValueStream(dict):
     def __setitem__(self, key, value):
         # if we have an old value and it isn't the new value, remove old value
         if key in self and self[key] != value:
-            self._value_stream.on_next(ValueAddPair(False, self[key]))
+            self._value_stream.on_next(CollectionEditInfo(False, key, self[key]))
         # if new value isn't the old value, add that new value
         if (key not in self or self[key] != value):
-            self._value_stream.on_next(ValueAddPair(True, value))
+            self._value_stream.on_next(CollectionEditInfo(True, key, value))
         #
         super().__setitem__(key, value)
 
     def __delitem__(self, key):
         if key in self:
-            self._value_stream.on_next(ValueAddPair(False, self[key]))
+            self._value_stream.on_next(CollectionEditInfo(False, key, self[key]))
         super().__delitem__(key)
 
     def clear(self):
