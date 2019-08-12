@@ -14,7 +14,7 @@ class CategoryTable(ModelTable):
         self.iFirstDataColumn = 0
         self.iFirstDataRow = 1
         # Refresh when new values come in
-        vModel.TransactionHistory._merged_amountStream_stream.subscribe(lambda x: self.Refresh())
+        #vModel.TransactionHistory._merged_amountStream_stream.subscribe(lambda x: self.Refresh())
 
     def FinishRefresh(self):
         self.AddSeparationLables()
@@ -41,6 +41,18 @@ class CategoryTable(ModelTable):
                 w.config(height=height)
             row += 1
         #
+
+        def OnCategoryTotalStreamsAddOrRemove(value_add_pair):
+            print(TM.FnName()+" value_add_pair.value:"+str(value_add_pair.value))
+            if value_add_pair.bAdd:
+                w = tk.Frame(self)
+                w.grid(row=1, column=self.iFirstDataColumn)
+                w.config(height=height)
+            else:
+                self.grid_remove(row=1, column=self.iFirstDataColumn)
+
+        self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(OnCategoryTotalStreamsAddOrRemove)
+
         self.iFirstDataColumn += 1
 
     def AddSeparationLables(self, no_text=False):

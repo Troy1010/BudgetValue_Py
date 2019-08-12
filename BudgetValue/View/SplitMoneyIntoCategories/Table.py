@@ -92,4 +92,4 @@ class Table(CategoryTable):
 
     def AddCategoryToColumn(self, category, transaction):
         transaction.categoryAmounts.AddCategory(category)
-        self.Refresh()
+        # self.Refresh()

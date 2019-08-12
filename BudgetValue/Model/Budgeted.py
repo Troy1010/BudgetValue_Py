@@ -1,5 +1,6 @@
 import BudgetValue as BV
 import rx
+from .Misc import Dict_ValueStream
 
 
 class Budgeted():
@@ -8,7 +9,7 @@ class Budgeted():
         self.vModel = vModel
         # Determine cCategoryTotalStreams, total_stream
         self.total_stream = rx.subjects.BehaviorSubject(0)
-        self.cCategoryTotalStreams = {}
+        self.cCategoryTotalStreams = Dict_ValueStream()
         #
         self.cDisposables_CT = {}
         self.cDisposableCount_CT = {}
