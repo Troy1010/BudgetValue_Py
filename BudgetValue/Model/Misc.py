@@ -65,8 +65,8 @@ class List_ValueStream(list):
         super().remove(value)
 
     def append(self, value):
-        self._value_stream.on_next(ValueAddPair(True, value))
         super().append(value)
+        self._value_stream.on_next(ValueAddPair(True, value))
 
     def __delitem__(self, key):
         if hasattr(self[key], 'destroy'):

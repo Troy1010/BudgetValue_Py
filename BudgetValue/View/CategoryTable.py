@@ -8,6 +8,7 @@ from .Misc import ModelTable
 from Model.Misc import List_ValueStream
 from Model import CategoryType
 from .._Logger import BVLog
+from .._Logger import Log
 
 
 class SeparationLable():
@@ -68,6 +69,7 @@ class CategoryTable(ModelTable):
             self.VM_CategoryTable = ViewModel_CategoryTable(vModel)
 
     def Refresh(self):
+        print("CategoryTable.Refresh() called by "+TM.FnName(2))
         super().Refresh()
         # Add Separation Labels
         for item in self.VM_CategoryTable:
@@ -75,7 +77,7 @@ class CategoryTable(ModelTable):
                 text = " " if self.bNoSeparationLabelText else "  " + item.name
                 WF.MakeSeparationLabel(self, self.GetRowOfValue(item), text)
 
-    def AddSpacersForBudgeted(self):
+    def AddSpacersForVMCategoryTable(self):
         row = self.iFirstDataRow
         # Determine height
         # fix: There must be a better way to determine the right height..
@@ -85,25 +87,31 @@ class CategoryTable(ModelTable):
         height_widget.grid_forget()
         height_widget.destroy()
         # Data
+        self.iSpacerColumn = self.iFirstDataColumn
+        self.iFirstDataColumn += 1
         for category in self.VM_CategoryTable:
             if not isinstance(category, BV.Model.Category):
                 continue
             w = tk.Frame(self)
-            w.grid(row=self.GetRowOfValue(category), column=self.iFirstDataColumn)
+            w.grid(row=self.GetRowOfValue(category), column=self.iSpacerColumn)
             w.config(height=height)
         #
 
-        def OnCategoryTotalStreamsAddOrRemove(value_add_pair):
-            pass
-            # if value_add_pair.bAdd:
-            #     w = tk.Frame(self)
-            #     w.grid(row=self.GetRowOfCategory(value_add_pair.key), column=self.iFirstDataColumn)
-            #     w.config(height=height)
-            # else:
-            #     self.grid_remove(row=1, column=self.iFirstDataColumn)
-        self.cDisposables.append(self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(OnCategoryTotalStreamsAddOrRemove))
-
-        self.iFirstDataColumn += 1
+        def LinkSpacersToVMCategoryTable(value_add_pair):
+            if value_add_pair.bAdd:
+                w = tk.Frame(self)
+                w.grid(row=self.GetRowOfValue(value_add_pair.value), column=self.iSpacerColumn)
+                w.config(height=height)
+            else:
+                cell_to_remove = self.GetCell(self.GetRowOfValue(value_add_pair.value), self.iSpacerColumn)
+                if cell_to_remove is None:
+                    BVLog.error(TM.FnName()+" cell_to_remove was None. row:"+str(self.GetRowOfValue(value_add_pair.value))+" col:"+str(self.iSpacerColumn))
+                    print("VM_CategoryTable")
+                    for x in self.VM_CategoryTable:
+                        print("   "+x.name)
+                assert cell_to_remove is not None
+                cell_to_remove.grid_remove()
+        self.cDisposables.append(self.VM_CategoryTable._value_stream.subscribe(LinkSpacersToVMCategoryTable))
 
     def GetCategoryOfRow(self, row):
         return self.VM_CategoryTable[(row-self.iFirstDataRow)]
@@ -118,8 +126,9 @@ class CategoryTable(ModelTable):
         try:
             returning = self.iFirstDataRow + list(self.VM_CategoryTable).index(value)
         except ValueError:  # could not find value in VM_CategoryTable
-            BVLog.warning(TM.FnName()+" could not find value:"+str(value)+" in VM_CategoryTable")
+            BVLog.warning(TM.FnName()+" could not find value:"+str(value)+" by name:"+("<NoName>" if not hasattr(value, 'name') else value.name)+" in VM_CategoryTable.")
             returning = None
+        Log(TM.FnName()+". value:"+str(value)+" value_name:" + ("<NoName>" if not hasattr(value, 'name') else value.name)+" row:"+str(returning))
         return returning
 
     def AddRowHeaderColumn(self):
@@ -136,12 +145,8 @@ class CategoryTable(ModelTable):
                                         )
             ))
 
-            def RemoveCategory(category):  # fix: I should rx this
+            def RemoveCategory(category):
                 self.vModel.Categories.RemoveCategory(category)
-                if hasattr(self, "RefreshParent"):
-                    self.RefreshParent()
-                else:
-                    self.Refresh()
             vDropdown.add_command(label="Remove Category", command=lambda x=event.x_root-self.winfo_toplevel().winfo_rootx(), y=event.y_root-self.winfo_toplevel().winfo_rooty(): (
                 BV.View.Popup_SelectFromList(self.winfo_toplevel(),
                                              RemoveCategory,
@@ -160,17 +165,10 @@ class CategoryTable(ModelTable):
 
             def AssignCategoryType(category_type_name, category_):
                 category_.type = BV.Model.CategoryType.GetByName(category_type_name)
-                if hasattr(self, "RefreshParent"):
-                    self.RefreshParent()
-                else:
-                    self.Refresh()
 
             def RemoveCategory(category_name):  # fix: I should rx this
+                print("Removing:"+category_name)
                 self.vModel.Categories.RemoveCategory(category_name)
-                if hasattr(self, "RefreshParent"):
-                    self.RefreshParent()
-                else:
-                    self.Refresh()
 
             def ShowCategoryCellMenu(event, category_):
                 vDropdown = tk.Menu(tearoff=False)

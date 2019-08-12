@@ -11,7 +11,7 @@ from ..CategoryTable import CategoryTable
 class Table(CategoryTable):
     def Refresh(self):
         super().Refresh()
-        self.AddSpacersForBudgeted()
+        self.AddSpacersForVMCategoryTable()
         # Column Header
         for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
             vColumnHeader = WF.MakeLable(self, (0, column), text=income_transaction.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
@@ -63,14 +63,12 @@ class Table(CategoryTable):
             if self.vModel.Categories.savings.name in event.widget.transaction.categoryAmounts.keys():
                 balance_amount += event.widget.transaction.categoryAmounts[self.vModel.Categories.savings.name].amount
             event.widget.transaction.categoryAmounts.AddCategory(self.vModel.Categories.savings, amount=balance_amount)
-            self.Refresh()
         vDropdown.add_command(label="Implement Paycheck Plan", command=lambda: ImplementPlan(self))
         vDropdown.post(event.x_root, event.y_root)
 
     def RemoveCell(self, cell):
         iColumn = cell.column - self.iFirstDataColumn
         self.vModel.TransactionHistory.GetIncome()[iColumn].categoryAmounts.RemoveCategory(cell.category_name)
-        self.Refresh()
 
     def GetTransactionOfColumn(self, iColumn):
         header = self.GetCell(0, iColumn)
@@ -79,7 +77,6 @@ class Table(CategoryTable):
 
     def ForgetTransaction(self, transaction):
         self.vModel.TransactionHistory.RemoveTransaction(transaction)
-        self.Refresh()
 
     def GetAddableCategories(self, iColumn):
         iColumn -= self.iFirstDataColumn
@@ -91,4 +88,3 @@ class Table(CategoryTable):
 
     def AddCategoryToColumn(self, category, transaction):
         transaction.categoryAmounts.AddCategory(category)
-        # self.Refresh()

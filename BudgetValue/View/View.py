@@ -44,6 +44,8 @@ class View(tk.Tk):
             frame.grid(row=0, sticky="nsew")
 
         self.vTabBar.ShowTab(self.vLastShownTab)
+        print("View init complete")
+        Log("View init complete")
 
     def Save(self):
         data = {"LastShownTab": self.vLastShownTab}
