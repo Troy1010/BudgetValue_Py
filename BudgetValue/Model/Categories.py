@@ -25,7 +25,7 @@ class CategoryType(AutoName):
 
     def GetIndex(type_):
         for i, category_type in enumerate(CategoryType):
-            if type_ == category_type:
+            if type_.name == category_type.name:  # fix: shouldn't compare names
                 return i
         return -1
 

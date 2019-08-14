@@ -12,48 +12,70 @@ from .._Logger import Log
 
 
 class SeparationLable():
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, type_):
+        self.type = type_
+        self.name = type_.name
 
 
 class ViewModel_CategoryTable(List_ValueStream):
+    count = 0
 
     def __init__(self, vModel, *args, **kwargs):
+        assert ViewModel_CategoryTable.count <= 1  # ViewModel_CategoryTable should be a singleton
+        ViewModel_CategoryTable.count += 1
         super().__init__()
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
-        for category_name in vModel.Budgeted.cCategoryTotalStreams.keys():
-            self.append(self.vModel.Categories[category_name])
-        self.Format()
-        # if an item of vModel.Budgeted.cCategoryTotalStreams is created or destroyed, update self
+        # stream SeparationLabels
 
-        def OnNewCategoryTotalStreamValueAddPair(self, collection_edit_info):
-            if collection_edit_info.bAdd:
-                self.append(self.vModel.Categories[collection_edit_info.key])
+        def AddOrRemoveSeparationLabels(edit_info):
+            if edit_info.bAdd:
+                # If I am a new type, insert my SeparationLabel
+                if edit_info.value.type not in [(x.type if edit_info.value != x else None) for x in self]:
+                    self.SortedInsert(SeparationLable(edit_info.value.type))
             else:
-                self.remove(self.vModel.Categories[collection_edit_info.key])
-            self.Format()
-        vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(lambda category_name: OnNewCategoryTotalStreamValueAddPair(self, category_name))
+                # If I was the last of my category, remove my SeparationLabel
+                for item in self:
+                    if edit_info.value == item or isinstance(item, SeparationLable):
+                        continue
+                    if edit_info.value.type == item.type:
+                        break
+                else:
+                    assert self[self.index(edit_info.value) - 1].name.lower() == edit_info.value.type.name.lower()
+                    del self[self.index(edit_info.value) - 1]
+        self._value_stream.subscribe(AddOrRemoveSeparationLabels)
+        # bring in current values from vModel.Budgeted.cCategoryTotalStreams
+        for category_name in vModel.Budgeted.cCategoryTotalStreams.keys():
+            self.SortedInsert(self.vModel.Categories[category_name])
+        # stream in values from vModel.Budgeted.cCategoryTotalStreams
 
-    def Format(self):
-        # remove all SeparationLabels
-        items_to_delete = []
-        for item in self:
-            if not isinstance(item, BV.Model.Category):
-                items_to_delete.append(item)
-        for item in items_to_delete:
-            self.remove(item)
-        # sort
-        self.sort(key=lambda item: CategoryType.GetIndex(item.type))
-        # add SeparationLabels
-        prev_type = None
-        i = 0
-        for category in list(self):
-            if prev_type != category.type:
-                self.insert(i, SeparationLable(category.type.name.capitalize()))
-                prev_type = category.type
-                i += 1
-            i += 1
+        def OnNewCategoryTotalStreamValue(self, collection_edit_info):
+            category_added_or_removed = self.vModel.Categories[collection_edit_info.key]
+            if collection_edit_info.bAdd:
+                self.SortedInsert(category_added_or_removed)
+            else:
+                self.remove(category_added_or_removed)
+        vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(lambda category_name: OnNewCategoryTotalStreamValue(self, category_name))
+
+    def get_sort_key(self, value):
+        type_index = CategoryType.GetIndex(value.type)
+        bSeparationLabel = not isinstance(value, SeparationLable)
+        return (type_index, bSeparationLabel, value.name)
+
+    def SortedInsert(self, value):
+        # determine insertion_index
+        sort_tuple = self.get_sort_key(value)
+        for i, item in enumerate(self):
+            if sort_tuple < self.get_sort_key(item):
+                insertion_index = i
+                break
+        else:
+            insertion_index = -1
+        # insert at insertion_index
+        if insertion_index == -1:
+            self.append(value)
+        else:
+            self.insert(insertion_index, value)
 
 
 class CategoryTable(ModelTable):
@@ -64,17 +86,28 @@ class CategoryTable(ModelTable):
         self.iFirstDataColumn = 0
         self.iFirstDataRow = 2
         self.bNoSeparationLabelText = bNoSeparationLabelText
-        #
-        if self.VM_CategoryTable is None:
-            self.VM_CategoryTable = ViewModel_CategoryTable(vModel)
+        # instantiate ViewModel_CategoryTable
+        if CategoryTable.VM_CategoryTable is None:
+            CategoryTable.VM_CategoryTable = ViewModel_CategoryTable(vModel)
+        # LinkSeparationLabelsToVMCategoryTable
+
+        def LinkSeparationLabelsToVMCategoryTable(value_add_pair):
+            if isinstance(value_add_pair.value, SeparationLable):
+                row = self.GetRowOfValue(value_add_pair.value)
+                if value_add_pair.bAdd:
+                    self.InsertRow(row)
+                    text = " " if self.bNoSeparationLabelText else "  " + value_add_pair.value.type.name.capitalize()
+                    WF.MakeSeparationLabel(self, row, text)
+                else:
+                    self.UninsertRow(row)
+        self.VM_CategoryTable._value_stream.subscribe(LinkSeparationLabelsToVMCategoryTable)
 
     def Refresh(self):
-        print("CategoryTable.Refresh() called by "+TM.FnName(2))
         super().Refresh()
         # Add Separation Labels
         for item in self.VM_CategoryTable:
             if isinstance(item, SeparationLable):
-                text = " " if self.bNoSeparationLabelText else "  " + item.name
+                text = " " if self.bNoSeparationLabelText else "  " + item.type.name.capitalize()
                 WF.MakeSeparationLabel(self, self.GetRowOfValue(item), text)
 
     def AddSpacersForVMCategoryTable(self):
@@ -89,28 +122,21 @@ class CategoryTable(ModelTable):
         # Data
         self.iSpacerColumn = self.iFirstDataColumn
         self.iFirstDataColumn += 1
-        for category in self.VM_CategoryTable:
-            if not isinstance(category, BV.Model.Category):
-                continue
-            w = tk.Frame(self)
-            w.grid(row=self.GetRowOfValue(category), column=self.iSpacerColumn)
-            w.config(height=height)
+        for item in self.VM_CategoryTable:
+            if isinstance(item, BV.Model.Category):
+                w = tk.Frame(self)
+                w.grid(row=self.GetRowOfValue(item), column=self.iSpacerColumn)
+                w.config(height=height)
         #
 
         def LinkSpacersToVMCategoryTable(value_add_pair):
-            if value_add_pair.bAdd:
-                w = tk.Frame(self)
-                w.grid(row=self.GetRowOfValue(value_add_pair.value), column=self.iSpacerColumn)
-                w.config(height=height)
-            else:
-                cell_to_remove = self.GetCell(self.GetRowOfValue(value_add_pair.value), self.iSpacerColumn)
-                if cell_to_remove is None:
-                    BVLog.error(TM.FnName()+" cell_to_remove was None. row:"+str(self.GetRowOfValue(value_add_pair.value))+" col:"+str(self.iSpacerColumn))
-                    print("VM_CategoryTable")
-                    for x in self.VM_CategoryTable:
-                        print("   "+x.name)
-                assert cell_to_remove is not None
-                cell_to_remove.grid_remove()
+            if isinstance(value_add_pair.value, BV.Model.Category):
+                if value_add_pair.bAdd:
+                    w = tk.Frame(self)
+                    w.grid(row=self.GetRowOfValue(value_add_pair.value), column=self.iSpacerColumn)
+                    w.config(height=height)
+                else:
+                    self.UninsertRow(self.GetRowOfValue(value_add_pair.value))
         self.cDisposables.append(self.VM_CategoryTable._value_stream.subscribe(LinkSpacersToVMCategoryTable))
 
     def GetCategoryOfRow(self, row):

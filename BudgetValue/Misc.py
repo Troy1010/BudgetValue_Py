@@ -1,6 +1,6 @@
 import decimal
 from decimal import Decimal
-from ._Logger import BVLog
+from ._Logger import BVLog  # noqa
 from ._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
 from datetime import datetime
@@ -18,10 +18,6 @@ def ValidateTimestamp(timestamp):
 
 def DisplayTimestamp(timestamp):
     return timestamp.strftime('%Y-%m-%d %H:%M')
-
-
-def Hello():
-    BVLog.debug("Hello")
 
 
 def GetAllChildren(vItem, bIncludeRoot=False):

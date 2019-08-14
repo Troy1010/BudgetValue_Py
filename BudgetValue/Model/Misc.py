@@ -55,14 +55,18 @@ class List_ValueStream(list):
             if hasattr(self[key], 'destroy'):
                 self[key].destroy()
             self._value_stream.on_next(ValueAddPair(False, self[key]))
-        self._value_stream.on_next(ValueAddPair(True, value))
         super().__setitem__(key, value)
+        self._value_stream.on_next(ValueAddPair(True, value))
 
     def remove(self, value):
         if hasattr(value, 'destroy'):
             value.destroy()
         self._value_stream.on_next(ValueAddPair(False, value))
         super().remove(value)
+
+    def insert(self, index, value):
+        super().insert(index, value)
+        self._value_stream.on_next(ValueAddPair(True, value))
 
     def append(self, value):
         super().append(value)
