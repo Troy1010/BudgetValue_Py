@@ -135,7 +135,7 @@ class Categories(Dict_ValueStream):
 
     def AddCategory(self, name, type_=None, bFavorite=False):
         if name in self.keys():
-            BVLog.warning("WARNING: categoryName:"+name+" already exists")
+            BVLog.warning("WARNING: category_name:"+name+" already exists")
             return
         self[name] = Category(name, type_=type_, bFavorite=bFavorite)
 

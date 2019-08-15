@@ -89,5 +89,5 @@ class Table(CategoryTable):
         self.vModel.PaycheckPlan[category.name].amount = amountText
 
     def GetCategoryOfRow(self, row):
-        categoryName = self.GetCell(row, 0).text
-        return self.vModel.Categories[categoryName]
+        category_name = self.GetCell(row, 0).text
+        return self.vModel.Categories[category_name]

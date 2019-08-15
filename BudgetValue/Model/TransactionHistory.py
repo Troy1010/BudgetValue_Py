@@ -273,7 +273,7 @@ class Transaction():
         return {'amount': self.amount,
                 'timestamp': self.timestamp,
                 'description': self.description,
-                'categoryAmounts': {categoryName: y.amount for (categoryName, y) in self.categoryAmounts.items()},
+                'categoryAmounts': {category_name: y.amount for (category_name, y) in self.categoryAmounts.items()},
                 'bSpend': self.bSpend
                 }
 
@@ -283,10 +283,10 @@ class Transaction():
         self.description = vSavable['description']
         if 'bSpend' in vSavable:
             self.bSpend = vSavable['bSpend']
-        for categoryName, amount in vSavable['categoryAmounts'].items():
-            if categoryName not in self.vModel.Categories:  # fix: should not exist
+        for category_name, amount in vSavable['categoryAmounts'].items():
+            if category_name not in self.vModel.Categories:  # fix: should not exist
                 continue
-            self.categoryAmounts.AddCategory(self.vModel.Categories[categoryName], amount)
+            self.categoryAmounts.AddCategory(self.vModel.Categories[category_name], amount)
 
 
 class CategoryAmounts(Misc.Dict_TotalStream):
@@ -316,7 +316,7 @@ class CategoryAmounts(Misc.Dict_TotalStream):
                 category_summary = Categories.default_category.name
             elif len(self) + length_adjustment == 1:
                 if length_adjustment == 1:
-                    category_summary = amountStreamInfo.categoryName
+                    category_summary = amountStreamInfo.category_name
                 else:
                     category_summary = list(self.values())[0].category.name
             else:

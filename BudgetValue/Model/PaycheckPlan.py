@@ -37,13 +37,13 @@ class PaycheckPlan(Misc.Dict_TotalStream):
 
     def Save(self):
         data = dict()
-        for categoryName, paycheck_plan_row in dict(self).items():
+        for category_name, paycheck_plan_row in dict(self).items():
             if isinstance(paycheck_plan_row, Misc.BalanceEntry):
                 continue
             category_plan_storable = dict()
             category_plan_storable['amount'] = paycheck_plan_row.amount
             category_plan_storable['period'] = paycheck_plan_row.period
-            data[categoryName] = category_plan_storable
+            data[category_name] = category_plan_storable
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -54,12 +54,12 @@ class PaycheckPlan(Misc.Dict_TotalStream):
             data = pickle.load(f)
         if not data:
             return
-        for categoryName, categoryPlan in data.items():
-            if categoryName not in self.vModel.Categories.keys():
+        for category_name, categoryPlan in data.items():
+            if category_name not in self.vModel.Categories.keys():
                 continue
-            self[categoryName] = PaycheckPlanRow()
+            self[category_name] = PaycheckPlanRow()
             for k, v in categoryPlan.items():
-                setattr(self[categoryName], k, v)
+                setattr(self[category_name], k, v)
 
 
 class PaycheckPlanRow():

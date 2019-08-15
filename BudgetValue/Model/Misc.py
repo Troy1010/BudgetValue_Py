@@ -95,11 +95,11 @@ def GetDiffStream(stream):
 
 
 class StreamInfo():
-    def __init__(self, bAdd, stream, categoryName=None):
+    def __init__(self, bAdd, stream, category_name=None):
         self.bAdd = bAdd
         self.stream = stream
         self.diff_stream = stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).publish().ref_count()
-        self.categoryName = categoryName
+        self.category_name = category_name
 
 
 class Dict_AmountStreamStream(dict):
@@ -165,9 +165,9 @@ class List_AmountStreamStream(list):
 
 
 class DiffStreamCategoryNamePair():
-    def __init__(self, diffStream, categoryName):
+    def __init__(self, diffStream, category_name):
         self.diffStream = diffStream
-        self.categoryName = categoryName
+        self.category_name = category_name
 
 
 class DiffStreams_Inheritable():
@@ -177,7 +177,7 @@ class DiffStreams_Inheritable():
         def __AccumulateDiffStreams(accumulator, value):
             assert(isinstance(value, StreamInfo))
             if value.bAdd:
-                accumulator[value.stream] = DiffStreamCategoryNamePair(value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]), value.categoryName)
+                accumulator[value.stream] = DiffStreamCategoryNamePair(value.stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]), value.category_name)
             else:
                 if value.stream in accumulator:
                     del accumulator[value.stream]
@@ -202,13 +202,13 @@ class CategoryTotalStreams_Inheritable():
 
         # Determine cCategoryTotalStreams
         self.cCategoryTotalStreams = dict()
-        for categoryName in self.vModel.Categories.keys():
-            self.cCategoryTotalStreams[categoryName] = rx.subjects.BehaviorSubject(0)
+        for category_name in self.vModel.Categories.keys():
+            self.cCategoryTotalStreams[category_name] = rx.subjects.BehaviorSubject(0)
         # stream updates to cCategoryTotalStreams
-        for categoryName, categoryTotal_stream in self.cCategoryTotalStreams.items():
+        for category_name, categoryTotal_stream in self.cCategoryTotalStreams.items():
             self._diffStreamCollection_stream.map(  # getting dict of amountStreams:diffStreamCategoryNamePair
-                lambda cAmountToDiffStreamCategoryNamePair, categoryName=categoryName: (
-                    {k: v for k, v in cAmountToDiffStreamCategoryNamePair.items() if v.categoryName == categoryName}
+                lambda cAmountToDiffStreamCategoryNamePair, category_name=category_name: (
+                    {k: v for k, v in cAmountToDiffStreamCategoryNamePair.items() if v.category_name == category_name}
                 )
             ).map(  # getting dict of amountStreams:diffStreamCategoryNamePair for only this category
                 lambda cAmountToDiffStreamCategoryNamePair: [x.diffStream for x in cAmountToDiffStreamCategoryNamePair.values()]
