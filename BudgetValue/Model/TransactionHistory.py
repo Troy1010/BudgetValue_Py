@@ -212,7 +212,7 @@ class Transaction():
         self.vModel = vModel
         # non-derivative data
         self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.timestamp_stream = rx.subjects.BehaviorSubject(time.time())
+        self.timestamp_stream = rx.subjects.BehaviorSubject(None)
         self.description_stream = rx.subjects.BehaviorSubject("")
         self.categoryAmounts = CategoryAmounts(vModel, self)
         self.bSpend = bSpend
