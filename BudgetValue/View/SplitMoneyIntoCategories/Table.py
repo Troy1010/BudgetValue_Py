@@ -9,6 +9,27 @@ from ..CategoryTable import CategoryTable
 
 
 class Table(CategoryTable):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # bind income_transactions M->V
+
+        def GetTransactionIndex(categoryAmounts):  # fix: should just stream the transaction
+            for i, x in enumerate(self.vModel.TransactionHistory):
+                if id(x.categoryAmounts) == id(categoryAmounts):
+                    return i
+            else:
+                return None
+
+        def BindIncomeTransactions(col_edit):
+            assert isinstance(col_edit, BV.Model.Misc.StreamInfo)
+            transaction_index = GetTransactionIndex(col_edit.parent_collection)
+            category_name = col_edit.category_name
+            if not col_edit.bAdd:
+                self.vModel.TransactionHistory[transaction_index].categoryAmounts.RemoveCategory(category_name)
+            else:
+                pass
+        self.vModel.TransactionHistory._merged_amountStream_stream.subscribe(BindIncomeTransactions)
+
     def Refresh(self):
         super().Refresh()
         self.AddSpacersForVMCategoryTable()
@@ -19,22 +40,25 @@ class Table(CategoryTable):
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
         # Data
         for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
-            for category_name in income_transaction.categoryAmounts.GetAll():
-                category = self.vModel.Categories[category_name]
-                row = self.GetRowOfValue(category_name)
-                background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
-                bEditableState = category != Categories.default_category
-                w = WF.MakeEntry(self,
-                                 (row, column),
-                                 text=income_transaction.categoryAmounts.GetAll()[category_name].amount_stream,  # fix: is GetAll necessary?
-                                 bEditableState=bEditableState,
-                                 background=background,
-                                 validation=BV.MakeValid_Money,
-                                 display=BV.MakeValid_Money_ZeroIsNone
-                                 )
-                w.category_name = category_name
-                if bEditableState:
-                    w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+            self.MakeEntry(income_transaction, column)
+
+    def MakeEntry(self, transaction, column):
+        for category_name in transaction.categoryAmounts.GetAll():
+            category = self.vModel.Categories[category_name]
+            row = self.GetRowOfValue(category_name)
+            background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
+            bEditableState = category != Categories.default_category
+            w = WF.MakeEntry(self,
+                             (row, column),
+                             text=transaction.categoryAmounts.GetAll()[category_name].amount_stream,  # fix: is GetAll necessary?
+                             bEditableState=bEditableState,
+                             background=background,
+                             validation=BV.MakeValid_Money,
+                             display=BV.MakeValid_Money_ZeroIsNone
+                             )
+            w.category_name = category_name
+            if bEditableState:
+                w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)

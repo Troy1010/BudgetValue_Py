@@ -95,11 +95,12 @@ def GetDiffStream(stream):
 
 
 class StreamInfo():
-    def __init__(self, bAdd, stream, category_name=None):
+    def __init__(self, bAdd, stream, category_name=None, parent_collection=None):
         self.bAdd = bAdd
         self.stream = stream
         self.diff_stream = stream.distinct_until_changed().pairwise().map(lambda cOldNewPair: cOldNewPair[1]-cOldNewPair[0]).publish().ref_count()
         self.category_name = category_name
+        self.parent_collection = parent_collection
 
 
 class Dict_AmountStreamStream(dict):
@@ -111,16 +112,16 @@ class Dict_AmountStreamStream(dict):
         # if we have an old value and it isn't the new value, remove old value
         if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
             self[key].amount_stream.on_next(0)
-            self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key))
+            self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key, self))
         # if new value isn't the old value and new value isn't a BalanceEntry, add that new value
         if hasattr(value, 'amount_stream') and (key not in self or self[key] != value) and not isinstance(value, BalanceEntry):
-            self._amountStream_stream.on_next(StreamInfo(True, value.amount_stream, key))
+            self._amountStream_stream.on_next(StreamInfo(True, value.amount_stream, key, self))
         super().__setitem__(key, value)
 
     def __delitem__(self, key):
         if key in self and hasattr(self[key], 'amount_stream'):
             self[key].amount_stream.on_next(0)
-            self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key))
+            self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key, self))
         super().__delitem__(key)
 
     def clear(self):
