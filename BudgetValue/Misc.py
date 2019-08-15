@@ -10,14 +10,17 @@ import time  # noqa
 def ValidateTimestamp(timestamp):
     if isinstance(timestamp, str):
         return datetime.strptime(timestamp, '%Y-%m-%d %H:%M')
-    elif isinstance(timestamp, datetime):
+    elif isinstance(timestamp, datetime) or timestamp is None:
         return timestamp
     else:
         return datetime.fromtimestamp(timestamp)
 
 
 def DisplayTimestamp(timestamp):
-    return timestamp.strftime('%Y-%m-%d %H:%M')
+    if timestamp is None:
+        return "<no timestamp>"
+    else:
+        return timestamp.strftime('%Y-%m-%d %H:%M')
 
 
 def GetAllChildren(vItem, bIncludeRoot=False):
