@@ -26,7 +26,7 @@ class ViewModel_CategoryTable(List_ValueStream):
         super().__init__()
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
-        # stream SeparationLabels
+        # SeparationLabels M -> VM
 
         def AddOrRemoveSeparationLabels(edit_info):
             if edit_info.bAdd:
@@ -89,7 +89,7 @@ class CategoryTable(ModelTable):
         # instantiate ViewModel_CategoryTable
         if CategoryTable.VM_CategoryTable is None:
             CategoryTable.VM_CategoryTable = ViewModel_CategoryTable(vModel)
-        # LinkSeparationLabelsToVMCategoryTable
+        # SeparationLabels VM -> V
 
         def LinkSeparationLabelsToVMCategoryTable(value_add_pair):
             if isinstance(value_add_pair.value, SeparationLable):
@@ -104,7 +104,7 @@ class CategoryTable(ModelTable):
 
     def Refresh(self):
         super().Refresh()
-        # Add Separation Labels
+        # Refresh Separation Labels
         for item in self.VM_CategoryTable:
             if isinstance(item, SeparationLable):
                 text = " " if self.bNoSeparationLabelText else "  " + item.type.name.capitalize()
