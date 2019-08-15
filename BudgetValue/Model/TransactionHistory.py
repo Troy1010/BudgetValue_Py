@@ -259,6 +259,8 @@ class Transaction():
 
     @timestamp.setter
     def timestamp(self, value):
+        if not (isinstance(value, datetime) or value is None):
+            raise Exception("timestamp set to invalid value")
         self.timestamp_stream.on_next(value)
 
     @property
