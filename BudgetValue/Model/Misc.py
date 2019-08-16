@@ -113,10 +113,12 @@ class Dict_AmountStreamStream(dict):
         if key in self and hasattr(self[key], 'amount_stream') and self[key] != value:
             self[key].amount_stream.on_next(0)
             self._amountStream_stream.on_next(StreamInfo(False, self[key].amount_stream, key, self))
-        # if new value isn't the old value and new value isn't a BalanceEntry, add that new value
-        if hasattr(value, 'amount_stream') and (key not in self or self[key] != value) and not isinstance(value, BalanceEntry):
-            self._amountStream_stream.on_next(StreamInfo(True, value.amount_stream, key, self))
+        #
+        bNewValueIsOldValue = key in self and self[key] == value
         super().__setitem__(key, value)
+        # if new value isn't the old value and new value isn't a BalanceEntry, add that new value
+        if hasattr(value, 'amount_stream') and not bNewValueIsOldValue and not isinstance(value, BalanceEntry):
+            self._amountStream_stream.on_next(StreamInfo(True, value.amount_stream, key, self))
 
     def __delitem__(self, key):
         if key in self and hasattr(self[key], 'amount_stream'):
