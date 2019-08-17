@@ -13,52 +13,56 @@ class Table(CategoryTable):
         super().__init__(*args, **kwargs)
         # bind income_transactions M->V
 
-        def GetTransactionIndex(categoryAmounts):  # fix: should just stream the transaction
-            for i, x in enumerate(self.vModel.TransactionHistory):
+        def GetColumnOfCategoryAmounts(categoryAmounts):  # fix: should just stream the transaction
+            for i, x in enumerate(self.vModel.TransactionHistory.Iter_Income()):
                 if id(x.categoryAmounts) == id(categoryAmounts):
-                    return i
+                    return i + self.iFirstDataColumn
             else:
                 return None
 
-        def BindIncomeTransactions(col_edit):
+        def M_to_V_IncomeTransactions(col_edit):
             assert isinstance(col_edit, BV.Model.Misc.StreamInfo)
-            transaction_index = GetTransactionIndex(col_edit.parent_collection)
-            category_name = col_edit.category_name
-            if not col_edit.bAdd:
-                self.vModel.TransactionHistory[transaction_index].categoryAmounts.RemoveCategory(category_name)
+            column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
+            if col_edit.bAdd:
+                transaction = self.GetTransactionOfColumn(column)
+                assert isinstance(transaction, BV.Model.Transaction)
+                self.MakeTransactionEntry(transaction, col_edit.category_name, column)
             else:
-                pass
-        self.vModel.TransactionHistory._merged_amountStream_stream.subscribe(BindIncomeTransactions)
+                row = self.GetRowOfVMValue(col_edit.category_name)
+                if row is None:
+                    pass  # cell has been removed by VM_CategoryTable
+                else:
+                    cell = self.GetCell(row, column)
+                    cell.grid_forget()
+                    cell.destroy()
+        self.vModel.TransactionHistory._merged_amountStream_stream.subscribe(M_to_V_IncomeTransactions)
 
     def Refresh(self):
         super().Refresh()
-        self.AddSpacersForVMCategoryTable()
-        # Column Header
+        # Refresh Transactions
         for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
             vColumnHeader = WF.MakeLable(self, (0, column), text=income_transaction.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
             vColumnHeader.transaction = income_transaction  # for GetTransactionOfColumn
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
-        # Data
-        for column, income_transaction in enumerate(self.vModel.TransactionHistory.Iter_Income(), self.iFirstDataColumn):
-            self.MakeEntry(income_transaction, column)
+            for category_name in income_transaction.categoryAmounts.GetAll():
+                self.MakeTransactionEntry(income_transaction, category_name, column)
 
-    def MakeEntry(self, transaction, column):
-        for category_name in transaction.categoryAmounts.GetAll():
-            category = self.vModel.Categories[category_name]
-            row = self.GetRowOfValue(category_name)
-            background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
-            bEditableState = category != Categories.default_category
-            w = WF.MakeEntry(self,
-                             (row, column),
-                             text=transaction.categoryAmounts.GetAll()[category_name].amount_stream,  # fix: is GetAll necessary?
-                             bEditableState=bEditableState,
-                             background=background,
-                             validation=BV.MakeValid_Money,
-                             display=BV.MakeValid_Money_ZeroIsNone
-                             )
-            w.category_name = category_name
-            if bEditableState:
-                w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
+    def MakeTransactionEntry(self, transaction, category_name, column):
+        category = self.vModel.Categories[category_name]
+        row = self.GetRowOfVMValue(category_name)
+        background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
+        bEditableState = category != Categories.default_category
+        w = WF.MakeEntry(self,
+                         (row, column),
+                         text=transaction.categoryAmounts.GetAll()[category_name].amount_stream,
+                         bEditableState=bEditableState,
+                         background=background,
+                         validation=BV.MakeValid_Money,
+                         display=BV.MakeValid_Money_ZeroIsNone
+                         )
+        w.category_name = category_name
+        if bEditableState:
+            w.bind("<Button-3>", lambda event: self.ShowCellMenu(event), add="+")
 
     def ShowCellMenu(self, event):
         vDropdown = tk.Menu(tearoff=False)

@@ -4,8 +4,8 @@ import TM_CommonPy as TM  # noqa
 from .Table import Table  # noqa
 import BudgetValue as BV
 from .. import WidgetFactories as WF
-from ..BudgetedTable import BudgetedTable  # noqa
 from ..Popup_InputAmount import Popup_InputAmount  # noqa
+from ..CategoryTable import CategoryTable
 
 
 class SpendHistory(tk.Frame):
@@ -26,7 +26,7 @@ class SpendHistory(tk.Frame):
         # BudgetedTable
         self.vBTCanvas = tk.Canvas(self.vFrameOfTables, highlightthickness=0)
         self.vBTCanvas.pack(side=tk.LEFT, fill='x', anchor='nw')
-        self.vBTTable = BudgetedTable(self.vBTCanvas, vModel)
+        self.vBTTable = CategoryTable(self.vBTCanvas, vModel)
         self.vBTCanvas.create_window((0, 0), window=self.vBTTable, anchor='nw')
         self.vBTTable.pack(anchor='nw')
         self.vBTTable.Refresh()

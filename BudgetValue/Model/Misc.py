@@ -25,11 +25,12 @@ class Dict_ValueStream(dict):
         # if we have an old value and it isn't the new value, remove old value
         if key in self and self[key] != value:
             self._value_stream.on_next(CollectionEditInfo(False, key, self[key]))
-        # if new value isn't the old value, add that new value
-        if (key not in self or self[key] != value):
-            self._value_stream.on_next(CollectionEditInfo(True, key, value))
         #
+        bNewValueIsOldValue = key in self and self[key] == value
         super().__setitem__(key, value)
+        # if new value isn't the old value, add that new value
+        if not bNewValueIsOldValue:
+            self._value_stream.on_next(CollectionEditInfo(True, key, value))
 
     def __delitem__(self, key):
         if key in self:

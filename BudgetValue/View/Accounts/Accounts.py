@@ -1,9 +1,9 @@
 import tkinter as tk
 from .AccountsTable import AccountsTable
 import BudgetValue as BV
-from ..BudgetedTable import BudgetedTable
 from .Difference import Difference
 from .. import WidgetFactories as WF
+from ..CategoryTable import CategoryTable
 
 
 class Accounts(tk.Frame):
@@ -25,7 +25,7 @@ class Accounts(tk.Frame):
         # BudgetedTable
         self.vBudgetedTableCanvas = tk.Canvas(self.vFrameOfTables, highlightthickness=0)
         self.vBudgetedTableCanvas.pack(side=tk.LEFT, anchor='nw')
-        self.vBudgetedTable = BudgetedTable(self.vBudgetedTableCanvas, vModel)
+        self.vBudgetedTable = CategoryTable(self.vBudgetedTableCanvas, vModel)
         self.vBudgetedTableCanvas.create_window((0, 0), window=self.vBudgetedTable, anchor='nw')
         self.vBudgetedTable.pack(anchor='nw')
         self.vBudgetedTable.Refresh()

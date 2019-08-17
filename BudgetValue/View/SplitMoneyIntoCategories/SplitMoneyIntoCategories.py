@@ -11,7 +11,7 @@ from .. import WidgetFactories as WF
 from ..Skin import vSkin
 from ...Model.Categories import Categories  # noqa
 from ..Popup_InputAmount import Popup_InputAmount
-from .. import BudgetedTable
+from ..CategoryTable import CategoryTable
 
 
 class SplitMoneyIntoCategories(tk.Frame):
@@ -57,7 +57,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         # Row Header Canvas
         self.vRowHeaderCanvas = tk.Canvas(self.vScrollbarFrame, highlightthickness=0)
         self.vRowHeaderCanvas.grid(row=1, column=0, sticky="NSEW")
-        self.vRowHeaderTable = BudgetedTable.BudgetedTable(self.vRowHeaderCanvas, vModel)
+        self.vRowHeaderTable = CategoryTable(self.vRowHeaderCanvas, vModel)
         self.vRowHeaderCanvas.create_window((0, 0), window=self.vRowHeaderTable, anchor='nw')
         self.vRowHeaderTable.Refresh()
         self.vRowHeaderTable.RefreshParent = self.Refresh
@@ -68,7 +68,7 @@ class SplitMoneyIntoCategories(tk.Frame):
         # Table
         self.vCanvas = tk.Canvas(self.vScrollbarFrame, highlightthickness=0)
         self.vCanvas.grid(row=1, column=1, sticky="NSEW")
-        self.vTable = Table(self.vCanvas, vModel, bNoSeparationLabelText=True)
+        self.vTable = Table(self.vCanvas, vModel, bNoSeparationLabelText=True, bAddCategoryRowHeaderColumn=False, bAddBudgetedColumn=False, bAddSpacers=True)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         # self.vTable.pack(anchor='nw') # this line causes vCanvas bbox not to match
         self.vTable.Refresh()
