@@ -22,19 +22,20 @@ class Table(CategoryTable):
 
         def M_to_V_IncomeTransactions(col_edit):
             assert isinstance(col_edit, BV.Model.Misc.StreamInfo)
-            column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
-            if col_edit.bAdd:
-                transaction = self.GetTransactionOfColumn(column)
-                assert isinstance(transaction, BV.Model.Transaction)
-                self.MakeTransactionEntry(transaction, col_edit.category_name, column)
-            else:
-                row = self.GetRowOfVMValue(col_edit.category_name)
-                if row is None:
-                    pass  # cell has been removed by VM_CategoryTable
+            if col_edit.category_name in self.vModel.TransactionHistory.Iter_Income():
+                column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
+                if col_edit.bAdd:
+                    transaction = self.GetTransactionOfColumn(column)
+                    assert isinstance(transaction, BV.Model.Transaction)
+                    self.MakeTransactionEntry(transaction, col_edit.category_name, column)
                 else:
-                    cell = self.GetCell(row, column)
-                    cell.grid_forget()
-                    cell.destroy()
+                    row = self.GetRowOfVMValue(col_edit.category_name)
+                    if row is None:
+                        pass  # cell has been removed by VM_CategoryTable
+                    else:
+                        cell = self.GetCell(row, column)
+                        cell.grid_forget()
+                        cell.destroy()
         self.vModel.TransactionHistory._merged_amountStream_stream.subscribe(M_to_V_IncomeTransactions)
 
     def Refresh(self):
