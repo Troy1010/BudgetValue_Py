@@ -29,7 +29,7 @@ class PaycheckPlan(tk.Frame):
         # Table
         self.vCanvas = tk.Canvas(self, highlightthickness=0)
         self.vCanvas.pack(side=tk.TOP, fill='x', anchor='nw')
-        self.vTable = Table(self.vCanvas, vModel)
+        self.vTable = Table(self.vCanvas, vModel, bAddBudgetedColumn=False)
         self.vCanvas.create_window((0, 0), window=self.vTable, anchor='nw')
         self.vTable.pack(anchor='nw')
         self.vTable.Refresh()

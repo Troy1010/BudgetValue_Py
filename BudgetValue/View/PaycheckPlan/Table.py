@@ -10,8 +10,8 @@ from ..Skin import vSkin
 
 
 class Table(CategoryTable):
-    def __init__(self, parent, vModel):
-        super().__init__(parent, vModel)
+    def __init__(self, parent, vModel, *args, **kwargs):
+        super().__init__(parent, vModel, *args, **kwargs)
         assert isinstance(vModel, BV.Model.Model)
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
