@@ -25,9 +25,7 @@ class Table(CategoryTable):
             if (col_edit.parent_collection == transaction.categoryAmounts for transaction in self.vModel.TransactionHistory.Iter_Income()):
                 column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
                 if col_edit.bAdd:
-                    transaction = self.GetTransactionOfColumn(column)
-                    assert isinstance(transaction, BV.Model.Transaction)
-                    self.MakeTransactionEntry(transaction, col_edit.category_name, column)
+                    self.MakeTransactionEntry(col_edit.stream, col_edit.category_name, column)
                 else:
                     row = self.GetRowOfVMValue(col_edit.category_name)
                     if row is None:
@@ -46,16 +44,16 @@ class Table(CategoryTable):
             vColumnHeader.transaction = income_transaction  # for GetTransactionOfColumn
             vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
             for category_name in income_transaction.categoryAmounts.GetAll():
-                self.MakeTransactionEntry(income_transaction, category_name, column)
+                self.MakeTransactionEntry(income_transaction.categoryAmounts.GetAll()[category_name].amount_stream, category_name, column)
 
-    def MakeTransactionEntry(self, transaction, category_name, column):
+    def MakeTransactionEntry(self, amount_stream, category_name, column):
         category = self.vModel.Categories[category_name]
         row = self.GetRowOfVMValue(category_name)
         background = vSkin.BG_READ_ONLY if category == Categories.default_category else vSkin.BG_DEFAULT
         bEditableState = category != Categories.default_category
         w = WF.MakeEntry(self,
                          (row, column),
-                         text=transaction.categoryAmounts.GetAll()[category_name].amount_stream,
+                         text=amount_stream,
                          bEditableState=bEditableState,
                          background=background,
                          validation=BV.MakeValid_Money,
