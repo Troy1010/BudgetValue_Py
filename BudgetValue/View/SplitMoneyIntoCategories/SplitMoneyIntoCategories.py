@@ -24,24 +24,16 @@ class SplitMoneyIntoCategories(tk.Frame):
         # ButtonBar
         self.vButtonBar = tk.Frame(self)
         self.vButtonBar.pack(side=tk.TOP, anchor='w')
-
-        def CreateTransaction(amount):
-            self.vModel.TransactionHistory.AddTransaction(bSpend=False, amount=amount)
-            self.vTable.Refresh()
         vButton_SplitPaycheck = ttk.Button(self.vButtonBar, text="Add Unverified Income",
-                                           command=lambda: Popup_InputAmount(self, lambda amount: CreateTransaction(amount)))
+                                           command=lambda: Popup_InputAmount(self, lambda amount: self.vModel.TransactionHistory.AddTransaction(bSpend=False, amount=amount)))
         vButton_SplitPaycheck.pack(side=tk.LEFT, anchor='w')
         # Button_SplitDifference
         vSplitDifferenceText_stream = rx.subjects.BehaviorSubject("")
         self.vModel.Balance.balance_stream.map(
             lambda balance: "Add Unverified Income - Difference (" + str(balance) + ")"
         ).subscribe(vSplitDifferenceText_stream)
-
-        def SplitDifference():
-            self.vModel.TransactionHistory.AddTransaction(amount=-self.vModel.Balance.balance_stream.value, bSpend=False)
-            self.vTable.Refresh()
         vButton_SplitDifference = WF.MakeButton(self.vButtonBar, stream=vSplitDifferenceText_stream,
-                                                command=lambda self=self: SplitDifference())
+                                                command=lambda: self.vModel.TransactionHistory.AddTransaction(amount=-self.vModel.Balance.balance_stream.value, bSpend=False))
 
         def HighlightBalanceButton(balance):
             if balance:
