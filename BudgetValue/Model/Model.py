@@ -24,8 +24,8 @@ class Model():
     def LoadAndHookSaves(self):
         self.Categories.Load()
         atexit.register(self.Categories.Save)
-        self.PaycheckPlan.Load()
-        atexit.register(self.PaycheckPlan.Save)
+        # self.PaycheckPlan.Load()
+        # atexit.register(self.PaycheckPlan.Save)
         self.Accounts.Load()
         atexit.register(self.Accounts.Save)
         self.TransactionHistory.Load()
