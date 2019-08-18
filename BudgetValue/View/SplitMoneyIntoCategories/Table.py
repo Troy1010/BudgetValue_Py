@@ -50,7 +50,7 @@ class Table(CategoryTable):
                 raise Exception("could not find column of NewIncomeTransaction")
             #
             if col_edit.bAdd:
-                vColumnHeader = WF.MakeLable(self, (0, column), text=col_edit.value.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
+                vColumnHeader = WF.MakeLable(self, (0, column), text=col_edit.value.timestamp_stream, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
                 vColumnHeader.transaction = col_edit.value  # for GetTransactionOfColumn
                 vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
                 for category_name in col_edit.value.categoryAmounts.GetAll():

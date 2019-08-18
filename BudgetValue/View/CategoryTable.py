@@ -143,6 +143,8 @@ class CategoryTable(ModelTable):
                         self.MakeBudgetedEntry(self.vModel.Categories[collection_edit.key])
 
         self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(M_to_V)
+        #
+        self.Refresh()
 
     def Refresh(self):
         super().Refresh()
@@ -170,7 +172,7 @@ class CategoryTable(ModelTable):
             for category in self.VM_CategoryTable:
                 if isinstance(category, BV.Model.Category):
                     self.MakeBudgetedEntry(category)
-            row = self.GetMaxRow() + 1
+            row = self.GetMaxRow() + self.iFirstDataRow
             # Black bar
             tk.Frame(self, background='black', height=2).grid(row=row, columnspan=self.GetMaxColumn()+1, sticky="ew")
             row += 1
