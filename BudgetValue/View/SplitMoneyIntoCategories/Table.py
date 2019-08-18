@@ -22,7 +22,7 @@ class Table(CategoryTable):
 
         def M_to_V_IncomeTransactions(col_edit):
             assert isinstance(col_edit, BV.Model.Misc.StreamInfo)
-            if col_edit.category_name in self.vModel.TransactionHistory.Iter_Income():
+            if (col_edit.parent_collection == transaction.categoryAmounts for transaction in self.vModel.TransactionHistory.Iter_Income()):
                 column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
                 if col_edit.bAdd:
                     transaction = self.GetTransactionOfColumn(column)
