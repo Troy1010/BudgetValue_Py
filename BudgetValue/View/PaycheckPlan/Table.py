@@ -1,7 +1,6 @@
 from BudgetValue._Logger import BVLog  # noqa
 import tkinter as tk
 import BudgetValue as BV
-from decimal import Decimal
 from BudgetValue.Model import CategoryType  # noqa
 from BudgetValue.View import WidgetFactories as WF
 from ...Model.Categories import Categories
@@ -16,77 +15,42 @@ class Table(CategoryTable):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
+        # Column Headers
+        for j, header_name in enumerate(['Amount', 'Period', 'Plan']):
+            w = WF.MakeHeader(self, (0, j+self.iFirstDataColumn), text=header_name)
+            w.bPerminent = True
+        # Link M -> V
+
+        def LinkPaycheckPlanModelToView(col_edit_info):
+            assert isinstance(col_edit_info.value, BV.Model.PaycheckPlanRow) or isinstance(col_edit_info.value, BV.Model.DataTypes.BalanceEntry)
+            category = self.vModel.Categories[col_edit_info.key]
+            row = self.GetRowOfVMValue(category)
+            if col_edit_info.bAdd:
+                if category.IsSpendable():
+                    self.MakeEntry((row, 1),
+                                   text=col_edit_info.value.amount_over_period_stream,
+                                   validation=BV.MakeValid_Money,
+                                   display=BV.MakeValid_Money_ZeroIsNone)
+                    self.MakeEntry((row, 2),
+                                   text=col_edit_info.value.period_stream,
+                                   validation=BV.MakeValid_Money,
+                                   display=BV.MakeValid_Money_ZeroIsNone)
+                    self.MakeEntry((row, 3),
+                                   text=col_edit_info.value.amount_stream,
+                                   validation=BV.MakeValid_Money,
+                                   display=BV.MakeValid_Money_ZeroIsNone)
+                else:
+                    bEditableState = category != Categories.default_category
+                    self.MakeEntry((row, 3), text=col_edit_info.value.amount_stream, bEditableState=bEditableState)
+        self.vModel.PaycheckPlan._value_stream.subscribe(LinkPaycheckPlanModelToView)
 
     def Refresh(self):
         super().Refresh()
-        # Refresh Column Headers
-        for j, header_name in enumerate(['Amount', 'Period', 'Plan']):
-            WF.MakeHeader(self, (0, j+self.iFirstDataColumn), text=header_name)
-        # Data
-        for category_name in self.vModel.PaycheckPlan.keys():
-            category = self.vModel.Categories[category_name]
-            row = self.GetRowOfVMValue(category)
-            amount_stream = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount_stream
-            try:
-                period = self.vModel.PaycheckPlan[category.name].period
-            except (AttributeError, KeyError):
-                period = None
-            if category.IsSpendable():
-                self.MakeEntry_Money((row, 1))
-                self.MakeEntry((row, 2), text=period)
-                self.MakeEntry_Money((row, 3), text=amount_stream)
-            else:
-                bEditableState = category != Categories.default_category
-                self.MakeEntry_Money((row, 3), text=amount_stream, bEditableState=bEditableState)
+        return
 
-    def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True):
+    def MakeEntry(self, cRowColumnPair, text=None, bEditableState=True, **kwargs):
         background = vSkin.BG_READ_ONLY if not bEditableState else vSkin.BG_DEFAULT
-        w = WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState, background=background)
-        if bEditableState:
-            w.bind("<FocusOut>", lambda event, w=w: self.MakeRowValid(w.row, w), add="+")
-            w.bind("<FocusOut>", lambda event, w=w: self.SaveToModel(w.row), add="+")
-        return w
-
-    def MakeEntry_Money(self, cRowColumnPair, text=None, bEditableState=True):
-        w = self.MakeEntry(cRowColumnPair, text, bEditableState)
-        w.ValidationHandler = BV.MakeValid_Money
-        return w
-
-    def MakeRowValid(self, row, cellToKeep=None):
-        columnToKeep = -1 if cellToKeep is None else cellToKeep.column
-        if self.GetCategoryOfRow(row).IsSpendable():
-            # Get values of row
-            amount = None if not self.GetCell(row, 1).text else Decimal(str(self.GetCell(row, 1).text))
-            period = None if not self.GetCell(row, 2).text else Decimal(str(self.GetCell(row, 2).text))
-            plan = None if not self.GetCell(row, 3).text else Decimal(str(self.GetCell(row, 3).text))
-            # if we can complete the row, do so.
-            if columnToKeep != 3 and amount and period:
-                self.GetCell(row, 3).text = amount / period
-            elif columnToKeep != 2 and amount and plan:
-                self.GetCell(row, 2).text = amount / plan
-            elif columnToKeep != 1 and period and plan:
-                self.GetCell(row, 1).text = plan * period
-
-    def SaveToModel(self, row):
-        # Determine category
-        category = self.GetCategoryOfRow(row)
-        # Retrieve text
-        if self.GetCell(row, 2):
-            periodText = self.GetCell(row, 2).text
-        else:
-            periodText = None
-        amountText = self.GetCell(row, 3).text
-        # Remove or add CategoryPlan
-        if not (periodText or amountText):
-            if category.name in self.vModel.PaycheckPlan:
-                del self.vModel.PaycheckPlan[category.name]
-            return
-        elif category.name not in self.vModel.PaycheckPlan:
-            self.vModel.PaycheckPlan[category.name] = BV.Model.PaycheckPlanRow()
-        # Set values
-        if self.GetCell(row, 2):
-            self.vModel.PaycheckPlan[category.name].period = periodText
-        self.vModel.PaycheckPlan[category.name].amount = amountText
+        return WF.MakeEntry(self, cRowColumnPair, text=text, bEditableState=bEditableState, background=background, **kwargs)
 
     def GetCategoryOfRow(self, row):
         category_name = self.GetCell(row, 0).text

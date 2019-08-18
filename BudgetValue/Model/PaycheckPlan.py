@@ -57,9 +57,15 @@ class PaycheckPlan(DataTypes.Dict_TotalStream):
 
 
 class PaycheckPlanRow():
-    def __init__(self, period=None):
+    def __init__(self):
         self.amount_stream = rx.subjects.BehaviorSubject(0)
-        self.period = period
+        self.period_stream = rx.subjects.BehaviorSubject(0)
+        self.amount_over_period_stream = rx.subjects.BehaviorSubject(0)
+        self.bLock = False
+        # Link RowValidation to streams
+        # self.amount_stream.subscribe(lambda x, item_to_keep=self.amount_stream: self.MakeRowValid(item_to_keep))
+        # self.period_stream.subscribe(lambda x, item_to_keep=self.period_stream: self.MakeRowValid(item_to_keep))
+        # self.amount_over_period_stream.subscribe(lambda x, item_to_keep=self.amount_over_period_stream: self.MakeRowValid(item_to_keep))
 
     @property
     def amount(self):
@@ -71,20 +77,27 @@ class PaycheckPlanRow():
 
     @property
     def period(self):
-        return self._period
+        return self.period_stream.value
 
     @period.setter
     def period(self, value):
-        self._period = BV.MakeValid_Money(value)
+        self.period_stream.on_next(value)  # fix: should make valid
 
     @property
     def amountOverPeriod(self):
-        try:
-            returning = self.amount / self._period
-        except (ZeroDivisionError, TypeError):  # period was None
-            returning = 0
-        return returning
+        return self.amount_over_period_stream.value
 
     @amountOverPeriod.setter
     def amountOverPeriod(self, value):
-        self.amount = value*self._period
+        self.amount_over_period_stream.on_next(BV.MakeValid_Money(value))
+
+    def MakeRowValid(self, item_to_keep):
+        if not self.bLock:
+            self.bLock = True
+            if item_to_keep != self.amount_stream and self.amountOverPeriod and self.period:
+                self.amount = self.amountOverPeriod / self.period
+            elif item_to_keep != self.period_stream and self.amountOverPeriod and self.amount:
+                self.period = self.amountOverPeriod / self.amount
+            elif item_to_keep != self.amount_over_period_stream and self.period and self.amount:
+                self.amountOverPeriod = self.amount * self.period
+            self.bLock = False
