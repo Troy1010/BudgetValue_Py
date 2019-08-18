@@ -224,14 +224,6 @@ class Transaction():
     def AddCategory(self, category, amount=None):
         self.categoryAmounts.AddCategory(category, amount=amount)
 
-    def GetCategorySummary(self):
-        if len(self.categoryAmounts) == 0:
-            return Categories.default_category.name
-        elif len(self.categoryAmounts) == 1:
-            return list(self.categoryAmounts.values())[0].category.name
-        else:
-            return "<Multiple Categories>"
-
     def IsOverride(self):
         return not self.bSpend
 
@@ -311,46 +303,59 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         # subscribe category_summary_stream
 
         def OnNewAmountStream(amountStreamInfo):
-            # fix: self.parent.GetCategorySummary() does not work here, but there should be an easier way
             assert isinstance(amountStreamInfo, BV.Model.StreamInfo)
-            length_adjustment = -1 + 2*(amountStreamInfo.bAdd)
-            if len(self) + length_adjustment == 0:
-                category_summary = Categories.default_category.name
-            elif len(self) + length_adjustment == 1:
-                if length_adjustment == 1:
-                    category_summary = amountStreamInfo.category_name
-                else:
-                    category_summary = list(self.values())[0].category.name
+
+            if amountStreamInfo.bAdd:
+                self.category_summary_stream.on_next(self.GetCategorySummary())
             else:
-                category_summary = "<Multiple Categories>"
-            self.category_summary_stream.on_next(category_summary)
+                temp_dict = dict(self)
+                del temp_dict[amountStreamInfo.category_name]
+                self.category_summary_stream.on_next(self.GetCategorySummary(temp_dict))
         self._amountStream_stream.subscribe(OnNewAmountStream)
 
+    def PrintMyself(self):
+        print(TM.FnName(1)+" collection..")
+        for x in self.items():
+            print("  "+x[0]+" "+x[1].category.name)
+
+    def GetCategorySummary(self, collection=None):
+        if collection is None:
+            collection = self
+        if len(collection) == 0:
+            return Categories.default_category.name
+        elif len(collection) == 1:  # fix:  and self.balance_stream.value == 0
+            return list(collection.values())[0].category.name
+        else:
+            return "<Multiple Categories>"
+
     def GetAll(self):
-        cAll = dict(self)
+        cAll = dict()
         default_category_amount = CategoryAmount(self)
         default_category_amount.category = Categories.default_category
         default_category_amount.amount_stream = self.balance_stream
         cAll[Categories.default_category.name] = default_category_amount
+        for x in self.items():
+            cAll[x[0]] = x[1]
         return cAll
 
     def AddCategory(self, category, amount=None):
         assert isinstance(category, BV.Model.Category)
         if category == Categories.default_category:
             return
-        self[category.name] = CategoryAmount(self)
-        self[category.name].category = category
+        category_amount = CategoryAmount(self)
+        category_amount.category = category
+        self[category.name] = category_amount
         if amount is not None:
-            self[category.name].amount = amount
+            category_amount.amount = amount
 
     def RemoveCategory(self, category):
-        assert(category != Categories.default_category)
         if isinstance(category, str):
-            if category in self:
-                del self[category]
+            category_name = category
         else:
-            if category.name in self:
-                del self[category.name]
+            category_name = category.name
+        assert(category_name != Categories.default_category.name)
+        if category_name in self:
+            del self[category]
 
 
 class CategoryAmount():
