@@ -140,4 +140,6 @@ class Table(CategoryTable):
         return cAddableCategories
 
     def AddCategoryToColumn(self, category, transaction):
+        if category is None:
+            return
         transaction.categoryAmounts.AddCategory(category)
