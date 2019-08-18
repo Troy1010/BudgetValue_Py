@@ -51,5 +51,5 @@ class Accounts(tk.Frame):
         self.vDifference.Refresh()
 
     def AddRow(self):
-        self.vModel.Accounts.AddRow()
+        self.vModel.Accounts.append(BV.Model.Account())
         self.vAccountsTable.Refresh()

@@ -45,7 +45,7 @@ class AccountsTable(TM.tk.TableFrame):
         row += 1
 
     def RemoveRow(self, iRow):
-        self.vModel.Accounts.RemoveRow(iRow-1)  # skip header
+        del self.vModel.Accounts[iRow-1]  # skip header
         self.Refresh()
 
     def MakeEntry(self, cRowColumnPair, text=None):

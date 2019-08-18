@@ -18,12 +18,6 @@ class Accounts(List_TotalStream):
         # Hook Save on exit
         atexit.register(self.Save)
 
-    def AddRow(self):
-        self.append(Account())
-
-    def RemoveRow(self, iRow):
-        del self[iRow]
-
     def Save(self):
         data = list()
         for account in list(self):
