@@ -4,7 +4,6 @@ import os
 import rx
 from . import Misc
 from .Categories import Categories
-import atexit
 
 
 class PaycheckPlan(Misc.Dict_TotalStream):
@@ -13,12 +12,6 @@ class PaycheckPlan(Misc.Dict_TotalStream):
         super().__init__()
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
-        # Load
-        self.Load()
-        # Save on exit
-        atexit.register(self.Save)
-        #
-        self[Categories.default_category.name] = Misc.BalanceEntry(self, self.total_stream)
 
     def __setitem__(self, key, value):
         # Keys must be a category name
@@ -60,6 +53,7 @@ class PaycheckPlan(Misc.Dict_TotalStream):
             self[category_name] = PaycheckPlanRow()
             for k, v in categoryPlan.items():
                 setattr(self[category_name], k, v)
+        self[Categories.default_category.name] = Misc.BalanceEntry(self, self.total_stream)
 
 
 class PaycheckPlanRow():

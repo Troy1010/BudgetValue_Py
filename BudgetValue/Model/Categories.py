@@ -5,7 +5,6 @@ from enum import Enum
 import enum
 import pickle
 import os
-import atexit
 import BudgetValue as BV
 from .Misc import Dict_ValueStream
 
@@ -90,14 +89,8 @@ class Categories(Dict_ValueStream):
 
     def __init__(self, vModel):
         super().__init__()
-        #
         self.vModel = vModel
-        # Load and hook save on exit
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Categories.pickle")
-        self.Load()
-        for category in self.__mandatory_catagories:
-            self[category.name] = category
-        atexit.register(self.Save)
 
     def Select(self, types=None, types_exclude=None):
         if types is not None and not isinstance(types, list):
@@ -132,6 +125,8 @@ class Categories(Dict_ValueStream):
             category = Category(category_savable['name'])
             self[category_savable['name']] = category
             category.LoadSavable(category_savable)
+        for category in self.__mandatory_catagories:
+            self[category.name] = category
 
     def AddCategory(self, name, type_=None, bFavorite=False):
         if name in self.keys():
