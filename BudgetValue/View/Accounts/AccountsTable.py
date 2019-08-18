@@ -29,7 +29,7 @@ class AccountsTable(TM.tk.TableFrame):
         row += 1
         # Data
         for net_worth_row in self.vModel.Accounts:
-            assert isinstance(net_worth_row, BV.Model.AccountsRow)
+            assert isinstance(net_worth_row, BV.Model.Account)
             self.MakeEntry((row, 0), text=net_worth_row.name)
             w = self.MakeEntry((row, 1), text=net_worth_row.amount_stream)
             w.ValidationHandler = BV.MakeValid_Money

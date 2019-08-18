@@ -19,18 +19,18 @@ class Accounts(List_TotalStream):
         atexit.register(self.Save)
 
     def AddRow(self):
-        self.append(AccountsRow())
+        self.append(Account())
 
     def RemoveRow(self, iRow):
         del self[iRow]
 
     def Save(self):
         data = list()
-        for net_worth_row in list(self):
-            net_worth_row_storable = dict()
-            net_worth_row_storable['name'] = net_worth_row.name
-            net_worth_row_storable['amount'] = net_worth_row.amount
-            data.append(net_worth_row_storable)
+        for account in list(self):
+            account_storable = dict()
+            account_storable['name'] = account.name
+            account_storable['amount'] = account.amount
+            data.append(account_storable)
         with open(self.sSaveFile, 'wb') as f:
             pickle.dump(data, f)
 
@@ -42,12 +42,12 @@ class Accounts(List_TotalStream):
         if not data:
             return
         for net_worth_row in data:
-            self.append(AccountsRow())
+            self.append(Account())
             for k, v in net_worth_row.items():
                 setattr(self[-1], k, v)
 
 
-class AccountsRow():
+class Account():
     def __init__(self, name=None):
         self.name = name
         self.amount_stream = rx.subjects.BehaviorSubject(0)
