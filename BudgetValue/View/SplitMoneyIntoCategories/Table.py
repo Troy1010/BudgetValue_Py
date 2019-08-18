@@ -24,17 +24,40 @@ class Table(CategoryTable):
             assert isinstance(col_edit, BV.Model.Misc.StreamInfo)
             if (col_edit.parent_collection == transaction.categoryAmounts for transaction in self.vModel.TransactionHistory.Iter_Income()):
                 column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
+                if column is None:
+                    return  # stream from categoryAmounts initiation
                 if col_edit.bAdd:
                     self.MakeTransactionEntry(col_edit.stream, col_edit.category_name, column)
                 else:
                     row = self.GetRowOfVMValue(col_edit.category_name)
                     if row is None:
-                        pass  # cell has been removed by VM_CategoryTable
+                        pass  # cell has already been removed
                     else:
                         cell = self.GetCell(row, column)
                         cell.grid_forget()
                         cell.destroy()
         self.vModel.TransactionHistory._merged_amountStream_stream.subscribe(M_to_V_IncomeTransactions)
+
+        def M_to_V_NewIncomeTransaction(col_edit):
+            assert isinstance(col_edit, BV.Model.Misc.ValueAddPair)
+            assert isinstance(col_edit.value, BV.Model.Transaction)
+            # Determine column
+            for j, x in enumerate(self.vModel.TransactionHistory.Iter_Income()):
+                if col_edit.value == x:
+                    column = j + self.iFirstDataColumn
+                    break
+            else:
+                raise Exception("could not find column of NewIncomeTransaction")
+            #
+            if col_edit.bAdd:
+                vColumnHeader = WF.MakeLable(self, (0, column), text=col_edit.value.timestamp, font=vSkin.FONT_SMALL_BOLD, display=BV.DisplayTimestamp)
+                vColumnHeader.transaction = col_edit.value  # for GetTransactionOfColumn
+                vColumnHeader.bind("<Button-3>", lambda event: self.ShowHeaderMenu(event))
+                for category_name in col_edit.value.categoryAmounts.GetAll():
+                    self.MakeTransactionEntry(col_edit.value.categoryAmounts.GetAll()[category_name].amount_stream, category_name, column)
+            else:
+                self.UninsertColumn(column)
+        self.vModel.TransactionHistory._value_stream.subscribe(M_to_V_NewIncomeTransaction)
 
     def Refresh(self):
         super().Refresh()

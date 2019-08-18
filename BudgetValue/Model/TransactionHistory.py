@@ -95,6 +95,7 @@ class TransactionHistory(Misc.List_ValueStream):
 
     def Iter_Income(self):
         for transaction in self:
+            assert isinstance(transaction, BV.Model.Transaction)
             if transaction.IsIncome() or transaction.IsOverride():
                 yield transaction
 
@@ -291,7 +292,7 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         # derivative data
         self.balance_stream = rx.subjects.BehaviorSubject(0)
         # manually merge balance_stream into parent's cCategoryTotals
-        self.parent.parent._merged_amountStream_stream.on_next(Misc.StreamInfo(True, self.balance_stream, Categories.default_category.name))
+        self.parent.parent._merged_amountStream_stream.on_next(Misc.StreamInfo(True, self.balance_stream, Categories.default_category.name, parent_collection=self))
         # subscribe balance_stream
         rx.Observable.combine_latest(
             self.parent.amount_stream,
