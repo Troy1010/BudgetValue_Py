@@ -18,6 +18,8 @@ class Model():
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
         self.Balance = BV.Model.Balance(self)
+        #
+        self.LoadAndHookSaves()
 
     def LoadAndHookSaves(self):
         self.Categories.Load()

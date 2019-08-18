@@ -11,7 +11,6 @@ from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 from BudgetValue.View.SpendHistory import SpendHistory
 import os
 import pickle
-import time
 
 
 class View(tk.Tk):
@@ -45,8 +44,6 @@ class View(tk.Tk):
             frame.grid(row=0, sticky="nsew")
 
         self.vTabBar.ShowTab(self.vLastShownTab)
-        print("View init complete. time_elapsed:"+str(time.time()-self.vModel.start_time))
-        Log("View init complete. time_elapsed:"+str(time.time()-self.vModel.start_time))
 
     def Save(self):
         data = {"LastShownTab": self.vLastShownTab}
