@@ -24,13 +24,16 @@ class TransactionHistory(DataTypes.List_ValueStream):
         self.cDisposables = {}
         self._merged_amountStream_stream = rx.subjects.Subject()
 
-        def MergeAmountStreamStreams(vValueAddPair):
+        def FeedMergedAmountStreamStreams(vValueAddPair):
+            def UpgradeStreamInfoAndPassIntoMergedAmountStreamStreams(stream_info):
+                stream_info.transaction = vValueAddPair.value
+                self._merged_amountStream_stream.on_next(stream_info)
             if vValueAddPair.bAdd:
-                self.cDisposables[vValueAddPair.value] = vValueAddPair.value.categoryAmounts._amountStream_stream.subscribe(self._merged_amountStream_stream)
+                self.cDisposables[vValueAddPair.value] = vValueAddPair.value.categoryAmounts._amountStream_stream.subscribe(UpgradeStreamInfoAndPassIntoMergedAmountStreamStreams)
             else:
                 self.cDisposables[vValueAddPair.value].dispose()
                 del self.cDisposables[vValueAddPair.value]
-        self._value_stream.subscribe(MergeAmountStreamStreams)
+        self._value_stream.subscribe(FeedMergedAmountStreamStreams)
         # If a category is deleted, remove that category from all Transactions
 
         def OnCategoryCreationOrDeletion(ValueAddPair_):
@@ -292,7 +295,7 @@ class CategoryAmounts(DataTypes.Dict_TotalStream):
         # derivative data
         self.balance_stream = rx.subjects.BehaviorSubject(0)
         # manually merge balance_stream into parent's cCategoryTotals
-        self.parent.parent._merged_amountStream_stream.on_next(DataTypes.StreamInfo(True, self.balance_stream, Categories.default_category.name, parent_collection=self))
+        self.parent.parent._merged_amountStream_stream.on_next(DataTypes.StreamInfo(True, self.balance_stream, Categories.default_category.name, self.parent))
         # subscribe balance_stream
         rx.Observable.combine_latest(
             self.parent.amount_stream,
@@ -364,6 +367,7 @@ class CategoryAmount():
         self.parent = parent
         self.category_stream = rx.subjects.BehaviorSubject(Categories.default_category)
         self.amount_stream = rx.subjects.BehaviorSubject(0)
+        self.amount_stream.on_completed = lambda: self.amount_stream.on_next(0)
 
     @property
     def amount(self):

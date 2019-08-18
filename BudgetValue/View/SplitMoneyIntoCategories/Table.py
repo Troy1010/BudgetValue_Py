@@ -13,17 +13,10 @@ class Table(CategoryTable):
         super().__init__(*args, **kwargs)
         # bind income_transactions M->V
 
-        def GetColumnOfCategoryAmounts(categoryAmounts):  # fix: should just stream the transaction
-            for i, x in enumerate(self.vModel.TransactionHistory.Iter_Income()):
-                if id(x.categoryAmounts) == id(categoryAmounts):
-                    return i + self.iFirstDataColumn
-            else:
-                return None
-
         def M_to_V_IncomeTransactions(col_edit):
-            assert isinstance(col_edit, BV.Model.Misc.StreamInfo)
+            assert isinstance(col_edit, BV.Model.DataTypes.StreamInfo)
             if (col_edit.parent_collection == transaction.categoryAmounts for transaction in self.vModel.TransactionHistory.Iter_Income()):
-                column = GetColumnOfCategoryAmounts(col_edit.parent_collection)
+                column = self.GetColumnOfTransaction(col_edit.transaction)
                 if column is None:
                     return  # stream from categoryAmounts initiation
                 if col_edit.bAdd:
@@ -39,7 +32,7 @@ class Table(CategoryTable):
         self.vModel.TransactionHistory._merged_amountStream_stream.subscribe(M_to_V_IncomeTransactions)
 
         def M_to_V_NewIncomeTransaction(col_edit):
-            assert isinstance(col_edit, BV.Model.Misc.ValueAddPair)
+            assert isinstance(col_edit, BV.Model.DataTypes.CollectionEditInfo)
             assert isinstance(col_edit.value, BV.Model.Transaction)
             # Determine column
             for j, x in enumerate(self.vModel.TransactionHistory.Iter_Income()):
@@ -124,6 +117,16 @@ class Table(CategoryTable):
         header = self.GetCell(0, iColumn)
         assert hasattr(header, 'transaction')
         return header.transaction
+
+    def GetColumnOfTransaction(self, transaction):
+        if not isinstance(transaction, BV.Model.Transaction):
+            print(str(transaction))
+        assert isinstance(transaction, BV.Model.Transaction)
+        for i, x in enumerate(self.vModel.TransactionHistory.Iter_Income()):
+            if id(x) == id(transaction):
+                return i + self.iFirstDataColumn
+        else:
+            return None
 
     def ForgetTransaction(self, transaction):
         self.vModel.TransactionHistory.RemoveTransaction(transaction)
