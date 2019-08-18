@@ -27,7 +27,7 @@ class View(tk.Tk):
         self.vLastShownTab = SplitMoneyIntoCategories
         self.Load()
 
-        cTabPages = (SpendHistory, SplitMoneyIntoCategories, Accounts, Reports, PaycheckPlan)
+        cTabPages = (SpendHistory, SplitMoneyIntoCategories, Accounts, PaycheckPlan, Reports)
         # MenuBar
         self.config(menu=MenuBar(vModel, self))
         # TabBar
