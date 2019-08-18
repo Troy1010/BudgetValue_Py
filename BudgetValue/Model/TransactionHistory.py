@@ -2,7 +2,7 @@ import os
 import pickle
 import BudgetValue as BV
 import rx
-from . import Misc  # noqa
+from . import DataTypes  # noqa
 from .Categories import Categories  # noqa
 import time
 import TM_CommonPy as TM  # noqa
@@ -14,7 +14,7 @@ from datetime import date  # noqa
 import dateutil
 
 
-class TransactionHistory(Misc.List_ValueStream):
+class TransactionHistory(DataTypes.List_ValueStream):
     def __init__(self, vModel):
         super().__init__()
         assert isinstance(vModel, BV.Model.Model)
@@ -284,7 +284,7 @@ class Transaction():
             self.categoryAmounts.AddCategory(self.vModel.Categories[category_name], amount)
 
 
-class CategoryAmounts(Misc.Dict_TotalStream):
+class CategoryAmounts(DataTypes.Dict_TotalStream):
     def __init__(self, vModel, parent):
         super().__init__()
         self.parent = parent
@@ -292,7 +292,7 @@ class CategoryAmounts(Misc.Dict_TotalStream):
         # derivative data
         self.balance_stream = rx.subjects.BehaviorSubject(0)
         # manually merge balance_stream into parent's cCategoryTotals
-        self.parent.parent._merged_amountStream_stream.on_next(Misc.StreamInfo(True, self.balance_stream, Categories.default_category.name, parent_collection=self))
+        self.parent.parent._merged_amountStream_stream.on_next(DataTypes.StreamInfo(True, self.balance_stream, Categories.default_category.name, parent_collection=self))
         # subscribe balance_stream
         rx.Observable.combine_latest(
             self.parent.amount_stream,

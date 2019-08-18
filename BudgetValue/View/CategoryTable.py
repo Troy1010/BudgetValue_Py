@@ -5,7 +5,7 @@ from BudgetValue.View import WidgetFactories as WF  # noqa
 from . import Misc  # noqa
 from .Skin import vSkin
 from .Misc import ModelTable
-from Model.Misc import List_ValueStream
+from Model.DataTypes import List_ValueStream
 from Model import CategoryType
 from .._Logger import BVLog
 from .._Logger import Log

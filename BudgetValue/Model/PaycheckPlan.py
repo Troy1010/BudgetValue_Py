@@ -2,11 +2,11 @@ import BudgetValue as BV
 import pickle
 import os
 import rx
-from . import Misc
+from . import DataTypes
 from .Categories import Categories
 
 
-class PaycheckPlan(Misc.Dict_TotalStream):
+class PaycheckPlan(DataTypes.Dict_TotalStream):
     def __init__(self, vModel):
         assert isinstance(vModel, BV.Model.Model)
         super().__init__()
@@ -31,7 +31,7 @@ class PaycheckPlan(Misc.Dict_TotalStream):
     def Save(self):
         data = dict()
         for category_name, paycheck_plan_row in dict(self).items():
-            if isinstance(paycheck_plan_row, Misc.BalanceEntry):
+            if isinstance(paycheck_plan_row, DataTypes.BalanceEntry):
                 continue
             category_plan_storable = dict()
             category_plan_storable['amount'] = paycheck_plan_row.amount
@@ -53,7 +53,7 @@ class PaycheckPlan(Misc.Dict_TotalStream):
             self[category_name] = PaycheckPlanRow()
             for k, v in categoryPlan.items():
                 setattr(self[category_name], k, v)
-        self[Categories.default_category.name] = Misc.BalanceEntry(self, self.total_stream)
+        self[Categories.default_category.name] = DataTypes.BalanceEntry(self, self.total_stream)
 
 
 class PaycheckPlanRow():

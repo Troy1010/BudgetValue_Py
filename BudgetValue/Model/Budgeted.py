@@ -1,6 +1,6 @@
 import BudgetValue as BV
 import rx
-from .Misc import Dict_ValueStream
+from .DataTypes import Dict_ValueStream
 
 
 class Budgeted():

@@ -3,7 +3,7 @@ import os
 import pickle
 import rx
 import TM_CommonPy as TM  # noqa
-from .Misc import List_TotalStream
+from .DataTypes import List_TotalStream
 
 
 class Accounts(List_TotalStream):

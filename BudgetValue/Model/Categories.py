@@ -6,7 +6,7 @@ import enum
 import pickle
 import os
 import BudgetValue as BV
-from .Misc import Dict_ValueStream
+from .DataTypes import Dict_ValueStream
 
 
 class AutoName(Enum):
