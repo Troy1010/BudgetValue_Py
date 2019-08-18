@@ -13,9 +13,8 @@ class Accounts(List_TotalStream):
         super().__init__()
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "Accounts.pickle")
-        # Load
+        # Load and Hook Save
         self.Load()
-        # Hook Save on exit
         atexit.register(self.Save)
 
     def Save(self):

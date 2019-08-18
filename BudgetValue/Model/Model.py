@@ -16,6 +16,6 @@ class Model():
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
         self.Balance = BV.Model.Balance(self)
-        # Load and hook Save
+        # Load TransactionHistory and hook Save
         self.TransactionHistory.Load()
         atexit.register(self.TransactionHistory.Save)
