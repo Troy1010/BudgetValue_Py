@@ -63,9 +63,9 @@ class PaycheckPlanRow():
         self.amount_over_period_stream = rx.subjects.BehaviorSubject(0)
         self.bLock = False
         # Link RowValidation to streams
-        # self.amount_stream.subscribe(lambda x, item_to_keep=self.amount_stream: self.MakeRowValid(item_to_keep))
-        # self.period_stream.subscribe(lambda x, item_to_keep=self.period_stream: self.MakeRowValid(item_to_keep))
-        # self.amount_over_period_stream.subscribe(lambda x, item_to_keep=self.amount_over_period_stream: self.MakeRowValid(item_to_keep))
+        self.amount_stream.subscribe(lambda x, item_to_keep=self.amount_stream: self.MakeRowValid(item_to_keep))
+        self.period_stream.subscribe(lambda x, item_to_keep=self.period_stream: self.MakeRowValid(item_to_keep))
+        self.amount_over_period_stream.subscribe(lambda x, item_to_keep=self.amount_over_period_stream: self.MakeRowValid(item_to_keep))
 
     @property
     def amount(self):
