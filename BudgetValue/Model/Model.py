@@ -16,8 +16,10 @@ class Model():
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
         self.Balance = BV.Model.Balance(self)
-        # Load and hook Save
-        #  loading after streams has been set up
+        #
+        self.LoadAndHookSaves()
+
+    def LoadAndHookSaves(self):
         self.Categories.Load()
         atexit.register(self.Categories.Save)
         self.PaycheckPlan.Load()
