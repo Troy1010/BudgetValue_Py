@@ -36,7 +36,7 @@ class CategoryType(AutoName):
         return None
 
     def IsSpendable(self):
-        return self in [self.always, self.reservoir, self.once]
+        return self in [self.always, self.reservoir, self.once, self.default_type]
 
 
 class Category():

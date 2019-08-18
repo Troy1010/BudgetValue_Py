@@ -16,15 +16,16 @@ class Table(CategoryTable):
         tk.Frame.__init__(self, parent)
         self.vModel = vModel
         self.parent = parent
-        self.iFirstDataColumn += 1  # Make space for AddRowHeaderColumn
 
     def Refresh(self):
         super().Refresh()
-        # Header
+        # Refresh Column Headers
         for j, header_name in enumerate(['Amount', 'Period', 'Plan']):
             WF.MakeHeader(self, (0, j+self.iFirstDataColumn), text=header_name)
         # Data
-        for row, category in enumerate(self.vModel.Categories.Select(), self.iFirstDataRow):
+        for category_name in self.vModel.PaycheckPlan.keys():
+            category = self.vModel.Categories[category_name]
+            row = self.GetRowOfVMValue(category)
             amount_stream = None if category.name not in self.vModel.PaycheckPlan else self.vModel.PaycheckPlan[category.name].amount_stream
             try:
                 period = self.vModel.PaycheckPlan[category.name].period
