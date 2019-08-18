@@ -3,10 +3,12 @@ import TM_CommonPy as TM  # noqa
 import BudgetValue as BV
 import os
 import atexit
+import time
 
 
 class Model():
     def __init__(self):
+        self.start_time = time.time()
         self.sWorkspace = os.path.expanduser("~/Documents/BudgetValue/")
         TM.TryMkdir(self.sWorkspace)
         #
