@@ -98,7 +98,7 @@ class AmountStreamStream():
 
         def OnValueStreamEdit(col_edit_info):
             assert isinstance(col_edit_info, CollectionEditInfo)
-            if hasattr(col_edit_info.value, 'amount_stream'):
+            if hasattr(col_edit_info.value, 'amount_stream') and not isinstance(col_edit_info.value, BalanceEntry):
                 if not col_edit_info.bAdd:
                     col_edit_info.value.amount_stream.on_completed()
                 self._amountStream_stream.on_next(StreamInfo(col_edit_info.bAdd, col_edit_info.value.amount_stream, col_edit_info.key))
