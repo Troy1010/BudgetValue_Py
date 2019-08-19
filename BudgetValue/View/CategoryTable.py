@@ -142,8 +142,6 @@ class CategoryTable(ModelTable):
                         self.MakeBudgetedEntry(self.vModel.Categories[collection_edit.key])
 
         self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(M_to_V)
-        #
-        self.Refresh()
 
     def Refresh(self):
         super().Refresh()
