@@ -13,10 +13,10 @@ class Model():
         TM.TryMkdir(self.sWorkspace)
         #
         self.Categories = BV.Model.Categories(self)
-        self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.Accounts = BV.Model.Accounts(self)
         self.TransactionHistory = BV.Model.TransactionHistory(self)
         self.Budgeted = BV.Model.Budgeted(self)
+        self.PaycheckPlan = BV.Model.PaycheckPlan(self)
         self.Balance = BV.Model.Balance(self)
         #
         self.LoadAndHookSaves()

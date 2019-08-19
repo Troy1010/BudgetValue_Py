@@ -12,6 +12,15 @@ class PaycheckPlan(DataTypes.Dict_TotalStream):
         super().__init__()
         self.vModel = vModel
         self.sSaveFile = os.path.join(self.vModel.sWorkspace, "PaycheckPlan.pickle")
+        # LinkActiveCategories VM->M
+
+        def LinkActiveCategories(col_edit_info):
+            assert isinstance(col_edit_info, BV.Model.DataTypes.CollectionEditInfo)
+            if col_edit_info.bAdd:
+                self[col_edit_info.key] = PaycheckPlanRow()
+            else:
+                del self[col_edit_info.key]
+        self.vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(LinkActiveCategories)
 
     def __setitem__(self, key, value):
         # Keys must be a category name
@@ -47,12 +56,11 @@ class PaycheckPlan(DataTypes.Dict_TotalStream):
             data = pickle.load(f)
         if not data:
             return
-        for category_name, categoryPlan in data.items():
-            if category_name not in self.vModel.Categories.keys():
-                continue
+        for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
             self[category_name] = PaycheckPlanRow()
-            for k, v in categoryPlan.items():
-                setattr(self[category_name], k, v)
+            if category_name in data.keys():
+                for k, v in data[category_name].items():
+                    setattr(self[category_name], k, v)
         self[Categories.default_category.name] = DataTypes.BalanceEntry(self, self.total_stream)
 
 

@@ -21,29 +21,30 @@ class Table(CategoryTable):
             w.bPerminent = True
         # Link M -> V
 
-        def LinkPaycheckPlanModelToView(col_edit_info):
-            assert isinstance(col_edit_info.value, BV.Model.PaycheckPlanRow) or isinstance(col_edit_info.value, BV.Model.DataTypes.BalanceEntry)
-            category = self.vModel.Categories[col_edit_info.key]
+        def LinkCategoryViewModelToView(col_edit_info):
+            if not isinstance(col_edit_info.value, BV.Model.Category):
+                return
+            category = col_edit_info.value
             row = self.GetRowOfVMValue(category)
             assert row is not None
             if col_edit_info.bAdd:
                 if category.IsSpendable():
                     WF.MakeEntry(self, (row, 1),
-                                 text=col_edit_info.value.amount_over_period_stream,
+                                 text=self.vModel.PaycheckPlan[category.name].amount_over_period_stream,
                                  validation=BV.MakeValid_Money,
                                  display=BV.MakeValid_Money_ZeroIsNone)
                     WF.MakeEntry(self, (row, 2),
-                                 text=col_edit_info.value.period_stream,
+                                 text=self.vModel.PaycheckPlan[category.name].period_stream,
                                  validation=BV.MakeValid_Money,
                                  display=BV.MakeValid_Money_ZeroIsNone)
                     WF.MakeEntry(self, (row, 3),
-                                 text=col_edit_info.value.amount_stream,
+                                 text=self.vModel.PaycheckPlan[category.name].amount_stream,
                                  validation=BV.MakeValid_Money,
                                  display=BV.MakeValid_Money_ZeroIsNone)
                 else:
                     bEditableState = category != Categories.default_category
                     WF.MakeEntry(self, (row, 3),
-                                 text=col_edit_info.value.amount_stream,
+                                 text=self.vModel.PaycheckPlan[category.name].amount_stream,
                                  bEditableState=bEditableState,
                                  background=vSkin.BG_READ_ONLY if not bEditableState else vSkin.BG_DEFAULT)
-        self.vModel.PaycheckPlan._value_stream.subscribe(LinkPaycheckPlanModelToView)
+        self.VM_CategoryTable._value_stream.subscribe(LinkCategoryViewModelToView)
