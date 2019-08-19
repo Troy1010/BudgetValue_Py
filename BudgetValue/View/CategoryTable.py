@@ -18,11 +18,11 @@ class SeparationLable():
 
 
 class ViewModel_CategoryTable(List_ValueStream):
-    count = 0
+    bInitialized = False
 
     def __init__(self, vModel, *args, **kwargs):
-        assert ViewModel_CategoryTable.count <= 1  # ViewModel_CategoryTable should be a singleton
-        ViewModel_CategoryTable.count += 1
+        assert not ViewModel_CategoryTable.bInitialized  # ViewModel_CategoryTable should be a singleton
+        ViewModel_CategoryTable.bInitialized = True
         super().__init__()
         assert isinstance(vModel, BV.Model.Model)
         self.vModel = vModel
