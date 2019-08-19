@@ -57,15 +57,15 @@ class ViewModel_CategoryTable(List_ValueStream):
                 self.remove(category_added_or_removed)
         vModel.Budgeted.cCategoryTotalStreams._value_stream.subscribe(lambda category_name: OnNewCategoryTotalStreamValue(self, category_name))
 
-    def get_sort_key(self, value):
+    def get_sort_tuple(self, value):
         type_index = CategoryType.GetIndex(value.type)
         bSeparationLabel = not isinstance(value, SeparationLable)
         return (type_index, bSeparationLabel, value.name)
 
     def GetInsertionIndex(self, value):
-        sort_tuple = self.get_sort_key(value)
+        sort_tuple = self.get_sort_tuple(value)
         for i, item in enumerate(self):
-            if sort_tuple < self.get_sort_key(item):
+            if sort_tuple < self.get_sort_tuple(item):
                 return i
         return -1
 
