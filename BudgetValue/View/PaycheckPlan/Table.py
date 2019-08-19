@@ -20,31 +20,40 @@ class Table(CategoryTable):
             w = WF.MakeHeader(self, (0, j+self.iFirstDataColumn), text=header_name)
             w.bPerminent = True
         # Link M -> V
+        self.VM_CategoryTable._value_stream.subscribe(self.LinkCategoryViewModelToView)
 
-        def LinkCategoryViewModelToView(col_edit_info):
-            if not isinstance(col_edit_info.value, BV.Model.Category):
-                return
-            category = col_edit_info.value
-            row = self.GetRowOfVMValue(category)
-            assert row is not None
-            if col_edit_info.bAdd:
-                if category.IsSpendable():
-                    WF.MakeEntry(self, (row, 1),
-                                 text=self.vModel.PaycheckPlan[category.name].amount_over_period_stream,
-                                 validation=BV.MakeValid_Money,
-                                 display=BV.MakeValid_Money_ZeroIsNone)
-                    WF.MakeEntry(self, (row, 2),
-                                 text=self.vModel.PaycheckPlan[category.name].period_stream,
-                                 validation=BV.MakeValid_Money,
-                                 display=BV.MakeValid_Money_ZeroIsNone)
-                    WF.MakeEntry(self, (row, 3),
-                                 text=self.vModel.PaycheckPlan[category.name].amount_stream,
-                                 validation=BV.MakeValid_Money,
-                                 display=BV.MakeValid_Money_ZeroIsNone)
-                else:
-                    bEditableState = category != Categories.default_category
-                    WF.MakeEntry(self, (row, 3),
-                                 text=self.vModel.PaycheckPlan[category.name].amount_stream,
-                                 bEditableState=bEditableState,
-                                 background=vSkin.BG_READ_ONLY if not bEditableState else vSkin.BG_DEFAULT)
-        self.VM_CategoryTable._value_stream.subscribe(LinkCategoryViewModelToView)
+    def Refresh(self):
+        super().Refresh()
+        #
+        for item in self.VM_CategoryTable:
+            if not isinstance(item, BV.Model.Category):
+                continue
+            fake_col_edit_info = BV.Model.DataTypes.CollectionEditInfo(True, None, item)
+            self.LinkCategoryViewModelToView(fake_col_edit_info)
+
+    def LinkCategoryViewModelToView(self, col_edit_info):
+        if not isinstance(col_edit_info.value, BV.Model.Category):
+            return
+        category = col_edit_info.value
+        row = self.GetRowOfVMValue(category)
+        assert row is not None
+        if col_edit_info.bAdd:
+            if category.IsSpendable():
+                WF.MakeEntry(self, (row, 1),
+                             text=self.vModel.PaycheckPlan[category.name].amount_over_period_stream,
+                             validation=BV.MakeValid_Money,
+                             display=BV.MakeValid_Money_ZeroIsNone)
+                WF.MakeEntry(self, (row, 2),
+                             text=self.vModel.PaycheckPlan[category.name].period_stream,
+                             validation=BV.MakeValid_Money,
+                             display=BV.MakeValid_Money_ZeroIsNone)
+                WF.MakeEntry(self, (row, 3),
+                             text=self.vModel.PaycheckPlan[category.name].amount_stream,
+                             validation=BV.MakeValid_Money,
+                             display=BV.MakeValid_Money_ZeroIsNone)
+            else:
+                bEditableState = category != Categories.default_category
+                WF.MakeEntry(self, (row, 3),
+                             text=self.vModel.PaycheckPlan[category.name].amount_stream,
+                             bEditableState=bEditableState,
+                             background=vSkin.BG_READ_ONLY if not bEditableState else vSkin.BG_DEFAULT)

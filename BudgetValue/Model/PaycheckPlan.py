@@ -4,6 +4,7 @@ import os
 import rx
 from . import DataTypes
 from .Categories import Categories
+import TM_CommonPy as TM  # noqa
 
 
 class PaycheckPlan(DataTypes.Dict_TotalStream):
@@ -16,6 +17,9 @@ class PaycheckPlan(DataTypes.Dict_TotalStream):
 
         def LinkActiveCategories(col_edit_info):
             assert isinstance(col_edit_info, BV.Model.DataTypes.CollectionEditInfo)
+            if col_edit_info.key == BV.Model.Categories.default_category.name:
+                self[col_edit_info.key] = DataTypes.BalanceEntry(self, self.total_stream)
+                return
             if col_edit_info.bAdd:
                 self[col_edit_info.key] = PaycheckPlanRow()
             else:
@@ -57,11 +61,17 @@ class PaycheckPlan(DataTypes.Dict_TotalStream):
         if not data:
             return
         for category_name in self.vModel.Budgeted.cCategoryTotalStreams.keys():
-            self[category_name] = PaycheckPlanRow()
+            if category_name == BV.Model.Categories.default_category.name:
+                continue
+            if category_name in self:  # got from LinkActiveCategories
+                pass
+            else:
+                self[category_name] = PaycheckPlanRow()
             if category_name in data.keys():
                 for k, v in data[category_name].items():
                     setattr(self[category_name], k, v)
-        self[Categories.default_category.name] = DataTypes.BalanceEntry(self, self.total_stream)
+        if Categories.default_category.name not in self:
+            self[Categories.default_category.name] = DataTypes.BalanceEntry(self, self.total_stream)
 
 
 class PaycheckPlanRow():
