@@ -7,11 +7,11 @@ from .Categories import Categories  # noqa
 import time
 import TM_CommonPy as TM  # noqa
 import pandas as pd
-from BudgetValue._Logger import Log  # noqa
 import time  # noqa
 from datetime import datetime  # noqa
 from datetime import date  # noqa
 import dateutil
+from BudgetValue._Logger import BVLog
 
 
 class TransactionHistory(DataTypes.List_ValueStream):
@@ -157,7 +157,7 @@ class TransactionHistory(DataTypes.List_ValueStream):
         if os.path.exists(save_name+'.pickle'):
             relevant_save_files = list(f for f in os.listdir(self.vModel.sWorkspace) if f.startswith(os.path.basename(save_name)))
             if relevant_save_files == []:
-                Log("relevant_save_files is empty")
+                BVLog.debug("relevant_save_files is empty")
             file_dictated_index = 2
             for file_name in relevant_save_files:
                 if '(' in file_name:
@@ -186,7 +186,7 @@ class TransactionHistory(DataTypes.List_ValueStream):
         for transaction in self:
             data.append(transaction.GetSavable())
         # dump save
-        Log("Saving file:"+save_name)
+        BVLog.debug("Saving file:"+save_name)
         with open(save_name, 'wb') as f:
             pickle.dump(data, f)
 
@@ -198,7 +198,7 @@ class TransactionHistory(DataTypes.List_ValueStream):
         elif os.path.exists(os.path.join(self.vModel.sWorkspace, save_name)):
             save_name = os.path.join(self.vModel.sWorkspace, save_name)
         else:
-            Log("Load`Could not find file:"+save_name, bPrint=True)
+            BVLog.debug("Load`Could not find file:"+save_name, bPrint=True)
             return
         with open(save_name, 'rb') as f:
             data = pickle.load(f)

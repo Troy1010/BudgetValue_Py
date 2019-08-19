@@ -1,4 +1,3 @@
-from BudgetValue._Logger import Log  # noqa
 from BudgetValue._Logger import BVLog  # noqa
 import TM_CommonPy as TM  # noqa
 from enum import Enum

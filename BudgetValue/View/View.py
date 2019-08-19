@@ -1,4 +1,3 @@
-from BudgetValue._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
 import tkinter.filedialog  # noqa
@@ -11,6 +10,7 @@ from BudgetValue.View.SplitMoneyIntoCategories import SplitMoneyIntoCategories
 from BudgetValue.View.SpendHistory import SpendHistory
 import os
 import pickle
+from BudgetValue._Logger import BVLog
 
 
 class View(tk.Tk):
@@ -67,7 +67,7 @@ class View(tk.Tk):
         for frame in self.vTabBar.cTabPageFrames.values():
             if hasattr(frame, "Refresh"):
                 frame.Refresh()
-                Log("Calling Refresh for:"+str(frame), bPrint=True)
+                BVLog.debug("Calling Refresh for:"+str(frame), bPrint=True)
 
 
 class MenuBar(tk.Menu):

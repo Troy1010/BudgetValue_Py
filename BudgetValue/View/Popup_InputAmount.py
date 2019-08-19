@@ -1,5 +1,4 @@
 import TM_CommonPy as TM  # noqa
-from BudgetValue._Logger import Log  # noqa
 import rx  # noqa
 from . import WidgetFactories as WF  # noqa
 import BudgetValue as BV

@@ -8,7 +8,6 @@ from .Misc import ModelTable
 from Model.DataTypes import List_ValueStream
 from Model import CategoryType
 from .._Logger import BVLog
-from .._Logger import Log
 
 
 class SeparationLable():
@@ -254,5 +253,5 @@ class CategoryTable(ModelTable):
         except ValueError:  # could not find value in VM_CategoryTable
             BVLog.debug(TM.FnName()+" could not find value:"+str(value)+" by name:"+("<NoName>" if not hasattr(value, 'name') else value.name)+" in VM_CategoryTable.")
             returning = None
-        Log(TM.FnName()+". value:"+str(value)+" value_name:" + ("<NoName>" if not hasattr(value, 'name') else value.name)+" row:"+str(returning))
+        BVLog.debug(TM.FnName()+". value:"+str(value)+" value_name:" + ("<NoName>" if not hasattr(value, 'name') else value.name)+" row:"+str(returning))
         return returning

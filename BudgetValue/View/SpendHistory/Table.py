@@ -4,7 +4,6 @@ import BudgetValue as BV  # noqa
 from BudgetValue.View import WidgetFactories as WF  # noqa
 from BudgetValue.View.Skin import vSkin  # noqa
 from .. import Misc  # noqa
-from BudgetValue._Logger import Log  # noqa
 
 
 class Table(Misc.ModelTable):

@@ -1,7 +1,6 @@
 import decimal
 from decimal import Decimal
 from ._Logger import BVLog  # noqa
-from ._Logger import Log  # noqa
 import TM_CommonPy as TM  # noqa
 from datetime import datetime
 import time  # noqa

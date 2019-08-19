@@ -17,9 +17,3 @@ if bPrint:
     vConsoleHandler = logging.StreamHandler()
     vConsoleHandler.setLevel(logging.WARNING)
     BVLog.addHandler(vConsoleHandler)
-
-
-def Log(*args, bPrint=False, **kwargs):
-    BVLog.debug(*args, **kwargs)
-    if bPrint:
-        print(args[0])

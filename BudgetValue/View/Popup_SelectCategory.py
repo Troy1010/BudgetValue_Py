@@ -1,6 +1,5 @@
 import TM_CommonPy as TM  # noqa
 import tkinter as tk
-from BudgetValue._Logger import Log  # noqa
 from .Popup_Inheritable import Popup_Inheritable
 
 
